@@ -50,12 +50,14 @@
 import Home from './pages/Home';
 import Profile from './pages/Profile';
 import Goals from './pages/Goals';
+import Journal from './pages/Journal';
 
 
 export const PAGES = {
     "Home": Home,
     "Profile": Profile,
     "Goals": Goals,
+    "Journal": Journal,
 }
 
 export const pagesConfig = {
