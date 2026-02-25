@@ -51,6 +51,7 @@ import Home from './pages/Home';
 import Profile from './pages/Profile';
 import Goals from './pages/Goals';
 import Journal from './pages/Journal';
+import Progress from './pages/Progress';
 
 
 export const PAGES = {
@@ -58,6 +59,7 @@ export const PAGES = {
     "Profile": Profile,
     "Goals": Goals,
     "Journal": Journal,
+    "Progress": Progress,
 }
 
 export const pagesConfig = {
