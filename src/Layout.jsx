@@ -1,14 +1,14 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { Home, Target, BookOpen, TrendingUp, User } from "lucide-react";
+import { Home, Sprout, TreePine, Leaf, BookOpen } from "lucide-react";
 
 const NAV = [
   { label: "Arbre", icon: Home, page: "Home" },
-  { label: "Identité", icon: User, page: "Profile" },
-  { label: "Objectifs", icon: Target, page: "Goals" },
+  { label: "Racines", icon: Sprout, page: "Roots" },
+  { label: "Tronc", icon: TreePine, page: "Trunk" },
+  { label: "Branches", icon: Leaf, page: "Beliefs" },
   { label: "Journal", icon: BookOpen, page: "Journal" },
-  { label: "Progrès", icon: TrendingUp, page: "Progress" },
 ];
 
 export default function Layout({ children, currentPageName }) {

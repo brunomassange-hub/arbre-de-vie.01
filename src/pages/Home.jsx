@@ -1,113 +1,103 @@
 import React, { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { createPageUrl } from "@/utils";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import TreeVisual from "@/components/tree/TreeVisual";
-import { Leaf, BookOpen, Target, User } from "lucide-react";
-
-const BRANCHES = [
-  { name: "Corps", color: "#e74c3c", icon: "💪" },
-  { name: "Esprit", color: "#3498db", icon: "🧠" },
-  { name: "Âme", color: "#9b59b6", icon: "✨" },
-  { name: "Social", color: "#f39c12", icon: "👥" },
-  { name: "Professionnel", color: "#27ae60", icon: "💼" },
-  { name: "Créativité", color: "#e91e63", icon: "🎨" },
-];
+import BranchDetailPanel from "@/components/tree/BranchDetailPanel";
+import TrunkDetailPanel from "@/components/tree/TrunkDetailPanel";
+import RootDetailPanel from "@/components/tree/RootDetailPanel";
 
 export default function Home() {
-  const [goals, setGoals] = useState([]);
-  const [profile, setProfile] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [beliefs, setBeliefs] = useState([]);
+  const [events, setEvents] = useState([]);
+  const [links, setLinks] = useState([]);
+  const [selectedBranch, setSelectedBranch] = useState(null);
+  const [selectedEvent, setSelectedEvent] = useState(null);
+  const [selectedLink, setSelectedLink] = useState(null);
+  const [showTrunkPanel, setShowTrunkPanel] = useState(false);
+  const [showRootPanel, setShowRootPanel] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    loadData();
+    Promise.all([
+      base44.entities.LimitingBelief.list(),
+      base44.entities.TraumaticEvent.list(),
+      base44.entities.Link.list(),
+    ]).then(([b, e, l]) => {
+      setBeliefs(b);
+      setEvents([...e].sort((a, b) => a.age - b.age));
+      setLinks(l);
+    });
   }, []);
 
-  const loadData = async () => {
-    const [goalsData, profileData] = await Promise.all([
-      base44.entities.Goal.list(),
-      base44.entities.TreeProfile.list(),
-    ]);
-    setGoals(goalsData);
-    setProfile(profileData[0] || null);
-    setLoading(false);
+  const globalScore = 0;
+
+  const handleBranchClick = (branch) => setSelectedBranch(branch);
+  const handleTrunkClick = (event) => {
+    setSelectedEvent(event);
+    setShowTrunkPanel(true);
   };
-
-  const getBranchScore = (branchName) => {
-    const branchGoals = goals.filter((g) => g.branch === branchName);
-    if (!branchGoals.length) return 0;
-    const avg =
-      branchGoals.reduce((sum, g) => sum + (g.progress || 0), 0) /
-      branchGoals.length;
-    return Math.round(avg);
+  const handleRootClick = (link) => {
+    setSelectedLink(link);
+    setShowRootPanel(true);
   };
-
-  const branchesWithScores = BRANCHES.map((b) => ({
-    ...b,
-    score: getBranchScore(b.name),
-  }));
-
-  const globalScore = branchesWithScores.length
-    ? Math.round(
-        branchesWithScores.reduce((s, b) => s + b.score, 0) /
-          branchesWithScores.length
-      )
-    : 0;
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#0a1628] via-[#0d2137] to-[#0a2818]">
       {/* Header */}
-      <div className="text-center pt-10 pb-4 px-4">
-        <h1 className="text-4xl font-bold text-white mb-1 tracking-wide">
-          🌳 Mon Arbre de Vie
-        </h1>
-        {profile?.identity && (
-          <p className="text-green-300 text-lg italic">"{profile.identity}"</p>
-        )}
-        <div className="mt-3 inline-block bg-white/10 backdrop-blur rounded-full px-6 py-2">
-          <span className="text-white font-semibold text-lg">
-            Épanouissement global :{" "}
-            <span className="text-green-400">{globalScore}%</span>
-          </span>
-        </div>
+      <div className="text-center pt-8 pb-2 px-4">
+        <h1 className="text-3xl font-bold text-white mb-1 tracking-wide">🌳 Mon Arbre de Vie</h1>
+        <p className="text-gray-400 text-sm">Cliquez sur les branches, le tronc ou les racines</p>
       </div>
 
       {/* Tree Visual */}
-      <div className="flex justify-center px-4">
-        <TreeVisual branches={branchesWithScores} profile={profile} />
+      <div className="flex justify-center px-2">
+        <TreeVisual
+          beliefs={beliefs}
+          events={events}
+          links={links}
+          onBranchClick={handleBranchClick}
+          onTrunkClick={handleTrunkClick}
+          onRootClick={handleRootClick}
+        />
       </div>
 
-      {/* Quick nav */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 max-w-2xl mx-auto px-4 pb-10 mt-4">
-        <Link to={createPageUrl("Profile")}>
-          <div className="bg-white/10 backdrop-blur hover:bg-white/20 transition rounded-xl p-4 text-center text-white cursor-pointer">
-            <User className="mx-auto mb-1 text-yellow-300" />
-            <div className="text-sm font-medium">Mon Identité</div>
-            <div className="text-xs text-gray-300">Tronc & Racines</div>
-          </div>
-        </Link>
-        <Link to={createPageUrl("Goals")}>
-          <div className="bg-white/10 backdrop-blur hover:bg-white/20 transition rounded-xl p-4 text-center text-white cursor-pointer">
-            <Target className="mx-auto mb-1 text-green-300" />
-            <div className="text-sm font-medium">Mes Objectifs</div>
-            <div className="text-xs text-gray-300">Par branche</div>
-          </div>
-        </Link>
-        <Link to={createPageUrl("Journal")}>
-          <div className="bg-white/10 backdrop-blur hover:bg-white/20 transition rounded-xl p-4 text-center text-white cursor-pointer">
-            <BookOpen className="mx-auto mb-1 text-blue-300" />
-            <div className="text-sm font-medium">Mon Journal</div>
-            <div className="text-xs text-gray-300">Réflexions</div>
-          </div>
-        </Link>
-        <Link to={createPageUrl("Progress")}>
-          <div className="bg-white/10 backdrop-blur hover:bg-white/20 transition rounded-xl p-4 text-center text-white cursor-pointer">
-            <Leaf className="mx-auto mb-1 text-emerald-300" />
-            <div className="text-sm font-medium">Ma Progression</div>
-            <div className="text-xs text-gray-300">Scores</div>
-          </div>
-        </Link>
+      {/* Legend */}
+      <div className="flex flex-wrap justify-center gap-3 px-4 pb-6 text-xs text-gray-400">
+        <span>🟢 Nœuds = croyances limitantes</span>
+        <span>🟤 Points tronc = événements marquants</span>
+        <span>🔴 Points racines = liens</span>
       </div>
+
+      {/* Branch panel */}
+      {selectedBranch && (
+        <BranchDetailPanel
+          branch={selectedBranch}
+          beliefs={beliefs.filter(b => b.branch === selectedBranch.name)}
+          onClose={() => setSelectedBranch(null)}
+          onNavigate={() => navigate(createPageUrl("Beliefs") + `?branch=${selectedBranch.name}`)}
+        />
+      )}
+
+      {/* Trunk panel */}
+      {showTrunkPanel && (
+        <TrunkDetailPanel
+          events={events}
+          selectedEvent={selectedEvent}
+          onClose={() => setShowTrunkPanel(false)}
+          onNavigate={() => navigate(createPageUrl("Trunk"))}
+        />
+      )}
+
+      {/* Root panel */}
+      {showRootPanel && (
+        <RootDetailPanel
+          links={links}
+          selectedLink={selectedLink}
+          onClose={() => setShowRootPanel(false)}
+          onNavigate={() => navigate(createPageUrl("Roots"))}
+        />
+      )}
     </div>
   );
 }
