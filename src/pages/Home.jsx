@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { createPageUrl } from "@/utils";
 import { Link } from "react-router-dom";
-import TreeVisual from "../components/tree/TreeVisual";
+import TreeVisual from "@/components/tree/TreeVisual";
 import { Leaf, BookOpen, Target, User } from "lucide-react";
 
 const BRANCHES = [
