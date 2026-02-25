@@ -52,6 +52,9 @@ import Profile from './pages/Profile';
 import Goals from './pages/Goals';
 import Journal from './pages/Journal';
 import Progress from './pages/Progress';
+import Roots from './pages/Roots';
+import Trunk from './pages/Trunk';
+import Beliefs from './pages/Beliefs';
 import __Layout from './Layout.jsx';
 
 
@@ -61,6 +64,9 @@ export const PAGES = {
     "Goals": Goals,
     "Journal": Journal,
     "Progress": Progress,
+    "Roots": Roots,
+    "Trunk": Trunk,
+    "Beliefs": Beliefs,
 }
 
 export const pagesConfig = {
