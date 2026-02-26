@@ -58,6 +58,7 @@ import Roots from './pages/Roots';
 import Trunk from './pages/Trunk';
 import Garden from './pages/Garden';
 import Growth from './pages/Growth';
+import TreeView from './pages/TreeView';
 import __Layout from './Layout.jsx';
 
 
@@ -73,6 +74,7 @@ export const PAGES = {
     "Trunk": Trunk,
     "Garden": Garden,
     "Growth": Growth,
+    "TreeView": TreeView,
 }
 
 export const pagesConfig = {
