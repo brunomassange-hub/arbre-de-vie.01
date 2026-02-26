@@ -47,28 +47,30 @@
  *
  * The mainPage value must match a key in the PAGES object exactly.
  */
-import Home from './pages/Home';
-import Profile from './pages/Profile';
+import Beliefs from './pages/Beliefs';
+import Cognitive from './pages/Cognitive';
 import Goals from './pages/Goals';
+import Home from './pages/Home';
 import Journal from './pages/Journal';
+import Profile from './pages/Profile';
 import Progress from './pages/Progress';
 import Roots from './pages/Roots';
 import Trunk from './pages/Trunk';
-import Beliefs from './pages/Beliefs';
-import Cognitive from './pages/Cognitive';
+import Garden from './pages/Garden';
 import __Layout from './Layout.jsx';
 
 
 export const PAGES = {
-    "Home": Home,
-    "Profile": Profile,
+    "Beliefs": Beliefs,
+    "Cognitive": Cognitive,
     "Goals": Goals,
+    "Home": Home,
     "Journal": Journal,
+    "Profile": Profile,
     "Progress": Progress,
     "Roots": Roots,
     "Trunk": Trunk,
-    "Beliefs": Beliefs,
-    "Cognitive": Cognitive,
+    "Garden": Garden,
 }
 
 export const pagesConfig = {
