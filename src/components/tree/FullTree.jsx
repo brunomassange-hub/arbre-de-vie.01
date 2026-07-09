@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { X, Plus } from "lucide-react";
 import TreeAddPanel from "@/components/tree/TreeAddPanel";
+import BigFiveRadarModal from "@/components/tree/BigFiveRadarModal";
 import { CHAKRAS } from "@/lib/chakras";
 import {
   cx, trunkTop, trunkBot, BRANCH_DEFS, BRANCH_COLORS,
@@ -50,6 +51,7 @@ export default function FullTree({ mode }) {
   const [detail, setDetail] = useState(null);
   const [addZone, setAddZone] = useState(null);
   const [treeStyle, setTreeStyle] = useState("illus");
+  const [showBigFive, setShowBigFive] = useState(false);
 
   const [bigFive, setBigFive] = useState(null);
   const [events, setEvents] = useState([]);
@@ -185,41 +187,45 @@ export default function FullTree({ mode }) {
               );
             })}
 
-            {/* Big Five bars — bottom of trunk */}
-            {!isWound && bigFive && (
-              <>
-                <text x={cx} y={trunkBot + 26} textAnchor="middle" fontSize="7" fill="#8d6e63" fontWeight="600" pointerEvents="none">Big Five</text>
-                {BIG5.map((t, i) => {
-                  const val = bigFive[t.key] ?? 50;
-                  const rowH = 12;
-                  const y = trunkBot + 38 + i * rowH;
-                  const barMaxW = 56;
-                  const barW = (val / 100) * barMaxW;
-                  const bx = cx - barMaxW / 2;
-                  return (
-                    <g key={t.key} pointerEvents="none">
-                      <text x={bx - 4} y={y + 1} textAnchor="end" dominantBaseline="middle" fontSize="7" fontWeight="700" fill={t.color}>{t.label}</text>
-                      <rect x={bx} y={y - 3.5} width={barMaxW} height={7} rx={3.5} fill="rgba(141,110,99,0.1)" />
-                      <rect x={bx} y={y - 3.5} width={barW} height={7} rx={3.5} fill={t.color} opacity={0.7} />
-                      <circle cx={bx + barW} cy={y} r="3" fill={t.color} />
-                      <text x={bx + barMaxW + 4} y={y + 1} textAnchor="start" dominantBaseline="middle" fontSize="6.5" fill="#8d6e63">{val}%</text>
-                    </g>
-                  );
-                })}
-                {bigFive?.qualites?.slice(0, 6).map((q, i) => {
-                  const n = Math.min(bigFive.qualites.length, 6);
-                  const spread = 110;
-                  const qx = cx - spread / 2 + (spread * i) / (n - 1 || 1);
-                  const qy = trunkBot + 108;
-                  return (
-                    <g key={i} pointerEvents="none">
-                      <ellipse cx={qx} cy={qy} rx={q.length * 3 + 5} ry={8} fill="rgba(127,174,126,0.15)" stroke="#7fae7e" strokeWidth="0.6" opacity={0.8}/>
-                      <text x={qx} y={qy + 1} textAnchor="middle" dominantBaseline="middle" fontSize="7" fill="#3e2723">{q}</text>
-                    </g>
-                  );
-                })}
-              </>
-            )}
+            {/* Big Five radar — bottom of trunk, above roots */}
+            {!isWound && (() => {
+              const rx = 34;
+              const ry = trunkBot + 32;
+              const n = 5;
+              const angs = BIG5.map((_, i) => (Math.PI * 2 * i) / n - Math.PI / 2);
+              const verts = angs.map(a => ({ x: cx + rx * Math.cos(a), y: ry + rx * Math.sin(a) }));
+              const dpts = BIG5.map((d, i) => {
+                const val = ((bigFive?.[d.key] ?? 50) / 100) * rx;
+                return { x: cx + val * Math.cos(angs[i]), y: ry + val * Math.sin(angs[i]) };
+              });
+              const poly = dpts.map(p => `${p.x},${p.y}`).join(" ");
+              return (
+                <g style={{ cursor: "pointer" }} onClick={(e) => { e.stopPropagation(); setShowBigFive(true); }}>
+                  {[0.5, 1].map(f => (
+                    <polygon key={f} points={verts.map(v => {
+                      const dx = v.x - cx, dy = v.y - ry;
+                      return `${cx + dx * f},${ry + dy * f}`;
+                    }).join(" ")} fill="none" stroke="rgba(141,110,99,0.2)" strokeWidth="0.8" />
+                  ))}
+                  {verts.map((v, i) => (
+                    <line key={i} x1={cx} y1={ry} x2={v.x} y2={v.y} stroke="rgba(141,110,99,0.2)" strokeWidth="0.8" />
+                  ))}
+                  <polygon points={poly} fill="rgba(127,174,126,0.22)" stroke="#7fae7e" strokeWidth="1.5" />
+                  {dpts.map((p, i) => (
+                    <circle key={i} cx={p.x} cy={p.y} r="2.5" fill={BIG5[i].color} />
+                  ))}
+                  {verts.map((v, i) => {
+                    const dx = v.x - cx, dy = v.y - ry;
+                    const lx = cx + dx * 1.3, ly = ry + dy * 1.3;
+                    return (
+                      <text key={i} x={lx} y={ly} textAnchor="middle" dominantBaseline="middle"
+                        fontSize="6" fontWeight="700" fill={BIG5[i].color} pointerEvents="none">{BIG5[i].label}</text>
+                    );
+                  })}
+                  <text x={cx} y={ry - rx - 6} textAnchor="middle" fontSize="6.5" fill="#8d6e63" fontWeight="600" pointerEvents="none">🧬 Big Five — toucher pour ajuster</text>
+                </g>
+              );
+            })()}
 
             {/* Branch click areas + beliefs + activities + labels */}
             {BRANCH_DEFS.map((bd) => {
@@ -331,6 +337,10 @@ export default function FullTree({ mode }) {
 
       {addZone && (
         <TreeAddPanel zone={addZone} onClose={() => setAddZone(null)} onSaved={loadData} polarityLock={polarityLock} />
+      )}
+
+      {showBigFive && !isWound && (
+        <BigFiveRadarModal profile={bigFive} onClose={() => setShowBigFive(false)} onSaved={loadData} />
       )}
 
       {detail && (
