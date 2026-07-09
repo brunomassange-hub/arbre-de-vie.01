@@ -111,7 +111,7 @@ function BigFiveSection() {
     <div>
       <div className="flex gap-4 flex-col sm:flex-row items-start">
         {/* Radar */}
-        <div className="flex-shrink-0 mx-auto">
+        <div className="flex-shrink-0 mx-auto rounded-xl p-2" style={{ background: "linear-gradient(135deg, #ffffff 0%, #f5f0e8 100%)", boxShadow: "inset 0 1px 4px rgba(141,110,99,0.15)" }}>
           <svg width="260" height="260" viewBox="0 0 260 260">
             {/* Grid circles */}
             {[0.25, 0.5, 0.75, 1].map(f => (
