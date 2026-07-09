@@ -1,0 +1,30 @@
+{
+  "name": "Link",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Nom de la personne"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "Famille",
+        "Ami(e)",
+        "Partenaire",
+        "Mentor",
+        "Coll\u00e8gue",
+        "Autre"
+      ],
+      "description": "Type de lien"
+    },
+    "description": {
+      "type": "string",
+      "description": "Description libre de ce lien"
+    }
+  },
+  "required": [
+    "name",
+    "type"
+  ]
+}

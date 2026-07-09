@@ -1,0 +1,33 @@
+{
+  "name": "Branch",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "enum": [
+        "Corps",
+        "Esprit",
+        "\u00c2me",
+        "Social",
+        "Professionnel",
+        "Cr\u00e9ativit\u00e9"
+      ],
+      "description": "La branche de l'arbre"
+    },
+    "score": {
+      "type": "number",
+      "description": "Score de progression de 0 \u00e0 100"
+    },
+    "color": {
+      "type": "string",
+      "description": "Couleur associ\u00e9e \u00e0 la branche"
+    },
+    "icon": {
+      "type": "string",
+      "description": "Ic\u00f4ne associ\u00e9e \u00e0 la branche"
+    }
+  },
+  "required": [
+    "name"
+  ]
+}

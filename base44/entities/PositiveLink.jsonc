@@ -1,0 +1,30 @@
+{
+  "name": "PositiveLink",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Nom de la personne"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "Famille",
+        "Ami(e)",
+        "Partenaire",
+        "Mentor",
+        "Coll\u00e8gue",
+        "Autre"
+      ],
+      "description": "Type de lien"
+    },
+    "description": {
+      "type": "string",
+      "description": "Ce que cette relation vous apporte de positif"
+    }
+  },
+  "required": [
+    "name",
+    "type"
+  ]
+}

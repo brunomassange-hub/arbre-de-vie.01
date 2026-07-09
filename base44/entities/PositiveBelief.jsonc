@@ -1,0 +1,30 @@
+{
+  "name": "PositiveBelief",
+  "type": "object",
+  "properties": {
+    "branch": {
+      "type": "string",
+      "enum": [
+        "Social",
+        "Physique",
+        "Intellectuel",
+        "\u00c9motionnel",
+        "Artistique",
+        "Spirituel"
+      ],
+      "description": "La branche concern\u00e9e"
+    },
+    "belief": {
+      "type": "string",
+      "description": "La croyance positive"
+    },
+    "note": {
+      "type": "string",
+      "description": "Note ou contexte suppl\u00e9mentaire"
+    }
+  },
+  "required": [
+    "branch",
+    "belief"
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "name": "CognitiveProfile",
+  "type": "object",
+  "properties": {
+    "mbti_type": {
+      "type": "string",
+      "description": "Type MBTI (ex: INTP, ENFJ...)"
+    },
+    "notes": {
+      "type": "string",
+      "description": "Notes personnelles sur son profil cognitif"
+    }
+  },
+  "required": []
+}

@@ -1,0 +1,47 @@
+{
+  "name": "Goal",
+  "type": "object",
+  "properties": {
+    "branch": {
+      "type": "string",
+      "enum": [
+        "Corps",
+        "Esprit",
+        "\u00c2me",
+        "Social",
+        "Professionnel",
+        "Cr\u00e9ativit\u00e9"
+      ],
+      "description": "La branche concern\u00e9e"
+    },
+    "title": {
+      "type": "string",
+      "description": "Titre de l'objectif"
+    },
+    "description": {
+      "type": "string",
+      "description": "Description de l'objectif"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "\u00e0 faire",
+        "en cours",
+        "termin\u00e9"
+      ],
+      "default": "\u00e0 faire"
+    },
+    "due_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "progress": {
+      "type": "number",
+      "description": "Progression de 0 \u00e0 100"
+    }
+  },
+  "required": [
+    "branch",
+    "title"
+  ]
+}

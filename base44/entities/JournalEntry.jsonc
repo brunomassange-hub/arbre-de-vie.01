@@ -1,0 +1,47 @@
+{
+  "name": "JournalEntry",
+  "type": "object",
+  "properties": {
+    "branch": {
+      "type": "string",
+      "enum": [
+        "Corps",
+        "Esprit",
+        "\u00c2me",
+        "Social",
+        "Professionnel",
+        "Cr\u00e9ativit\u00e9",
+        "Racines",
+        "Tronc"
+      ],
+      "description": "La branche ou zone concern\u00e9e"
+    },
+    "title": {
+      "type": "string",
+      "description": "Titre de l'entr\u00e9e"
+    },
+    "content": {
+      "type": "string",
+      "description": "Contenu de l'entr\u00e9e journal"
+    },
+    "mood": {
+      "type": "string",
+      "enum": [
+        "\ud83d\ude0a \u00c9panoui",
+        "\ud83d\ude0c Serein",
+        "\ud83d\ude10 Neutre",
+        "\ud83d\ude14 Difficile",
+        "\ud83d\ude24 Tendu"
+      ],
+      "description": "Humeur du moment"
+    },
+    "entry_date": {
+      "type": "string",
+      "format": "date"
+    }
+  },
+  "required": [
+    "branch",
+    "content"
+  ]
+}

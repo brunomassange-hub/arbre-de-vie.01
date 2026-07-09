@@ -1,0 +1,22 @@
+{
+  "name": "TreeProfile",
+  "type": "object",
+  "properties": {
+    "identity": {
+      "type": "string",
+      "description": "Le tronc : qui je suis, mon identit\u00e9"
+    },
+    "personal_history": {
+      "type": "string",
+      "description": "Les racines : mon pass\u00e9, mon histoire personnelle"
+    },
+    "values": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Mes valeurs fondamentales (racines)"
+    }
+  },
+  "required": []
+}
