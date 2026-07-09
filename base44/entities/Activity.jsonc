@@ -1,0 +1,30 @@
+{
+  "name": "Activity",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Nom de l'activit\u00e9"
+    },
+    "branch": {
+      "type": "string",
+      "enum": [
+        "Social",
+        "Physique",
+        "Intellectuel",
+        "\u00c9motionnel",
+        "Artistique",
+        "Spirituel"
+      ],
+      "description": "La branche concern\u00e9e"
+    },
+    "description": {
+      "type": "string",
+      "description": "Pourquoi cette activit\u00e9 me fait du bien"
+    }
+  },
+  "required": [
+    "name",
+    "branch"
+  ]
+}

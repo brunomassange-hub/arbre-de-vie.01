@@ -7,7 +7,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { ArrowLeft, Plus, Trash2, ChevronDown, ChevronUp, Save, X } from "lucide-react";
+import { ArrowLeft, Plus, Trash2, Save, X } from "lucide-react";
+import ForcesTree from "@/components/tree/ForcesTree";
 
 // ─── SHARED ──────────────────────────────────────────────
 const LINK_TYPES = ["Famille", "Ami(e)", "Partenaire", "Mentor", "Collègue", "Autre"];
@@ -257,88 +258,6 @@ function RacinesPositivesSection() {
   );
 }
 
-// ─── BRANCHES POSITIVES ──────────────────────────────────
-function BranchesPositivesSection() {
-  const [beliefs, setBeliefs] = useState([]);
-  const [openAxis, setOpenAxis] = useState(null);
-  const [showFormFor, setShowFormFor] = useState(null);
-  const [form, setForm] = useState({ belief: "", note: "" });
-
-  useEffect(() => { base44.entities.PositiveBelief.list().then(setBeliefs); }, []);
-
-  const handleCreate = async (branch) => {
-    if (!form.belief.trim()) return;
-    await base44.entities.PositiveBelief.create({ ...form, branch });
-    setForm({ belief: "", note: "" });
-    setShowFormFor(null);
-    base44.entities.PositiveBelief.list().then(setBeliefs);
-  };
-
-  const handleDelete = async (id) => {
-    await base44.entities.PositiveBelief.delete(id);
-    setBeliefs(beliefs.filter(b => b.id !== id));
-  };
-
-  return (
-    <div className="space-y-2">
-      {BRANCH_AXES.map(axis => {
-        const axisBelief = beliefs.filter(b => b.branch === axis.name);
-        const isOpen = openAxis === axis.name;
-        const isFormOpen = showFormFor === axis.name;
-
-        return (
-          <div key={axis.name} className={`rounded-xl border ${axis.bg} overflow-hidden`}>
-            <button className="w-full flex items-center justify-between px-4 py-3 text-left"
-              onClick={() => setOpenAxis(isOpen ? null : axis.name)}>
-              <div className="flex items-center gap-2">
-                <span className="text-lg">{axis.icon}</span>
-                <span className={`font-semibold ${axis.color}`}>{axis.name}</span>
-                <span className="text-gray-500 text-xs">({axisBelief.length} croyance{axisBelief.length !== 1 ? "s" : ""})</span>
-              </div>
-              {isOpen ? <ChevronUp className="w-4 h-4 text-gray-400" /> : <ChevronDown className="w-4 h-4 text-gray-400" />}
-            </button>
-
-            {isOpen && (
-              <div className="px-4 pb-4 space-y-2">
-                {axisBelief.map(b => (
-                  <div key={b.id} className="bg-black/20 rounded-lg p-3 border border-white/10 flex items-start justify-between gap-2">
-                    <div className="flex-1 min-w-0">
-                      <p className="text-white text-sm font-medium">✦ {b.belief}</p>
-                      {b.note && <p className="text-gray-400 text-xs mt-1">{b.note}</p>}
-                    </div>
-                    <button onClick={() => handleDelete(b.id)} className="text-gray-600 hover:text-red-400 transition flex-shrink-0">
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  </div>
-                ))}
-
-                {isFormOpen ? (
-                  <div className="bg-black/20 rounded-lg p-3 border border-white/10 space-y-2">
-                    <Input value={form.belief} onChange={e => setForm({ ...form, belief: e.target.value })}
-                      placeholder="La croyance positive..." className="bg-white/10 border-white/20 text-white placeholder:text-gray-500 text-sm" />
-                    <Input value={form.note} onChange={e => setForm({ ...form, note: e.target.value })}
-                      placeholder="Note (optionnel)" className="bg-white/10 border-white/20 text-white placeholder:text-gray-500 text-sm" />
-                    <div className="flex gap-2">
-                      <Button onClick={() => handleCreate(axis.name)} size="sm" className="flex-1 bg-green-800 hover:bg-green-700 text-xs">Ajouter</Button>
-                      <Button onClick={() => { setShowFormFor(null); setForm({ belief: "", note: "" }); }}
-                        size="sm" variant="outline" className="border-white/20 text-white hover:bg-white/10 text-xs">Annuler</Button>
-                    </div>
-                  </div>
-                ) : (
-                  <button onClick={() => setShowFormFor(axis.name)}
-                    className={`flex items-center gap-1 text-xs ${axis.color} opacity-70 hover:opacity-100 transition`}>
-                    <Plus className="w-3 h-3" /> Ajouter une croyance
-                  </button>
-                )}
-              </div>
-            )}
-          </div>
-        );
-      })}
-    </div>
-  );
-}
-
 // ─── PAGE PRINCIPALE ─────────────────────────────────────
 export default function Growth() {
   return (
@@ -361,9 +280,9 @@ export default function Growth() {
           <RacinesPositivesSection />
         </Section>
 
-        <Section emoji="🍃" title="Les Branches" subtitle="Croyances positives selon les 6 axes de vie"
+        <Section emoji="🍃" title="Les Branches" subtitle="Croyances ✦ et activités 🍃 qui vous font du bien"
           accentClass="bg-teal-900/10 border-teal-700/30">
-          <BranchesPositivesSection />
+          <ForcesTree />
         </Section>
       </div>
     </div>
