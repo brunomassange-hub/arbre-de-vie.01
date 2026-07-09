@@ -20,11 +20,11 @@ const LINK_COLORS = {
 };
 
 const BRANCH_AXES = [
-  { name: "Social", icon: "👥", color: "text-sky-300", bg: "bg-sky-500/10 border-sky-500/20" },
-  { name: "Physique", icon: "💪", color: "text-green-300", bg: "bg-green-500/10 border-green-500/20" },
-  { name: "Intellectuel", icon: "🧠", color: "text-indigo-300", bg: "bg-indigo-500/10 border-indigo-500/20" },
   { name: "Émotionnel", icon: "❤️", color: "text-rose-300", bg: "bg-rose-500/10 border-rose-500/20" },
+  { name: "Physique", icon: "💪", color: "text-green-300", bg: "bg-green-500/10 border-green-500/20" },
+  { name: "Social", icon: "👥", color: "text-sky-300", bg: "bg-sky-500/10 border-sky-500/20" },
   { name: "Artistique", icon: "🎨", color: "text-amber-300", bg: "bg-amber-500/10 border-amber-500/20" },
+  { name: "Intellectuel", icon: "🧠", color: "text-indigo-300", bg: "bg-indigo-500/10 border-indigo-500/20" },
   { name: "Spirituel", icon: "✨", color: "text-purple-300", bg: "bg-purple-500/10 border-purple-500/20" },
 ];
 
@@ -266,15 +266,16 @@ export default function Growth() {
 
         <FullTree mode="strengths" />
 
-        <Section emoji="🌲" title="Le Tronc — Big Five" subtitle="Votre profil de personnalité et vos qualités"
-          accentClass="bg-green-50 border-green-200">
-          <BigFiveSection />
-        </Section>
-
-        <Section emoji="🌱" title="Les Racines" subtitle="Relations positives et nourrissantes"
-          accentClass="bg-emerald-50 border-emerald-200">
-          <RacinesPositivesSection />
-        </Section>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
+          <Section emoji="🌱" title="Les Racines" subtitle="Relations nourrissantes"
+            accentClass="bg-emerald-50 border-emerald-200">
+            <RacinesPositivesSection />
+          </Section>
+          <Section emoji="🌲" title="Le Tronc — Big Five" subtitle="Profil & qualités"
+            accentClass="bg-green-50 border-green-200">
+            <BigFiveSection />
+          </Section>
+        </div>
       </div>
     </div>
   );

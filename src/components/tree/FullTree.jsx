@@ -88,14 +88,18 @@ export default function FullTree({ mode }) {
 
   const StyleArt = STYLES.find(s => s.id === treeStyle)?.art || CellShadedArt;
 
+  const BRANCH_DISPLAY_ORDER = ["Émotionnel", "Physique", "Social", "Artistique", "Intellectuel", "Spirituel"];
   const chips = [
-    { label: "Tronc", onClick: () => setAddZone({ type: "trunk" }), color: "#a1887f" },
     { label: "Racines", onClick: () => setAddZone({ type: "root" }), color: isWound ? "#bcaaa4" : "#a5d6a7" },
-    ...BRANCH_DEFS.map((bd) => ({
-      label: bd.name,
-      onClick: () => setAddZone({ type: "branch", name: bd.name }),
-      color: BRANCH_COLORS[bd.name],
-    })),
+    { label: "Tronc", onClick: () => setAddZone({ type: "trunk" }), color: "#a1887f" },
+    ...BRANCH_DISPLAY_ORDER.map((name) => {
+      const bd = BRANCH_DEFS.find((b) => b.name === name);
+      return {
+        label: bd.name,
+        onClick: () => setAddZone({ type: "branch", name: bd.name }),
+        color: BRANCH_COLORS[bd.name],
+      };
+    }),
   ];
 
   return (
