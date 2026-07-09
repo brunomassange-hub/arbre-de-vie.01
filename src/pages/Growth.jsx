@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { Plus, Trash2, Save, X } from "lucide-react";
 import FullTree from "@/components/tree/FullTree";
+import PositiveEventsSection from "@/components/sections/PositiveEventsSection";
 
 // ─── SHARED ──────────────────────────────────────────────
 const LINK_TYPES = ["Famille", "Ami(e)", "Partenaire", "Mentor", "Collègue", "Autre"];
@@ -274,6 +275,13 @@ export default function Growth() {
           <Section emoji="🌲" title="Le Tronc — Big Five" subtitle="Profil & qualités"
             accentClass="bg-green-50 border-green-200">
             <BigFiveSection />
+          </Section>
+        </div>
+
+        <div className="mb-8">
+          <Section emoji="🌳" title="Le Tronc — Événements positifs" subtitle="Vos expériences marquantes"
+            accentClass="bg-green-50 border-green-200">
+            <PositiveEventsSection />
           </Section>
         </div>
       </div>
