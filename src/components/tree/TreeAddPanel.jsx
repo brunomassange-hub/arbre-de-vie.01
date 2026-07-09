@@ -43,7 +43,7 @@ export default function TreeAddPanel({ zone, onClose, onSaved, polarityLock }) {
   // Quality form (trunk strength)
   const [quality, setQuality] = useState("");
   const [posEventForm, setPosEventForm] = useState({ age: "", title: "", description: "", emotion: "Amour" });
-  const [trunkSubType, setTrunkSubType] = useState("quality");
+  const [trunkSubType, setTrunkSubType] = useState("event");
 
   const meta = ZONE_META[zone?.type] || ZONE_META.trunk;
   const branchName = zone?.name || "";
