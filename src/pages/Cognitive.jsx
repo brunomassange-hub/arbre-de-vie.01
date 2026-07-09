@@ -5,6 +5,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { ArrowLeft, Save } from "lucide-react";
+import EnneagramSection from "@/components/cognitive/EnneagramSection";
 
 // MBTI cognitive function stacks
 const MBTI_FUNCTIONS = {
@@ -46,6 +47,7 @@ export default function Cognitive() {
   const [profile, setProfile] = useState(null);
   const [selectedType, setSelectedType] = useState("INTP");
   const [notes, setNotes] = useState("");
+  const [enneagramType, setEnneagramType] = useState(null);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
 
@@ -55,6 +57,7 @@ export default function Cognitive() {
         setProfile(data[0]);
         setSelectedType(data[0].mbti_type || "INTP");
         setNotes(data[0].notes || "");
+        setEnneagramType(data[0].enneagram_type || null);
       }
     });
   }, []);
@@ -63,7 +66,7 @@ export default function Cognitive() {
 
   const handleSave = async () => {
     setSaving(true);
-    const data = { mbti_type: selectedType, notes };
+    const data = { mbti_type: selectedType, enneagram_type: enneagramType, notes };
     if (profile) {
       await base44.entities.CognitiveProfile.update(profile.id, data);
     } else {
@@ -176,6 +179,8 @@ export default function Cognitive() {
             })}
           </div>
         </div>
+
+        <EnneagramSection selected={enneagramType} onSelect={setEnneagramType} />
 
         {/* Notes */}
         <div className="bg-white/10 backdrop-blur rounded-2xl p-5 mb-5 border border-white/20">

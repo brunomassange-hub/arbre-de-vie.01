@@ -55,17 +55,15 @@ export default function FullTree({ mode }) {
   const [activities, setActivities] = useState([]);
 
   const loadData = () => {
-    const base = [base44.entities.BigFiveProfile.list()];
     if (isWound) {
-      Promise.all([...base, base44.entities.TraumaticEvent.list(), base44.entities.Link.list(), base44.entities.LimitingBelief.list()])
-        .then(([bf, ev, wl, lb]) => {
-          setBigFive(bf[0] || null);
+      Promise.all([base44.entities.TraumaticEvent.list(), base44.entities.Link.list(), base44.entities.LimitingBelief.list()])
+        .then(([ev, wl, lb]) => {
           setEvents([...ev].sort((a, b) => a.age - b.age));
           setWoundLinks(wl);
           setLimitBeliefs(lb);
         });
     } else {
-      Promise.all([...base, base44.entities.PositiveLink.list(), base44.entities.PositiveBelief.list(), base44.entities.Activity.list()])
+      Promise.all([base44.entities.BigFiveProfile.list(), base44.entities.PositiveLink.list(), base44.entities.PositiveBelief.list(), base44.entities.Activity.list()])
         .then(([bf, pl, pb, act]) => {
           setBigFive(bf[0] || null);
           setPosLinks(pl);
@@ -172,8 +170,8 @@ export default function FullTree({ mode }) {
               );
             })}
 
-            {/* ── BIG FIVE BARS (bottom of trunk, right side) ── */}
-            {bigFive ? (
+            {/* ── BIG FIVE BARS (strengths only, bottom of trunk) ── */}
+            {!isWound && bigFive && (
               <>
                 <text x={cx + 35} y={trunkBot - 88} textAnchor="middle" fontSize="7" fill="#666" fontWeight="600" pointerEvents="none">Big Five</text>
                 {BIG5.map((t, i) => {
@@ -190,25 +188,21 @@ export default function FullTree({ mode }) {
                     </g>
                   );
                 })}
+                {bigFive?.qualites?.slice(0, 6).map((q, i) => {
+                  const n = Math.min(bigFive.qualites.length, 6);
+                  const angle = Math.PI * 0.55 + (Math.PI * 0.9 * i) / (n - 1 || 1);
+                  const qr = 52;
+                  const qx = cx + qr * Math.cos(angle);
+                  const qy = trunkBot - 30 + qr * 0.32 * Math.sin(angle);
+                  return (
+                    <g key={i} pointerEvents="none">
+                      <ellipse cx={qx} cy={qy} rx={q.length * 3 + 5} ry={8} fill="rgba(34,197,94,0.12)" stroke="#22c55e" strokeWidth="0.6" opacity={0.8} />
+                      <text x={qx} y={qy + 1} textAnchor="middle" dominantBaseline="middle" fontSize="7" fill="#86efac">{q}</text>
+                    </g>
+                  );
+                })}
               </>
-            ) : (
-              <text x={cx + 35} y={trunkBot - 40} textAnchor="middle" fontSize="7" fill="#444" pointerEvents="none">Cliquez le tronc → Big Five</text>
             )}
-
-            {/* ── QUALITIES (around Big Five, left side) ── */}
-            {bigFive?.qualites?.slice(0, 6).map((q, i) => {
-              const n = Math.min(bigFive.qualites.length, 6);
-              const angle = Math.PI * 0.55 + (Math.PI * 0.9 * i) / (n - 1 || 1);
-              const qr = 52;
-              const qx = cx + qr * Math.cos(angle);
-              const qy = trunkBot - 30 + qr * 0.32 * Math.sin(angle);
-              return (
-                <g key={i} pointerEvents="none">
-                  <ellipse cx={qx} cy={qy} rx={q.length * 3 + 5} ry={8} fill="rgba(34,197,94,0.12)" stroke="#22c55e" strokeWidth="0.6" opacity={0.8} />
-                  <text x={qx} y={qy + 1} textAnchor="middle" dominantBaseline="middle" fontSize="7" fill="#86efac">{q}</text>
-                </g>
-              );
-            })}
 
             {/* ── BRANCHES ── */}
             {BRANCH_DEFS.map((bd) => {
