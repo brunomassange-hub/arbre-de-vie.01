@@ -3,20 +3,13 @@ import { createPageUrl } from "@/utils";
 import { useNavigate } from "react-router-dom";
 
 const CHAKRAS = [
-  { name: "Spiritualité", color: "#9333ea" },
-  { name: "Solitude / Paix", color: "#a855f7" },
-  { name: "Intuition", color: "#6366f1" },
-  { name: "Colère / clarté", color: "#6366f1" },
-  { name: "Communication", color: "#06b6d4" },
-  { name: "Anxiété / assertivité", color: "#06b6d4" },
-  { name: "Connexion", color: "#22c55e" },
-  { name: "Amour / peur", color: "#22c55e" },
-  { name: "Volonté", color: "#eab308" },
-  { name: "Pouvoir / Culpabilité", color: "#eab308" },
-  { name: "Créativité", color: "#000", bg: "#eab308" },
-  { name: "Plaisir / Honte", color: "#000", bg: "#eab308" },
-  { name: "Stabilité", color: "#ef4444" },
-  { name: "Tristesse / Joie", color: "#ef4444" },
+  { light: "Spiritualité", shadow: "Solitude / Paix", color: "#9333ea" },
+  { light: "Intuition", shadow: "Colère / clarté", color: "#6366f1" },
+  { light: "Communication", shadow: "Anxiété / assertivité", color: "#06b6d4" },
+  { light: "Connexion", shadow: "Amour / peur", color: "#22c55e" },
+  { light: "Volonté", shadow: "Pouvoir / Culpabilité", color: "#eab308" },
+  { light: "Créativité", shadow: "Plaisir / Honte", color: "#eab308", dark: true },
+  { light: "Stabilité", shadow: "Tristesse / Joie", color: "#ef4444" },
 ];
 
 const MASLOW = [
@@ -80,18 +73,22 @@ export default function Home() {
         {/* LEFT: Chakras */}
         <div className="flex flex-col justify-between py-4 w-28 shrink-0">
           <p className="text-xs font-bold text-gray-500 mb-2 text-center">Chakras</p>
-          <div className="flex flex-col gap-1.5 flex-1 justify-center">
+          <div className="flex flex-col gap-3 flex-1 justify-center">
             {CHAKRAS.map((c, i) => (
-              <div key={i} className="text-right pr-2">
+              <div key={i} className="text-right pr-2 flex justify-end items-center gap-1">
+                <span className="text-xs font-bold" style={{ color: c.dark ? "#fbbf24" : c.color }}>
+                  {c.light}
+                </span>
+                <span className="text-xs text-gray-400">—</span>
                 <span
                   className="text-xs font-semibold px-1 py-0.5 rounded"
                   style={{
-                    color: c.color,
-                    backgroundColor: c.bg || "transparent",
-                    border: c.bg ? "1px solid " + c.color : "none",
+                    color: c.dark ? "#fff" : c.color,
+                    backgroundColor: c.dark ? c.color : "transparent",
+                    border: c.dark ? "1px solid " + c.color : "none",
                   }}
                 >
-                  {c.name}
+                  {c.shadow}
                 </span>
               </div>
             ))}
