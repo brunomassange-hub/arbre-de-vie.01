@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { X, Plus } from "lucide-react";
 import TreeAddPanel from "@/components/tree/TreeAddPanel";
+import BigFivePanel from "@/components/tree/BigFivePanel";
 
 const BRANCH_COLORS = {
   Social: "#38bdf8", Physique: "#4ade80", Intellectuel: "#818cf8",
@@ -326,6 +327,11 @@ export default function FullTree({ mode }) {
             </button>
           ))}
         </div>
+
+        {/* Big Five profiling — strengths only */}
+        {!isWound && (
+          <BigFivePanel profile={bigFive} onSaved={loadData} />
+        )}
 
         {/* Counts */}
         <div className="grid grid-cols-3 gap-2 mt-4">
