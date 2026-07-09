@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { X, Plus } from "lucide-react";
 import TreeAddPanel from "@/components/tree/TreeAddPanel";
+import { CHAKRAS } from "@/lib/chakras";
 
 const BRANCH_COLORS = {
   Social: "#38bdf8", Physique: "#4ade80", Intellectuel: "#818cf8",
@@ -53,6 +54,7 @@ export default function FullTree({ mode }) {
   const [posLinks, setPosLinks] = useState([]);
   const [posBeliefs, setPosBeliefs] = useState([]);
   const [activities, setActivities] = useState([]);
+  const [posEvents, setPosEvents] = useState([]);
 
   const loadData = () => {
     if (isWound) {
@@ -63,12 +65,13 @@ export default function FullTree({ mode }) {
           setLimitBeliefs(lb);
         });
     } else {
-      Promise.all([base44.entities.BigFiveProfile.list(), base44.entities.PositiveLink.list(), base44.entities.PositiveBelief.list(), base44.entities.Activity.list()])
-        .then(([bf, pl, pb, act]) => {
+      Promise.all([base44.entities.BigFiveProfile.list(), base44.entities.PositiveLink.list(), base44.entities.PositiveBelief.list(), base44.entities.Activity.list(), base44.entities.PositiveEvent.list()])
+        .then(([bf, pl, pb, act, pe]) => {
           setBigFive(bf[0] || null);
           setPosLinks(pl);
           setPosBeliefs(pb);
           setActivities(act);
+          setPosEvents([...pe].sort((a, b) => a.age - b.age));
         });
     }
   };
@@ -79,6 +82,7 @@ export default function FullTree({ mode }) {
   const trunkTop = 110;
   const trunkBot = 380;
   const trunkEvents = events.slice(0, 6);
+  const trunkPosEvents = posEvents.slice(0, 6);
 
   return (
     <div className="min-h-screen bg-[#080f1a] px-2 py-6">
@@ -160,10 +164,25 @@ export default function FullTree({ mode }) {
             {/* Wound events on upper trunk (left side) */}
             {isWound && trunkEvents.map((ev, i) => {
               const y = trunkTop + 40 + i * 28;
-              const col = EMOTION_COLORS[ev.emotion] || "#888";
+              const chakra = CHAKRAS.find(c => c.name === ev.chakra);
+              const col = chakra?.color || EMOTION_COLORS[ev.emotion] || "#888";
               return (
                 <g key={ev.id} style={{ cursor: "pointer" }}
                   onClick={(e) => { e.stopPropagation(); setDetail({ type: "event", data: ev, color: col }); }}>
+                  <circle cx={cx - 24} cy={y} r="9" fill={col} opacity={0.85} />
+                  <text x={cx - 24} y={y + 1} textAnchor="middle" dominantBaseline="middle" fontSize="7" fill="white" fontWeight="bold">{ev.age}</text>
+                </g>
+              );
+            })}
+
+            {/* Positive events on upper trunk (left side) */}
+            {!isWound && trunkPosEvents.map((ev, i) => {
+              const y = trunkTop + 40 + i * 28;
+              const chakra = CHAKRAS.find(c => c.name === ev.chakra);
+              const col = chakra?.color || "#4ade80";
+              return (
+                <g key={ev.id} style={{ cursor: "pointer" }}
+                  onClick={(e) => { e.stopPropagation(); setDetail({ type: "pos_event", data: ev, color: col }); }}>
                   <circle cx={cx - 24} cy={y} r="9" fill={col} opacity={0.85} />
                   <text x={cx - 24} y={y + 1} textAnchor="middle" dominantBaseline="middle" fontSize="7" fill="white" fontWeight="bold">{ev.age}</text>
                 </g>
@@ -325,15 +344,15 @@ export default function FullTree({ mode }) {
         <div className="grid grid-cols-3 gap-2 mt-4">
           <div className="bg-white/5 rounded-xl p-3 text-center border border-white/10">
             <p className="text-2xl font-bold" style={{ color: isWound ? "#ef4444" : "#4ade80" }}>
-              {isWound ? events.length : posLinks.length}
+              {isWound ? events.length : posEvents.length}
             </p>
-            <p className="text-gray-500 text-xs">{isWound ? "Événements" : "Relations"}</p>
+            <p className="text-gray-500 text-xs">Événements</p>
           </div>
           <div className="bg-white/5 rounded-xl p-3 text-center border border-white/10">
             <p className="text-2xl font-bold text-amber-400">
-              {isWound ? woundLinks.length : activities.length}
+              {isWound ? woundLinks.length : posLinks.length}
             </p>
-            <p className="text-gray-500 text-xs">{isWound ? "Relations" : "Activités"}</p>
+            <p className="text-gray-500 text-xs">Relations</p>
           </div>
           <div className="bg-white/5 rounded-xl p-3 text-center border border-white/10">
             <p className="text-2xl font-bold text-green-400">
@@ -360,7 +379,24 @@ export default function FullTree({ mode }) {
                   <>
                     <p className="text-xs text-gray-400 mb-0.5">Événement — {detail.data.age} ans</p>
                     <h2 className="text-lg font-bold text-white">{detail.data.title}</h2>
-                    <span className="text-xs px-2 py-0.5 rounded-full mt-1 inline-block" style={{ background: detail.color + "33", color: detail.color }}>{detail.data.emotion}</span>
+                    <div className="flex gap-2 flex-wrap mt-1">
+                      <span className="text-xs px-2 py-0.5 rounded-full" style={{ background: detail.color + "33", color: detail.color }}>{detail.data.emotion}</span>
+                      {detail.data.chakra && (() => {
+                        const ch = CHAKRAS.find(c => c.name === detail.data.chakra);
+                        return <span className="text-xs px-2 py-0.5 rounded-full" style={{ background: (ch?.color || "#888") + "33", color: ch?.color || "#888" }}>{detail.data.chakra} — {ch?.shadow}</span>;
+                      })()}
+                    </div>
+                    {detail.data.description && <p className="text-gray-400 text-sm mt-2">{detail.data.description}</p>}
+                  </>
+                )}
+                {detail.type === "pos_event" && (
+                  <>
+                    <p className="text-xs mb-0.5" style={{ color: detail.color }}>Événement positif — {detail.data.age} ans</p>
+                    <h2 className="text-lg font-bold text-white">{detail.data.title}</h2>
+                    {detail.data.chakra && (() => {
+                      const ch = CHAKRAS.find(c => c.name === detail.data.chakra);
+                      return <span className="text-xs px-2 py-0.5 rounded-full mt-1 inline-block" style={{ background: (ch?.color || "#888") + "33", color: ch?.color || "#888" }}>{detail.data.chakra} — {ch?.light}</span>;
+                    })()}
                     {detail.data.description && <p className="text-gray-400 text-sm mt-2">{detail.data.description}</p>}
                   </>
                 )}

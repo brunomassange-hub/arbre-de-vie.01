@@ -1,5 +1,5 @@
 {
-  "name": "TraumaticEvent",
+  "name": "PositiveEvent",
   "type": "object",
   "properties": {
     "age": {
@@ -8,25 +8,11 @@
     },
     "title": {
       "type": "string",
-      "description": "Titre de l'\u00e9v\u00e9nement"
+      "description": "Titre de l'\u00e9v\u00e9nement positif"
     },
     "description": {
       "type": "string",
       "description": "Description de l'\u00e9v\u00e9nement"
-    },
-    "emotion": {
-      "type": "string",
-      "enum": [
-        "Peur",
-        "Col\u00e8re",
-        "Tristesse",
-        "Honte",
-        "D\u00e9go\u00fbt",
-        "Abandon",
-        "Trahison",
-        "Impuissance"
-      ],
-      "description": "\u00c9motion principale associ\u00e9e"
     },
     "chakra": {
       "type": "string",
@@ -39,12 +25,12 @@
         "Cr\u00e9ativit\u00e9",
         "Stabilit\u00e9"
       ],
-      "description": "Chakra associ\u00e9 (\u00e9motion d'ombre)"
+      "description": "Chakra associ\u00e9 (\u00e9motion de lumi\u00e8re)"
     }
   },
   "required": [
     "age",
     "title",
-    "emotion"
+    "chakra"
   ]
 }

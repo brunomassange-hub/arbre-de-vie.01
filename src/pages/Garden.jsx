@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { Plus, Trash2, ChevronDown, ChevronUp } from "lucide-react";
 import FullTree from "@/components/tree/FullTree";
+import { CHAKRAS } from "@/lib/chakras";
 
 // ─── TRONC ───────────────────────────────────────────────
 const EMOTIONS = ["Peur", "Colère", "Tristesse", "Honte", "Dégoût", "Abandon", "Trahison", "Impuissance"];
@@ -61,7 +62,7 @@ function Section({ emoji, title, subtitle, accentClass, children }) {
 function TroncSection() {
   const [events, setEvents] = useState([]);
   const [showForm, setShowForm] = useState(false);
-  const [form, setForm] = useState({ age: "", title: "", description: "", emotion: "Peur" });
+  const [form, setForm] = useState({ age: "", title: "", description: "", emotion: "Peur", chakra: "Connexion" });
 
   useEffect(() => {
     base44.entities.TraumaticEvent.list().then(d => setEvents([...d].sort((a, b) => a.age - b.age)));
@@ -70,7 +71,7 @@ function TroncSection() {
   const handleCreate = async () => {
     if (!form.title.trim() || !form.age) return;
     await base44.entities.TraumaticEvent.create({ ...form, age: Number(form.age) });
-    setForm({ age: "", title: "", description: "", emotion: "Peur" });
+    setForm({ age: "", title: "", description: "", emotion: "Peur", chakra: "Connexion" });
     setShowForm(false);
     base44.entities.TraumaticEvent.list().then(d => setEvents([...d].sort((a, b) => a.age - b.age)));
   };
@@ -97,6 +98,10 @@ function TroncSection() {
               <SelectContent>{EMOTIONS.map(e => <SelectItem key={e} value={e}>{e}</SelectItem>)}</SelectContent>
             </Select>
           </div>
+          <Select value={form.chakra} onValueChange={v => setForm({ ...form, chakra: v })}>
+            <SelectTrigger className="bg-white/10 border-white/20 text-white"><SelectValue /></SelectTrigger>
+            <SelectContent>{CHAKRAS.map(c => <SelectItem key={c.name} value={c.name}>{c.name} — {c.shadow}</SelectItem>)}</SelectContent>
+          </Select>
           <Input value={form.title} onChange={e => setForm({ ...form, title: e.target.value })}
             placeholder="Titre de l'événement" className="bg-white/10 border-white/20 text-white placeholder:text-gray-500" />
           <Textarea value={form.description} onChange={e => setForm({ ...form, description: e.target.value })}

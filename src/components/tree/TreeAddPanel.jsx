@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { X } from "lucide-react";
+import { CHAKRAS } from "@/lib/chakras";
 
 const LINK_TYPES = ["Famille", "Ami(e)", "Partenaire", "Mentor", "Collègue", "Autre"];
 const EMOTIONS = ["Peur", "Colère", "Tristesse", "Honte", "Dégoût", "Abandon", "Trahison", "Impuissance"];
@@ -22,13 +23,15 @@ export default function TreeAddPanel({ zone, onClose, onSaved, polarityLock }) {
   const [activityForm, setActivityForm] = useState({ name: "", description: "" });
 
   // Trunk wound form
-  const [eventForm, setEventForm] = useState({ age: "", title: "", description: "", emotion: "Peur" });
+  const [eventForm, setEventForm] = useState({ age: "", title: "", description: "", emotion: "Peur", chakra: "Connexion" });
   // Link form (root)
   const [linkForm, setLinkForm] = useState({ name: "", type: "Famille", description: "" });
   // Belief form (branch)
   const [beliefForm, setBeliefForm] = useState({ belief: "", origin: "", reframe: "", note: "" });
   // Quality form (trunk strength)
   const [quality, setQuality] = useState("");
+  const [posEventForm, setPosEventForm] = useState({ age: "", title: "", description: "", chakra: "Connexion" });
+  const [trunkSubType, setTrunkSubType] = useState("quality");
 
   const meta = ZONE_META[zone?.type] || ZONE_META.trunk;
   const branchName = zone?.name || "";
@@ -40,17 +43,23 @@ export default function TreeAddPanel({ zone, onClose, onSaved, polarityLock }) {
         if (polarity === "wound") {
           if (!eventForm.title.trim() || !eventForm.age) return;
           await base44.entities.TraumaticEvent.create({ ...eventForm, age: Number(eventForm.age) });
-          setEventForm({ age: "", title: "", description: "", emotion: "Peur" });
+          setEventForm({ age: "", title: "", description: "", emotion: "Peur", chakra: "Connexion" });
         } else {
-          if (!quality.trim()) return;
-          const existing = await base44.entities.BigFiveProfile.list();
-          if (existing[0]) {
-            const q = [...(existing[0].qualites || []), quality.trim()];
-            await base44.entities.BigFiveProfile.update(existing[0].id, { qualites: q });
+          if (trunkSubType === "quality") {
+            if (!quality.trim()) return;
+            const existing = await base44.entities.BigFiveProfile.list();
+            if (existing[0]) {
+              const q = [...(existing[0].qualites || []), quality.trim()];
+              await base44.entities.BigFiveProfile.update(existing[0].id, { qualites: q });
+            } else {
+              await base44.entities.BigFiveProfile.create({ qualites: [quality.trim()] });
+            }
+            setQuality("");
           } else {
-            await base44.entities.BigFiveProfile.create({ qualites: [quality.trim()] });
+            if (!posEventForm.title.trim() || !posEventForm.age) return;
+            await base44.entities.PositiveEvent.create({ ...posEventForm, age: Number(posEventForm.age) });
+            setPosEventForm({ age: "", title: "", description: "", chakra: "Connexion" });
           }
-          setQuality("");
         }
       } else if (zone.type === "root") {
         if (!linkForm.name.trim()) return;
@@ -83,7 +92,10 @@ export default function TreeAddPanel({ zone, onClose, onSaved, polarityLock }) {
   };
 
   const canSave = () => {
-    if (zone.type === "trunk") return polarity === "wound" ? (eventForm.title.trim() && eventForm.age) : quality.trim();
+    if (zone.type === "trunk") {
+      if (polarity === "wound") return eventForm.title.trim() && eventForm.age;
+      return trunkSubType === "quality" ? quality.trim() : (posEventForm.title.trim() && posEventForm.age);
+    }
     if (zone.type === "root") return linkForm.name.trim();
     if (zone.type === "branch") {
       if (polarity === "strength" && branchSubType === "activity") return activityForm.name.trim();
@@ -138,6 +150,10 @@ export default function TreeAddPanel({ zone, onClose, onSaved, polarityLock }) {
                   <SelectContent>{EMOTIONS.map(e => <SelectItem key={e} value={e}>{e}</SelectItem>)}</SelectContent>
                 </Select>
               </div>
+              <Select value={eventForm.chakra} onValueChange={v => setEventForm({ ...eventForm, chakra: v })}>
+                <SelectTrigger className="bg-white/10 border-white/20 text-white"><SelectValue /></SelectTrigger>
+                <SelectContent>{CHAKRAS.map(c => <SelectItem key={c.name} value={c.name}>{c.name} — {c.shadow}</SelectItem>)}</SelectContent>
+              </Select>
               <Input value={eventForm.title} onChange={e => setEventForm({ ...eventForm, title: e.target.value })}
                 placeholder="Titre de l'événement" className="bg-white/10 border-white/20 text-white placeholder:text-gray-500" />
               <Textarea value={eventForm.description} onChange={e => setEventForm({ ...eventForm, description: e.target.value })}
@@ -148,9 +164,39 @@ export default function TreeAddPanel({ zone, onClose, onSaved, polarityLock }) {
 
           {zone.type === "trunk" && polarity === "strength" && (
             <>
-              <p className="text-gray-400 text-xs">Ajoutez une qualité personnelle à votre tronc.</p>
-              <Input value={quality} onChange={e => setQuality(e.target.value)}
-                placeholder="Ex: Résilient, Créatif, Empathique..." className="bg-white/10 border-white/20 text-white placeholder:text-gray-500" />
+              <div className="flex gap-2">
+                <button onClick={() => setTrunkSubType("quality")}
+                  className={`flex-1 py-2 rounded-lg text-xs font-semibold transition border ${trunkSubType === "quality" ? "bg-green-900/60 text-green-200 border-green-700" : "bg-white/5 text-gray-400 border-white/10"}`}>
+                  ✨ Qualité
+                </button>
+                <button onClick={() => setTrunkSubType("event")}
+                  className={`flex-1 py-2 rounded-lg text-xs font-semibold transition border ${trunkSubType === "event" ? "bg-green-900/60 text-green-200 border-green-700" : "bg-white/5 text-gray-400 border-white/10"}`}>
+                  🌳 Événement positif
+                </button>
+              </div>
+              {trunkSubType === "quality" ? (
+                <>
+                  <p className="text-gray-400 text-xs">Ajoutez une qualité personnelle à votre tronc.</p>
+                  <Input value={quality} onChange={e => setQuality(e.target.value)}
+                    placeholder="Ex: Résilient, Créatif, Empathique..." className="bg-white/10 border-white/20 text-white placeholder:text-gray-500" />
+                </>
+              ) : (
+                <>
+                  <div className="grid grid-cols-2 gap-3">
+                    <Input type="number" value={posEventForm.age} onChange={e => setPosEventForm({ ...posEventForm, age: e.target.value })}
+                      placeholder="Âge" className="bg-white/10 border-white/20 text-white placeholder:text-gray-500" />
+                    <Select value={posEventForm.chakra} onValueChange={v => setPosEventForm({ ...posEventForm, chakra: v })}>
+                      <SelectTrigger className="bg-white/10 border-white/20 text-white"><SelectValue /></SelectTrigger>
+                      <SelectContent>{CHAKRAS.map(c => <SelectItem key={c.name} value={c.name}>{c.name} — {c.light}</SelectItem>)}</SelectContent>
+                    </Select>
+                  </div>
+                  <Input value={posEventForm.title} onChange={e => setPosEventForm({ ...posEventForm, title: e.target.value })}
+                    placeholder="Titre de l'événement" className="bg-white/10 border-white/20 text-white placeholder:text-gray-500" />
+                  <Textarea value={posEventForm.description} onChange={e => setPosEventForm({ ...posEventForm, description: e.target.value })}
+                    placeholder="Description (optionnel)" rows={2}
+                    className="bg-white/10 border-white/20 text-white placeholder:text-gray-500 resize-none" />
+                </>
+              )}
             </>
           )}
 
@@ -216,7 +262,7 @@ export default function TreeAddPanel({ zone, onClose, onSaved, polarityLock }) {
             disabled={!canSave() || saving}
             className={`w-full ${polarity === "wound" ? "bg-red-800 hover:bg-red-700" : "bg-green-800 hover:bg-green-700"} text-white`}
           >
-            {saving ? "..." : polarity === "wound" ? "Ajouter la blessure" : branchSubType === "activity" ? "Ajouter l'activité" : "Ajouter la force"}
+            {saving ? "..." : polarity === "wound" ? "Ajouter la blessure" : zone.type === "trunk" && trunkSubType === "event" ? "Ajouter l'événement" : branchSubType === "activity" ? "Ajouter l'activité" : "Ajouter la force"}
           </Button>
         </div>
       </div>
