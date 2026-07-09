@@ -15,9 +15,11 @@ const ZONE_META = {
   root:    { label: "Les Racines", emoji: "🌱", sub: "Relations" },
 };
 
-export default function TreeAddPanel({ zone, onClose, onSaved }) {
-  const [polarity, setPolarity] = useState("wound");
+export default function TreeAddPanel({ zone, onClose, onSaved, polarityLock }) {
+  const [polarity, setPolarity] = useState(polarityLock || "wound");
   const [saving, setSaving] = useState(false);
+  const [branchSubType, setBranchSubType] = useState("belief");
+  const [activityForm, setActivityForm] = useState({ name: "", description: "" });
 
   // Trunk wound form
   const [eventForm, setEventForm] = useState({ age: "", title: "", description: "", emotion: "Peur" });
@@ -59,13 +61,19 @@ export default function TreeAddPanel({ zone, onClose, onSaved }) {
         }
         setLinkForm({ name: "", type: "Famille", description: "" });
       } else if (zone.type === "branch") {
-        if (!beliefForm.belief.trim()) return;
-        if (polarity === "wound") {
-          await base44.entities.LimitingBelief.create({ belief: beliefForm.belief, origin: beliefForm.origin, reframe: beliefForm.reframe, branch: branchName });
+        if (polarity === "strength" && branchSubType === "activity") {
+          if (!activityForm.name.trim()) return;
+          await base44.entities.Activity.create({ ...activityForm, branch: branchName });
+          setActivityForm({ name: "", description: "" });
         } else {
-          await base44.entities.PositiveBelief.create({ belief: beliefForm.belief, note: beliefForm.note, branch: branchName });
+          if (!beliefForm.belief.trim()) return;
+          if (polarity === "wound") {
+            await base44.entities.LimitingBelief.create({ belief: beliefForm.belief, origin: beliefForm.origin, reframe: beliefForm.reframe, branch: branchName });
+          } else {
+            await base44.entities.PositiveBelief.create({ belief: beliefForm.belief, note: beliefForm.note, branch: branchName });
+          }
+          setBeliefForm({ belief: "", origin: "", reframe: "", note: "" });
         }
-        setBeliefForm({ belief: "", origin: "", reframe: "", note: "" });
       }
       onSaved?.();
       onClose();
@@ -77,7 +85,10 @@ export default function TreeAddPanel({ zone, onClose, onSaved }) {
   const canSave = () => {
     if (zone.type === "trunk") return polarity === "wound" ? (eventForm.title.trim() && eventForm.age) : quality.trim();
     if (zone.type === "root") return linkForm.name.trim();
-    if (zone.type === "branch") return beliefForm.belief.trim();
+    if (zone.type === "branch") {
+      if (polarity === "strength" && branchSubType === "activity") return activityForm.name.trim();
+      return beliefForm.belief.trim();
+    }
     return false;
   };
 
@@ -98,6 +109,7 @@ export default function TreeAddPanel({ zone, onClose, onSaved }) {
         </div>
 
         {/* Polarity toggle */}
+        {!polarityLock && (
         <div className="flex gap-2 px-5 mb-4">
           <button
             onClick={() => setPolarity("wound")}
@@ -112,6 +124,7 @@ export default function TreeAddPanel({ zone, onClose, onSaved }) {
             }`}
           >✨ Force</button>
         </div>
+        )}
 
         {/* Form body */}
         <div className="px-5 pb-5 space-y-3">
@@ -170,10 +183,31 @@ export default function TreeAddPanel({ zone, onClose, onSaved }) {
 
           {zone.type === "branch" && polarity === "strength" && (
             <>
-              <Input value={beliefForm.belief} onChange={e => setBeliefForm({ ...beliefForm, belief: e.target.value })}
-                placeholder="La croyance positive..." className="bg-white/10 border-white/20 text-white placeholder:text-gray-500" />
-              <Input value={beliefForm.note} onChange={e => setBeliefForm({ ...beliefForm, note: e.target.value })}
-                placeholder="Note (optionnel)" className="bg-white/10 border-white/20 text-white placeholder:text-gray-500" />
+              <div className="flex gap-2">
+                <button onClick={() => setBranchSubType("belief")}
+                  className={`flex-1 py-2 rounded-lg text-xs font-semibold transition border ${branchSubType === "belief" ? "bg-green-900/60 text-green-200 border-green-700" : "bg-white/5 text-gray-400 border-white/10"}`}>
+                  ✦ Croyance
+                </button>
+                <button onClick={() => setBranchSubType("activity")}
+                  className={`flex-1 py-2 rounded-lg text-xs font-semibold transition border ${branchSubType === "activity" ? "bg-green-900/60 text-green-200 border-green-700" : "bg-white/5 text-gray-400 border-white/10"}`}>
+                  🍃 Activité
+                </button>
+              </div>
+              {branchSubType === "belief" ? (
+                <>
+                  <Input value={beliefForm.belief} onChange={e => setBeliefForm({ ...beliefForm, belief: e.target.value })}
+                    placeholder="La croyance positive..." className="bg-white/10 border-white/20 text-white placeholder:text-gray-500" />
+                  <Input value={beliefForm.note} onChange={e => setBeliefForm({ ...beliefForm, note: e.target.value })}
+                    placeholder="Note (optionnel)" className="bg-white/10 border-white/20 text-white placeholder:text-gray-500" />
+                </>
+              ) : (
+                <>
+                  <Input value={activityForm.name} onChange={e => setActivityForm({ ...activityForm, name: e.target.value })}
+                    placeholder="Nom de l'activité..." className="bg-white/10 border-white/20 text-white placeholder:text-gray-500" />
+                  <Input value={activityForm.description} onChange={e => setActivityForm({ ...activityForm, description: e.target.value })}
+                    placeholder="Pourquoi elle me fait du bien (optionnel)" className="bg-white/10 border-white/20 text-white placeholder:text-gray-500" />
+                </>
+              )}
             </>
           )}
 
@@ -182,7 +216,7 @@ export default function TreeAddPanel({ zone, onClose, onSaved }) {
             disabled={!canSave() || saving}
             className={`w-full ${polarity === "wound" ? "bg-red-800 hover:bg-red-700" : "bg-green-800 hover:bg-green-700"} text-white`}
           >
-            {saving ? "..." : polarity === "wound" ? "Ajouter la blessure" : "Ajouter la force"}
+            {saving ? "..." : polarity === "wound" ? "Ajouter la blessure" : branchSubType === "activity" ? "Ajouter l'activité" : "Ajouter la force"}
           </Button>
         </div>
       </div>
