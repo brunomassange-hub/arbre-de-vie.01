@@ -3,13 +3,13 @@ import { createPageUrl } from "@/utils";
 import { useNavigate } from "react-router-dom";
 
 const CHAKRAS = [
-  { light: "Spiritualité", shadow: "Solitude / Paix", color: "#9333ea" },
-  { light: "Intuition", shadow: "Colère / clarté", color: "#6366f1" },
-  { light: "Communication", shadow: "Anxiété / assertivité", color: "#06b6d4" },
-  { light: "Connexion", shadow: "Amour / peur", color: "#22c55e" },
-  { light: "Volonté", shadow: "Pouvoir / Culpabilité", color: "#eab308" },
-  { light: "Créativité", shadow: "Plaisir / Honte", color: "#eab308", dark: true },
-  { light: "Stabilité", shadow: "Tristesse / Joie", color: "#ef4444" },
+  { light: "Spiritualité", shadow: "Solitude Paix", color: "#9333ea" },
+  { light: "Intuition", shadow: "Colère Clarté", color: "#6366f1" },
+  { light: "Communication", shadow: "Anxiété Assertivité", color: "#06b6d4" },
+  { light: "Connexion", shadow: "Amour Peur", color: "#22c55e" },
+  { light: "Volonté", shadow: "Pouvoir Culpabilité", color: "#eab308" },
+  { light: "Créativité", shadow: "Plaisir Honte", color: "#eab308", dark: true },
+  { light: "Stabilité", shadow: "Tristesse Joie", color: "#ef4440" },
 ];
 
 const MASLOW = [
@@ -45,9 +45,9 @@ const SEPHIROT_INFO = {
   comprehension: { title: "Compréhension (Binah)", desc: "La grande mère, réception, structure, intuition profonde.", chakra: "Intuition", maslow: "Estime" },
   sagesse: { title: "Sagesse (Hokhmah)", desc: "Le père, éclair de l'inspiration, point originel de l'idée.", chakra: "Intuition", maslow: "Estime" },
   desir: { title: "Désir (Hod)", desc: "Splendeur, intellect, communication, pensée analytique.", chakra: "Communication", maslow: "Appartenance" },
-  amour: { title: "Amour (Netzah)", desc: "Victoire des émotions, désir, nature, instinct, créativité.", chakra: "Amour / peur", maslow: "Appartenance" },
+  amour: { title: "Amour (Netzah)", desc: "Victoire des émotions, désir, nature, instinct, créativité.", chakra: "Amour Peur", maslow: "Appartenance" },
   beaute: { title: "Beauté (Tiferet)", desc: "Le cœur, équilibre, harmonie, compassion, beauté spirituelle.", chakra: "Connexion", maslow: "Appartenance" },
-  gloire: { title: "Gloire (Hod)", desc: "Splendeur, intellect, communication, pensée analytique.", chakra: "Pouvoir / Culpabilité", maslow: "Sécurité" },
+  gloire: { title: "Gloire (Hod)", desc: "Splendeur, intellect, communication, pensée analytique.", chakra: "Pouvoir Culpabilité", maslow: "Sécurité" },
   victoire: { title: "Victoire (Netzah)", desc: "Victoire, endurance, émotion, désir, créativité.", chakra: "Volonté", maslow: "Sécurité" },
   personnalite: { title: "Personnalité (Yesod)", desc: "Fondation, ego, inconscient, pont entre spirituel et matériel.", chakra: "Créativité", maslow: "Sécurité" },
   instinct: { title: "Instinct (Malkuth)", desc: "Le royaume, manifestation physique, la Terre, instinct de survie.", chakra: "Stabilité", maslow: "Physiologique" },
