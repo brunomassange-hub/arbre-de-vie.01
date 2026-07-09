@@ -112,31 +112,51 @@ function BigFiveSection() {
       <div className="flex gap-4 flex-col sm:flex-row items-start">
         {/* Radar */}
         <div className="flex-shrink-0 mx-auto rounded-xl p-2" style={{ background: "linear-gradient(135deg, #ffffff 0%, #f5f0e8 100%)", boxShadow: "inset 0 1px 4px rgba(141,110,99,0.15)" }}>
-          <svg width="260" height="260" viewBox="0 0 260 260">
+          <svg width="280" height="280" viewBox="0 0 280 280">
+            {/* Colored sectors — each axis filled in its own color */}
+            {BIG5.map((d, i) => {
+              const next = (i + 1) % n;
+              return (
+                <polygon key={d.key}
+                  points={`${cx},${cy} ${dataPoints[i].x},${dataPoints[i].y} ${dataPoints[next].x},${dataPoints[next].y}`}
+                  fill={d.color} opacity={0.5} stroke={d.color} strokeWidth="1" />
+              );
+            })}
             {/* Grid circles */}
             {[0.25, 0.5, 0.75, 1].map(f => (
               <polygon key={f} points={points.map(p => {
                 const dx = p.ax - cx, dy = p.ay - cy;
                 return `${cx + dx * f},${cy + dy * f}`;
-              }).join(" ")} fill="none" stroke="rgba(141,110,99,0.35)" strokeWidth="1" />
+              }).join(" ")} fill="none" stroke="rgba(141,110,99,0.4)" strokeWidth="1" />
             ))}
             {/* Axes */}
             {points.map((p, i) => (
-              <line key={i} x1={cx} y1={cy} x2={p.ax} y2={p.ay} stroke="rgba(141,110,99,0.3)" strokeWidth="1" />
+              <line key={i} x1={cx} y1={cy} x2={p.ax} y2={p.ay} stroke="rgba(141,110,99,0.35)" strokeWidth="1" />
             ))}
-            {/* Data polygon */}
-            <polygon points={polygon} fill="rgba(34,197,94,0.2)" stroke="#22c55e" strokeWidth="2" />
+            {/* Data polygon — filled black for strong contrast */}
+            <polygon points={polygon} fill="rgba(0,0,0,0.15)" stroke="#1a1a1a" strokeWidth="2.5" />
             {/* Data dots */}
             {dataPoints.map((p, i) => (
-              <circle key={i} cx={p.x} cy={p.y} r="4" fill={BIG5[i].color} />
+              <circle key={i} cx={p.x} cy={p.y} r="5" fill={BIG5[i].color} stroke="#1a1a1a" strokeWidth="1.5" />
             ))}
-            {/* Labels */}
+            {/* Percentage labels on data points */}
+            {dataPoints.map((p, i) => {
+              const dx = p.x - cx, dy = p.y - cy;
+              const dist = Math.sqrt(dx * dx + dy * dy) || 1;
+              const lx = p.x + (dx / dist) * 16;
+              const ly = p.y + (dy / dist) * 16;
+              return (
+                <text key={`pct-${i}`} x={lx} y={ly} textAnchor="middle" dominantBaseline="middle"
+                  fontSize="11" fontWeight="700" fill="#1a1a1a">{scores[BIG5[i].key]}%</text>
+              );
+            })}
+            {/* Trait labels at outer vertices */}
             {points.map((p, i) => {
               const dx = p.ax - cx, dy = p.ay - cy;
-              const lx = cx + dx * 1.22, ly = cy + dy * 1.22;
+              const lx = cx + dx * 1.25, ly = cy + dy * 1.25;
               return (
-                <text key={i} x={lx} y={ly} textAnchor="middle" dominantBaseline="middle"
-                  fontSize="10" fontWeight="600" fill={BIG5[i].color}>{BIG5[i].label}</text>
+                <text key={`lbl-${i}`} x={lx} y={ly} textAnchor="middle" dominantBaseline="middle"
+                  fontSize="10" fontWeight="700" fill={BIG5[i].color}>{BIG5[i].label}</text>
               );
             })}
           </svg>
