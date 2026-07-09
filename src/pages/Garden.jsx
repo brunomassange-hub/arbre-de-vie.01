@@ -10,16 +10,15 @@ import FullTree from "@/components/tree/FullTree";
 import { CHAKRAS } from "@/lib/chakras";
 
 // ─── TRONC ───────────────────────────────────────────────
-const EMOTIONS = ["Peur", "Colère", "Tristesse", "Honte", "Dégoût", "Abandon", "Trahison", "Impuissance"];
+const EMOTIONS = ["Solitude", "Colère", "Anxiété", "Peur", "Culpabilité", "Honte", "Tristesse"];
 const EMOTION_COLORS = {
-  Peur: "bg-indigo-500/20 text-indigo-300 border-indigo-500/30",
-  Colère: "bg-red-500/20 text-red-300 border-red-500/30",
-  Tristesse: "bg-blue-500/20 text-blue-300 border-blue-500/30",
-  Honte: "bg-yellow-500/20 text-yellow-300 border-yellow-500/30",
-  Dégoût: "bg-lime-500/20 text-lime-300 border-lime-500/30",
-  Abandon: "bg-pink-500/20 text-pink-300 border-pink-500/30",
-  Trahison: "bg-orange-500/20 text-orange-300 border-orange-500/30",
-  Impuissance: "bg-purple-500/20 text-purple-300 border-purple-500/30",
+  Solitude: "bg-purple-500/20 text-purple-300 border-purple-500/30",
+  Colère: "bg-indigo-500/20 text-indigo-300 border-indigo-500/30",
+  Anxiété: "bg-cyan-500/20 text-cyan-300 border-cyan-500/30",
+  Peur: "bg-green-500/20 text-green-300 border-green-500/30",
+  Culpabilité: "bg-yellow-500/20 text-yellow-300 border-yellow-500/30",
+  Honte: "bg-amber-500/20 text-amber-300 border-amber-500/30",
+  Tristesse: "bg-red-500/20 text-red-300 border-red-500/30",
 };
 
 // ─── RACINES ─────────────────────────────────────────────
@@ -62,7 +61,7 @@ function Section({ emoji, title, subtitle, accentClass, children }) {
 function TroncSection() {
   const [events, setEvents] = useState([]);
   const [showForm, setShowForm] = useState(false);
-  const [form, setForm] = useState({ age: "", title: "", description: "", emotion: "Peur", chakra: "Connexion" });
+  const [form, setForm] = useState({ age: "", title: "", description: "", emotion: "Peur" });
 
   useEffect(() => {
     base44.entities.TraumaticEvent.list().then(d => setEvents([...d].sort((a, b) => a.age - b.age)));
@@ -70,8 +69,9 @@ function TroncSection() {
 
   const handleCreate = async () => {
     if (!form.title.trim() || !form.age) return;
-    await base44.entities.TraumaticEvent.create({ ...form, age: Number(form.age) });
-    setForm({ age: "", title: "", description: "", emotion: "Peur", chakra: "Connexion" });
+    const chakra = CHAKRAS.find(c => c.shadow === form.emotion)?.name || "Connexion";
+    await base44.entities.TraumaticEvent.create({ ...form, age: Number(form.age), chakra });
+    setForm({ age: "", title: "", description: "", emotion: "Peur" });
     setShowForm(false);
     base44.entities.TraumaticEvent.list().then(d => setEvents([...d].sort((a, b) => a.age - b.age)));
   };
@@ -95,13 +95,10 @@ function TroncSection() {
               placeholder="Âge" className="bg-white/60 border-[#e0d6c8] text-[#3e2723] placeholder:text-[#8d6e63]/50" />
             <Select value={form.emotion} onValueChange={v => setForm({ ...form, emotion: v })}>
               <SelectTrigger className="bg-white/60 border-[#e0d6c8] text-[#3e2723]"><SelectValue /></SelectTrigger>
-              <SelectContent>{EMOTIONS.map(e => <SelectItem key={e} value={e}>{e}</SelectItem>)}</SelectContent>
+              <SelectContent>{CHAKRAS.map(c => <SelectItem key={c.shadow} value={c.shadow}>{c.shadow} — {c.name}</SelectItem>)}</SelectContent>
             </Select>
           </div>
-          <Select value={form.chakra} onValueChange={v => setForm({ ...form, chakra: v })}>
-            <SelectTrigger className="bg-white/60 border-[#e0d6c8] text-[#3e2723]"><SelectValue /></SelectTrigger>
-            <SelectContent>{CHAKRAS.map(c => <SelectItem key={c.name} value={c.name}>{c.name} — {c.shadow}</SelectItem>)}</SelectContent>
-          </Select>
+          <p className="text-xs text-[#8d6e63]">Chakra : {CHAKRAS.find(c => c.shadow === form.emotion)?.name || "—"}</p>
           <Input value={form.title} onChange={e => setForm({ ...form, title: e.target.value })}
             placeholder="Titre de l'événement" className="bg-white/60 border-[#e0d6c8] text-[#3e2723] placeholder:text-[#8d6e63]/50" />
           <Textarea value={form.description} onChange={e => setForm({ ...form, description: e.target.value })}

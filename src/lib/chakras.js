@@ -8,6 +8,17 @@ export const CHAKRAS = [
   { name: "Stabilité", light: "Joie", shadow: "Tristesse", color: "#ef4444" },
 ];
 
+export const SHADOW_EMOTIONS = CHAKRAS.map(c => c.shadow);
+export const LIGHT_EMOTIONS = CHAKRAS.map(c => c.light);
+
 export function getChakra(name) {
   return CHAKRAS.find(c => c.name === name);
+}
+
+export function getChakraByShadow(emotion) {
+  return CHAKRAS.find(c => c.shadow === emotion);
+}
+
+export function getChakraByLight(emotion) {
+  return CHAKRAS.find(c => c.light === emotion);
 }

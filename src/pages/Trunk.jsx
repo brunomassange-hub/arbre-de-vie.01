@@ -9,16 +9,15 @@ import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { ArrowLeft, Plus, Trash2 } from "lucide-react";
 
-const EMOTIONS = ["Peur", "Colère", "Tristesse", "Honte", "Dégoût", "Abandon", "Trahison", "Impuissance"];
+const EMOTIONS = ["Solitude", "Colère", "Anxiété", "Peur", "Culpabilité", "Honte", "Tristesse"];
 const EMOTION_COLORS = {
-  Peur: "bg-indigo-500/20 text-indigo-300",
-  Colère: "bg-red-500/20 text-red-300",
-  Tristesse: "bg-blue-500/20 text-blue-300",
-  Honte: "bg-yellow-500/20 text-yellow-300",
-  Dégoût: "bg-lime-500/20 text-lime-300",
-  Abandon: "bg-pink-500/20 text-pink-300",
-  Trahison: "bg-orange-500/20 text-orange-300",
-  Impuissance: "bg-purple-500/20 text-purple-300",
+  Solitude: "bg-purple-500/20 text-purple-300",
+  Colère: "bg-indigo-500/20 text-indigo-300",
+  Anxiété: "bg-cyan-500/20 text-cyan-300",
+  Peur: "bg-green-500/20 text-green-300",
+  Culpabilité: "bg-yellow-500/20 text-yellow-300",
+  Honte: "bg-amber-500/20 text-amber-300",
+  Tristesse: "bg-red-500/20 text-red-300",
 };
 
 export default function Trunk() {

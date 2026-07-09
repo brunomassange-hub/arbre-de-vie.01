@@ -8,7 +8,6 @@ import { X } from "lucide-react";
 import { CHAKRAS } from "@/lib/chakras";
 
 const LINK_TYPES = ["Famille", "Ami(e)", "Partenaire", "Mentor", "Collègue", "Autre"];
-const EMOTIONS = ["Peur", "Colère", "Tristesse", "Honte", "Dégoût", "Abandon", "Trahison", "Impuissance"];
 
 const ZONE_META = {
   trunk:   { label: "Le Tronc",   emoji: "🌲", sub: "Événements de vie & personnalité" },
@@ -36,14 +35,14 @@ export default function TreeAddPanel({ zone, onClose, onSaved, polarityLock }) {
   const [activityForm, setActivityForm] = useState({ name: "", description: "" });
 
   // Trunk wound form
-  const [eventForm, setEventForm] = useState({ age: "", title: "", description: "", emotion: "Peur", chakra: "Connexion" });
+  const [eventForm, setEventForm] = useState({ age: "", title: "", description: "", emotion: "Peur" });
   // Link form (root)
   const [linkForm, setLinkForm] = useState({ name: "", type: "Famille", description: "" });
   // Belief form (branch)
   const [beliefForm, setBeliefForm] = useState({ belief: "", origin: "", reframe: "", note: "" });
   // Quality form (trunk strength)
   const [quality, setQuality] = useState("");
-  const [posEventForm, setPosEventForm] = useState({ age: "", title: "", description: "", chakra: "Connexion" });
+  const [posEventForm, setPosEventForm] = useState({ age: "", title: "", description: "", emotion: "Amour" });
   const [trunkSubType, setTrunkSubType] = useState("quality");
 
   const meta = ZONE_META[zone?.type] || ZONE_META.trunk;
@@ -55,8 +54,9 @@ export default function TreeAddPanel({ zone, onClose, onSaved, polarityLock }) {
       if (zone.type === "trunk") {
         if (polarity === "wound") {
           if (!eventForm.title.trim() || !eventForm.age) return;
-          await base44.entities.TraumaticEvent.create({ ...eventForm, age: Number(eventForm.age) });
-          setEventForm({ age: "", title: "", description: "", emotion: "Peur", chakra: "Connexion" });
+          const chakra = CHAKRAS.find(c => c.shadow === eventForm.emotion)?.name || "Connexion";
+          await base44.entities.TraumaticEvent.create({ ...eventForm, age: Number(eventForm.age), chakra });
+          setEventForm({ age: "", title: "", description: "", emotion: "Peur" });
         } else {
           if (trunkSubType === "quality") {
             if (!quality.trim()) return;
@@ -70,8 +70,9 @@ export default function TreeAddPanel({ zone, onClose, onSaved, polarityLock }) {
             setQuality("");
           } else {
             if (!posEventForm.title.trim() || !posEventForm.age) return;
-            await base44.entities.PositiveEvent.create({ ...posEventForm, age: Number(posEventForm.age) });
-            setPosEventForm({ age: "", title: "", description: "", chakra: "Connexion" });
+            const chakra = CHAKRAS.find(c => c.light === posEventForm.emotion)?.name || "Connexion";
+            await base44.entities.PositiveEvent.create({ ...posEventForm, age: Number(posEventForm.age), chakra });
+            setPosEventForm({ age: "", title: "", description: "", emotion: "Amour" });
           }
         }
       } else if (zone.type === "root") {
@@ -174,13 +175,10 @@ export default function TreeAddPanel({ zone, onClose, onSaved, polarityLock }) {
                   placeholder="Âge" className="bg-white/60 border-[#e0d6c8] text-[#3e2723] placeholder:text-[#8d6e63]/50" />
                 <Select value={eventForm.emotion} onValueChange={v => setEventForm({ ...eventForm, emotion: v })}>
                   <SelectTrigger className="bg-white/60 border-[#e0d6c8] text-[#3e2723]"><SelectValue /></SelectTrigger>
-                  <SelectContent>{EMOTIONS.map(e => <SelectItem key={e} value={e}>{e}</SelectItem>)}</SelectContent>
+                  <SelectContent>{CHAKRAS.map(c => <SelectItem key={c.shadow} value={c.shadow}>{c.shadow} — {c.name}</SelectItem>)}</SelectContent>
                 </Select>
               </div>
-              <Select value={eventForm.chakra} onValueChange={v => setEventForm({ ...eventForm, chakra: v })}>
-                <SelectTrigger className="bg-white/60 border-[#e0d6c8] text-[#3e2723]"><SelectValue /></SelectTrigger>
-                <SelectContent>{CHAKRAS.map(c => <SelectItem key={c.name} value={c.name}>{c.name} — {c.shadow}</SelectItem>)}</SelectContent>
-              </Select>
+              <p className="text-xs text-[#8d6e63]">Chakra : {CHAKRAS.find(c => c.shadow === eventForm.emotion)?.name || "—"}</p>
               <Input value={eventForm.title} onChange={e => setEventForm({ ...eventForm, title: e.target.value })}
                 placeholder="Titre de l'événement" className="bg-white/60 border-[#e0d6c8] text-[#3e2723] placeholder:text-[#8d6e63]/50" />
               <Textarea value={eventForm.description} onChange={e => setEventForm({ ...eventForm, description: e.target.value })}
@@ -212,11 +210,12 @@ export default function TreeAddPanel({ zone, onClose, onSaved, polarityLock }) {
                   <div className="grid grid-cols-2 gap-3">
                     <Input type="number" value={posEventForm.age} onChange={e => setPosEventForm({ ...posEventForm, age: e.target.value })}
                       placeholder="Âge" className="bg-white/60 border-[#e0d6c8] text-[#3e2723] placeholder:text-[#8d6e63]/50" />
-                    <Select value={posEventForm.chakra} onValueChange={v => setPosEventForm({ ...posEventForm, chakra: v })}>
+                    <Select value={posEventForm.emotion} onValueChange={v => setPosEventForm({ ...posEventForm, emotion: v })}>
                       <SelectTrigger className="bg-white/60 border-[#e0d6c8] text-[#3e2723]"><SelectValue /></SelectTrigger>
-                      <SelectContent>{CHAKRAS.map(c => <SelectItem key={c.name} value={c.name}>{c.name} — {c.light}</SelectItem>)}</SelectContent>
+                      <SelectContent>{CHAKRAS.map(c => <SelectItem key={c.light} value={c.light}>{c.light} — {c.name}</SelectItem>)}</SelectContent>
                     </Select>
                   </div>
+                  <p className="text-xs text-[#8d6e63]">Chakra : {CHAKRAS.find(c => c.light === posEventForm.emotion)?.name || "—"}</p>
                   <Input value={posEventForm.title} onChange={e => setPosEventForm({ ...posEventForm, title: e.target.value })}
                     placeholder="Titre de l'événement" className="bg-white/60 border-[#e0d6c8] text-[#3e2723] placeholder:text-[#8d6e63]/50" />
                   <Textarea value={posEventForm.description} onChange={e => setPosEventForm({ ...posEventForm, description: e.target.value })}

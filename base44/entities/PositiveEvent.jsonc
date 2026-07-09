@@ -14,6 +14,19 @@
       "type": "string",
       "description": "Description de l'\u00e9v\u00e9nement"
     },
+    "emotion": {
+      "type": "string",
+      "enum": [
+        "Paix",
+        "Clart\u00e9",
+        "Assertivit\u00e9",
+        "Amour",
+        "Pouvoir",
+        "Plaisir",
+        "Joie"
+      ],
+      "description": "\u00c9motion principale ressentie (lumi\u00e8re du chakra)"
+    },
     "chakra": {
       "type": "string",
       "enum": [
@@ -25,12 +38,12 @@
         "Cr\u00e9ativit\u00e9",
         "Stabilit\u00e9"
       ],
-      "description": "Chakra associ\u00e9 (\u00e9motion de lumi\u00e8re)"
+      "description": "Chakra associ\u00e9 (d\u00e9riv\u00e9 de l'\u00e9motion)"
     }
   },
   "required": [
     "age",
     "title",
-    "chakra"
+    "emotion"
   ]
 }

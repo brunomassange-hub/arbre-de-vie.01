@@ -169,13 +169,14 @@ export default function FullTree({ mode }) {
             {trunkEvents.map((ev, i) => {
               const y = trunkTop + 40 + i * 28;
               const chakra = CHAKRAS.find(c => c.name === ev.chakra);
-              const col = chakra?.color || (isWound ? (EMOTION_COLORS[ev.emotion] || "#888") : "#7fae7e");
+              const col = chakra?.color || (isWound ? "#a1887f" : "#7fae7e");
               const type = isWound ? "event" : "pos_event";
               return (
                 <g key={ev.id} style={{ cursor: "pointer" }}
                   onClick={(e) => { e.stopPropagation(); setDetail({ type, data: ev, color: col }); }}>
                   <circle cx={cx - 24} cy={y} r="10" fill={col} opacity={0.8} stroke="#fff" strokeWidth="1.5" />
                   <text x={cx - 24} y={y + 1} textAnchor="middle" dominantBaseline="middle" fontSize="8" fill="#fff" fontWeight="bold">{ev.age}</text>
+                  {ev.emotion && <text x={cx - 10} y={y + 1} dominantBaseline="middle" fontSize="7" fill={col} fontWeight="600" pointerEvents="none">{ev.emotion}</text>}
                 </g>
               );
             })}
@@ -350,10 +351,13 @@ export default function FullTree({ mode }) {
                   <>
                     <p className="text-xs mb-0.5" style={{ color: detail.color }}>Événement positif — {detail.data.age} ans</p>
                     <h2 className="text-lg font-bold" style={{ color: "#3e2723" }}>{detail.data.title}</h2>
-                    {detail.data.chakra && (() => {
-                      const ch = CHAKRAS.find(c => c.name === detail.data.chakra);
-                      return <span className="text-xs px-2 py-0.5 rounded-full mt-1.5 inline-block" style={{ background: (ch?.color || "#888") + "30", color: ch?.color || "#888" }}>{detail.data.chakra} — {ch?.light}</span>;
-                    })()}
+                    <div className="flex gap-2 flex-wrap mt-1.5">
+                      {detail.data.emotion && <span className="text-xs px-2 py-0.5 rounded-full" style={{ background: detail.color + "30", color: detail.color }}>{detail.data.emotion}</span>}
+                      {detail.data.chakra && (() => {
+                        const ch = CHAKRAS.find(c => c.name === detail.data.chakra);
+                        return <span className="text-xs px-2 py-0.5 rounded-full" style={{ background: (ch?.color || "#888") + "30", color: ch?.color || "#888" }}>{detail.data.chakra} — {ch?.light}</span>;
+                      })()}
+                    </div>
                     {detail.data.description && <p className="text-sm mt-2" style={{ color: "#5d4037" }}>{detail.data.description}</p>}
                   </>
                 )}

@@ -17,16 +17,15 @@
     "emotion": {
       "type": "string",
       "enum": [
-        "Peur",
+        "Solitude",
         "Col\u00e8re",
-        "Tristesse",
+        "Anxi\u00e9t\u00e9",
+        "Peur",
+        "Culpabilit\u00e9",
         "Honte",
-        "D\u00e9go\u00fbt",
-        "Abandon",
-        "Trahison",
-        "Impuissance"
+        "Tristesse"
       ],
-      "description": "\u00c9motion principale associ\u00e9e"
+      "description": "\u00c9motion principale ressentie (ombre du chakra)"
     },
     "chakra": {
       "type": "string",
@@ -39,7 +38,7 @@
         "Cr\u00e9ativit\u00e9",
         "Stabilit\u00e9"
       ],
-      "description": "Chakra associ\u00e9 (\u00e9motion d'ombre)"
+      "description": "Chakra associ\u00e9 (d\u00e9riv\u00e9 de l'\u00e9motion)"
     }
   },
   "required": [
