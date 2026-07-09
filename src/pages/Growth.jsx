@@ -118,11 +118,11 @@ function BigFiveSection() {
               <polygon key={f} points={points.map(p => {
                 const dx = p.ax - cx, dy = p.ay - cy;
                 return `${cx + dx * f},${cy + dy * f}`;
-              }).join(" ")} fill="none" stroke="rgba(141,110,99,0.15)" strokeWidth="1" />
+              }).join(" ")} fill="none" stroke="rgba(141,110,99,0.35)" strokeWidth="1" />
             ))}
             {/* Axes */}
             {points.map((p, i) => (
-              <line key={i} x1={cx} y1={cy} x2={p.ax} y2={p.ay} stroke="rgba(141,110,99,0.2)" strokeWidth="1" />
+              <line key={i} x1={cx} y1={cy} x2={p.ax} y2={p.ay} stroke="rgba(141,110,99,0.3)" strokeWidth="1" />
             ))}
             {/* Data polygon */}
             <polygon points={polygon} fill="rgba(34,197,94,0.2)" stroke="#22c55e" strokeWidth="2" />

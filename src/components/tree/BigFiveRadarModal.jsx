@@ -80,16 +80,16 @@ export default function BigFiveRadarModal({ profile, onClose, onSaved }) {
         </div>
 
         {/* Radar chart */}
-        <div className="flex justify-center mb-4">
+        <div className="flex justify-center mb-4 rounded-xl p-2" style={{ background: "linear-gradient(135deg, #ffffff 0%, #f5f0e8 100%)", boxShadow: "inset 0 1px 4px rgba(141,110,99,0.15)" }}>
           <svg width="260" height="260" viewBox="0 0 260 260">
             {[0.25, 0.5, 0.75, 1].map(f => (
               <polygon key={f} points={vertices.map(v => {
                 const dx = v.x - cxR, dy = v.y - cyR;
                 return `${cxR + dx * f},${cyR + dy * f}`;
-              }).join(" ")} fill="none" stroke="rgba(141,110,99,0.15)" strokeWidth="1" />
+              }).join(" ")} fill="none" stroke="rgba(141,110,99,0.35)" strokeWidth="1" />
             ))}
             {vertices.map((v, i) => (
-              <line key={i} x1={cxR} y1={cyR} x2={v.x} y2={v.y} stroke="rgba(141,110,99,0.2)" strokeWidth="1" />
+              <line key={i} x1={cxR} y1={cyR} x2={v.x} y2={v.y} stroke="rgba(141,110,99,0.3)" strokeWidth="1" />
             ))}
             <polygon points={polygon} fill="rgba(127,174,126,0.2)" stroke="#7fae7e" strokeWidth="2" />
             {dataPoints.map((p, i) => (
