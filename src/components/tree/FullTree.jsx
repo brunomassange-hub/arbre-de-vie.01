@@ -185,30 +185,32 @@ export default function FullTree({ mode }) {
               );
             })}
 
-            {/* Big Five bars */}
+            {/* Big Five bars — bottom of trunk */}
             {!isWound && bigFive && (
               <>
-                <text x={cx + 35} y={trunkBot - 88} textAnchor="middle" fontSize="7" fill="#8d6e63" fontWeight="600" pointerEvents="none">Big Five</text>
+                <text x={cx} y={trunkBot + 26} textAnchor="middle" fontSize="7" fill="#8d6e63" fontWeight="600" pointerEvents="none">Big Five</text>
                 {BIG5.map((t, i) => {
                   const val = bigFive[t.key] ?? 50;
-                  const y = trunkBot - 78 + i * 16;
-                  const barMaxW = 32;
+                  const rowH = 12;
+                  const y = trunkBot + 38 + i * rowH;
+                  const barMaxW = 56;
                   const barW = (val / 100) * barMaxW;
+                  const bx = cx - barMaxW / 2;
                   return (
                     <g key={t.key} pointerEvents="none">
-                      <rect x={cx + 20} y={y - 4} width={barMaxW} height={8} rx={4} fill="rgba(141,110,99,0.1)" />
-                      <rect x={cx + 20} y={y - 4} width={barW} height={8} rx={4} fill={t.color} opacity={0.7} />
-                      <circle cx={cx + 20 + barW} cy={y} r="3.5" fill={t.color} />
-                      <text x={cx + 20 + barMaxW + 5} y={y + 1} textAnchor="start" dominantBaseline="middle" fontSize="8" fontWeight="700" fill={t.color}>{t.label}</text>
+                      <text x={bx - 4} y={y + 1} textAnchor="end" dominantBaseline="middle" fontSize="7" fontWeight="700" fill={t.color}>{t.label}</text>
+                      <rect x={bx} y={y - 3.5} width={barMaxW} height={7} rx={3.5} fill="rgba(141,110,99,0.1)" />
+                      <rect x={bx} y={y - 3.5} width={barW} height={7} rx={3.5} fill={t.color} opacity={0.7} />
+                      <circle cx={bx + barW} cy={y} r="3" fill={t.color} />
+                      <text x={bx + barMaxW + 4} y={y + 1} textAnchor="start" dominantBaseline="middle" fontSize="6.5" fill="#8d6e63">{val}%</text>
                     </g>
                   );
                 })}
                 {bigFive?.qualites?.slice(0, 6).map((q, i) => {
                   const n = Math.min(bigFive.qualites.length, 6);
-                  const angle = Math.PI * 0.55 + (Math.PI * 0.9 * i) / (n - 1 || 1);
-                  const qr = 52;
-                  const qx = cx + qr * Math.cos(angle);
-                  const qy = trunkBot - 30 + qr * 0.32 * Math.sin(angle);
+                  const spread = 110;
+                  const qx = cx - spread / 2 + (spread * i) / (n - 1 || 1);
+                  const qy = trunkBot + 108;
                   return (
                     <g key={i} pointerEvents="none">
                       <ellipse cx={qx} cy={qy} rx={q.length * 3 + 5} ry={8} fill="rgba(127,174,126,0.15)" stroke="#7fae7e" strokeWidth="0.6" opacity={0.8}/>
