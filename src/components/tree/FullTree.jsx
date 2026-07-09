@@ -23,11 +23,11 @@ const EMOTION_COLORS = {
 };
 
 const BRANCH_DEFS = [
-  { name: "Social", side: "left", level: 0 },
-  { name: "Physique", side: "right", level: 0 },
-  { name: "Intellectuel", side: "left", level: 1 },
-  { name: "Émotionnel", side: "right", level: 1 },
-  { name: "Artistique", side: "left", level: 2 },
+  { name: "Physique", side: "left", level: 0 },
+  { name: "Émotionnel", side: "right", level: 0 },
+  { name: "Social", side: "left", level: 1 },
+  { name: "Artistique", side: "right", level: 1 },
+  { name: "Intellectuel", side: "left", level: 2 },
   { name: "Spirituel", side: "right", level: 2 },
 ];
 
@@ -50,8 +50,8 @@ const SPLASH_SHAPES = [
 
 function getBranchEnd(side, level) {
   const c = 200;
-  const baseY = 165 - level * 45;
-  const spread = 130 - level * 18;
+  const baseY = [305, 175, 100][level];
+  const spread = [128, 116, 102][level];
   return { x: side === "left" ? c - spread : c + spread, y: baseY };
 }
 
@@ -288,11 +288,12 @@ export default function FullTree({ mode }) {
             {/* Branches */}
             {BRANCH_DEFS.map((bd) => {
               const end = getBranchEnd(bd.side, bd.level);
-              const startX = bd.side === "left" ? cx - 14 : cx + 14;
-              const startY = trunkTop + 10 + bd.level * 8;
-              const midX = bd.side === "left" ? cx - 45 - bd.level * 12 : cx + 45 + bd.level * 12;
-              const midY = (startY + end.y) / 2;
+              const startX = bd.side === "left" ? cx - 13 : cx + 13;
+              const startY = [340, 215, 140][bd.level];
+              const midX = bd.side === "left" ? cx - 55 - bd.level * 8 : cx + 55 + bd.level * 8;
+              const midY = (startY + end.y) / 2 + (bd.side === "left" ? -10 : 10);
               const color = BRANCH_COLORS[bd.name];
+              const branchW = [7.5, 6, 4.5][bd.level];
 
               const wBeliefs = isWound ? limitBeliefs.filter(b => b.branch === bd.name) : [];
               const sBeliefs = !isWound ? posBeliefs.filter(b => b.branch === bd.name) : [];
@@ -307,7 +308,23 @@ export default function FullTree({ mode }) {
               return (
                 <g key={bd.name}>
                   <path d={`M ${startX} ${startY} Q ${midX} ${midY} ${end.x} ${end.y}`}
-                    stroke={color} strokeWidth="5" fill="none" strokeLinecap="round" opacity={0.7} pointerEvents="none" filter="url(#wc)"/>
+                    stroke={color} strokeWidth={branchW} fill="none" strokeLinecap="round" opacity={0.6} pointerEvents="none" filter="url(#wc)"/>
+                  {/* Sub-branches for organic feel */}
+                  {(() => {
+                    const p1 = bezier(0.5);
+                    const p2 = bezier(0.72);
+                    const dir = bd.side === "left" ? -1 : 1;
+                    return (
+                      <g pointerEvents="none" opacity={0.45}>
+                        <path d={`M ${p1.x} ${p1.y} Q ${p1.x + dir * 14} ${p1.y - 10} ${p1.x + dir * 28} ${p1.y - 22}`}
+                          stroke={color} strokeWidth={branchW * 0.5} fill="none" strokeLinecap="round" filter="url(#wc)"/>
+                        <path d={`M ${p2.x} ${p2.y} Q ${p2.x + dir * 10} ${p2.y - 12} ${p2.x + dir * 20} ${p2.y - 26}`}
+                          stroke={color} strokeWidth={branchW * 0.4} fill="none" strokeLinecap="round" filter="url(#wc)"/>
+                        <path d={`M ${p1.x} ${p1.y} Q ${p1.x - dir * 8} ${p1.y - 6} ${p1.x - dir * 16} ${p1.y - 14}`}
+                          stroke={color} strokeWidth={branchW * 0.35} fill="none" strokeLinecap="round" filter="url(#wc)"/>
+                      </g>
+                    );
+                  })()}
                   <path d={`M ${startX} ${startY} Q ${midX} ${midY} ${end.x} ${end.y}`}
                     stroke="transparent" strokeWidth="22" fill="none" strokeLinecap="round"
                     style={{ cursor: "pointer" }} onClick={() => setAddZone({ type: "branch", name: bd.name })} />
@@ -365,17 +382,20 @@ export default function FullTree({ mode }) {
             })}
 
             {/* Foliage */}
-            <g filter="url(#foliage)" opacity={0.82}>
-              <ellipse cx={cx} cy={75} rx={58} ry={50} fill={foliageColors[0]}/>
-              <ellipse cx={cx - 48} cy={95} rx={42} ry={38} fill={foliageColors[2]}/>
-              <ellipse cx={cx + 48} cy={95} rx={42} ry={38} fill={foliageColors[1]}/>
-              <ellipse cx={cx - 22} cy={50} rx={35} ry={30} fill={foliageColors[3]}/>
-              <ellipse cx={cx + 22} cy={50} rx={35} ry={30} fill={foliageColors[1]}/>
-              <ellipse cx={cx} cy={35} rx={30} ry={26} fill={foliageColors[0]}/>
-              <ellipse cx={cx - 30} cy={75} rx={28} ry={24} fill={foliageColors[3]}/>
-              <ellipse cx={cx + 30} cy={75} rx={28} ry={24} fill={foliageColors[4]}/>
-              <ellipse cx={cx - 58} cy={80} rx={25} ry={22} fill={foliageColors[2]}/>
-              <ellipse cx={cx + 58} cy={80} rx={25} ry={22} fill={foliageColors[3]}/>
+            <g filter="url(#foliage)" opacity={0.72}>
+              {[
+                [cx, 70, 55, 0], [cx - 42, 88, 40, 2], [cx + 42, 88, 40, 1],
+                [cx - 18, 45, 33, 3], [cx + 18, 45, 33, 1], [cx, 28, 28, 0],
+                [cx - 28, 72, 26, 3], [cx + 28, 72, 26, 4],
+                [cx - 55, 78, 24, 2], [cx + 55, 78, 24, 3],
+                [cx - 70, 100, 22, 4], [cx + 70, 100, 22, 2],
+                [cx - 38, 55, 22, 1], [cx + 38, 55, 22, 3],
+                [cx - 15, 95, 20, 4], [cx + 15, 95, 20, 0],
+                [cx - 80, 115, 18, 3], [cx + 80, 115, 18, 4],
+              ].map(([fx, fy, fr, ci], i) => (
+                <ellipse key={i} cx={fx} cy={fy} rx={fr * 1.15} ry={fr * 0.8}
+                  fill={foliageColors[ci]} opacity={0.88 - i * 0.025}/>
+              ))}
             </g>
           </svg>
         </div>
