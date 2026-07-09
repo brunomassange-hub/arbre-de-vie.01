@@ -138,6 +138,13 @@ export default function FullTree({ mode }) {
 
   return (
     <div className="px-3 py-5" style={{ background: "#faf6f0" }}>
+      <style>{`
+        @keyframes treePulse {
+          0%, 100% { opacity: 1; transform: scale(1); }
+          50% { opacity: 0.6; transform: scale(1.15); }
+        }
+        .tree-pulse { animation: treePulse 2s ease-in-out infinite; transform-origin: center; transform-box: fill-box; }
+      `}</style>
       <div className="max-w-lg mx-auto">
         <div className="text-center mb-3">
           <h1 className="text-2xl font-bold mb-1" style={{ fontFamily: SERIF, color: "#3e2723" }}>
@@ -177,6 +184,13 @@ export default function FullTree({ mode }) {
                 stroke="transparent" strokeWidth="22" fill="none" strokeLinecap="round"
                 style={{ cursor: "pointer" }} onClick={() => setAddZone({ type: "root" })} />
             ))}
+            {/* Root interactive badge */}
+            {rootDots.length === 0 && (
+              <g style={{ cursor: "pointer" }} onClick={() => setAddZone({ type: "root" })}>
+                <circle cx={cx} cy={trunkBot + 35} r="10" fill="#faf6f0" stroke={isWound ? "#bcaaa4" : "#a5d6a7"} strokeWidth="1.5" className="tree-pulse" />
+                <text x={cx} y={trunkBot + 36} textAnchor="middle" dominantBaseline="middle" fontSize="11" fill={isWound ? "#bcaaa4" : "#a5d6a7"} fontWeight="bold">+</text>
+              </g>
+            )}
 
             {/* Root dots */}
             {rootDots.map((lk, i) => {
@@ -314,6 +328,13 @@ export default function FullTree({ mode }) {
                     <circle cx={end.x} cy={end.y} r={14} fill={color} opacity={0.12} pointerEvents="none" />
                   )}
 
+                  {/* Branch interactive badge */}
+                  {wBeliefs.length === 0 && sBeliefs.length === 0 && bActivities.length === 0 && (
+                    <g style={{ cursor: "pointer" }} onClick={() => setAddZone({ type: "branch", name: bd.name })}>
+                      <circle cx={end.x} cy={end.y} r="9" fill="#faf6f0" stroke={color} strokeWidth="1.5" className="tree-pulse" />
+                      <text x={end.x} y={end.y + 1} textAnchor="middle" dominantBaseline="middle" fontSize="10" fill={color} fontWeight="bold">+</text>
+                    </g>
+                  )}
                   <text x={end.x + (bd.side === "left" ? -6 : 6)} y={end.y - 12}
                     textAnchor={bd.side === "left" ? "end" : "start"}
                     fontSize="9" fontWeight="600" fill={color} opacity={0.85} pointerEvents="none"
