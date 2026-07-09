@@ -37,9 +37,9 @@ const SPLASH_SHAPES = [
 ];
 
 const STYLES = [
+  { id: "illus", label: "Illustré", art: IllustratedArt },
   { id: "cell", label: "Cell-shading", art: CellShadedArt },
   { id: "line", label: "Linéaire", art: LineArtArt },
-  { id: "illus", label: "Illustré", art: IllustratedArt },
 ];
 
 export default function FullTree({ mode }) {
@@ -49,7 +49,7 @@ export default function FullTree({ mode }) {
 
   const [detail, setDetail] = useState(null);
   const [addZone, setAddZone] = useState(null);
-  const [treeStyle, setTreeStyle] = useState("cell");
+  const [treeStyle, setTreeStyle] = useState("illus");
 
   const [bigFive, setBigFive] = useState(null);
   const [events, setEvents] = useState([]);
