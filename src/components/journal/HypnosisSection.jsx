@@ -34,6 +34,7 @@ export default function HypnosisSection() {
       const prompt = `Tu es un hypnothérapeute éricksonnien bienveillant. Crée une séance d'hypnose de 5-7 minutes pour accompagner la guérison de cet événement:
 Titre: ${selected.title}
 Description: ${selected.description || "—"}
+Type de blessure: ${selected.wound_type || "Non précisé"}
 Émotion ressentie: ${selected.emotion} (chakra: ${selected.chakra})
 Âge: ${selected.age} ans
 

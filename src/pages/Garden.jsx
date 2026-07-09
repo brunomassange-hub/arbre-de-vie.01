@@ -61,7 +61,7 @@ function Section({ emoji, title, subtitle, accentClass, children }) {
 function TroncSection() {
   const [events, setEvents] = useState([]);
   const [showForm, setShowForm] = useState(false);
-  const [form, setForm] = useState({ age: "", title: "", description: "", emotion: "Peur" });
+  const [form, setForm] = useState({ age: "", title: "", description: "", emotion: "Peur", wound_type: "" });
 
   useEffect(() => {
     base44.entities.TraumaticEvent.list().then(d => setEvents([...d].sort((a, b) => a.age - b.age)));
@@ -71,7 +71,7 @@ function TroncSection() {
     if (!form.title.trim() || !form.age) return;
     const chakra = CHAKRAS.find(c => c.shadow === form.emotion)?.name || "Connexion";
     await base44.entities.TraumaticEvent.create({ ...form, age: Number(form.age), chakra });
-    setForm({ age: "", title: "", description: "", emotion: "Peur" });
+    setForm({ age: "", title: "", description: "", emotion: "Peur", wound_type: "" });
     setShowForm(false);
     base44.entities.TraumaticEvent.list().then(d => setEvents([...d].sort((a, b) => a.age - b.age)));
   };
@@ -99,6 +99,14 @@ function TroncSection() {
             </Select>
           </div>
           <p className="text-xs text-[#8d6e63]">Chakra : {CHAKRAS.find(c => c.shadow === form.emotion)?.name || "—"}</p>
+          <Select value={form.wound_type} onValueChange={v => setForm({ ...form, wound_type: v })}>
+            <SelectTrigger className="bg-white/60 border-[#e0d6c8] text-[#3e2723]">
+              <SelectValue placeholder="Type de blessure (optionnel)" />
+            </SelectTrigger>
+            <SelectContent>
+              {["Trahison", "Rejet", "Abandon", "Humiliation", "Injustice"].map(w => <SelectItem key={w} value={w}>{w}</SelectItem>)}
+            </SelectContent>
+          </Select>
           <Input value={form.title} onChange={e => setForm({ ...form, title: e.target.value })}
             placeholder="Titre de l'événement" className="bg-white/60 border-[#e0d6c8] text-[#3e2723] placeholder:text-[#8d6e63]/50" />
           <Textarea value={form.description} onChange={e => setForm({ ...form, description: e.target.value })}
@@ -125,6 +133,7 @@ function TroncSection() {
                     <div className="flex items-center gap-2 flex-wrap">
                       <span className="text-[#3e2723] text-sm font-semibold">{ev.title}</span>
                       <Badge className={`${EMOTION_COLORS[ev.emotion]} text-xs border`}>{ev.emotion}</Badge>
+                      {ev.wound_type && <Badge className="bg-red-900/20 text-red-700 border border-red-900/30 text-xs">{ev.wound_type}</Badge>}
                     </div>
                     {ev.description && <p className="text-[#8d6e63] text-xs mt-1">{ev.description}</p>}
                   </div>

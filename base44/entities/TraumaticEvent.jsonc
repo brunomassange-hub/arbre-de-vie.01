@@ -14,6 +14,17 @@
       "type": "string",
       "description": "Description de l'\u00e9v\u00e9nement"
     },
+    "wound_type": {
+      "type": "string",
+      "enum": [
+        "Trahison",
+        "Rejet",
+        "Abandon",
+        "Humiliation",
+        "Injustice"
+      ],
+      "description": "Type de blessure"
+    },
     "emotion": {
       "type": "string",
       "enum": [

@@ -33,6 +33,7 @@ export default function TrunkDetailPanel({ events, selectedEvent, onClose, onNav
                 <div className="flex items-center gap-2 flex-wrap">
                   <span className="text-white text-sm font-medium">{e.title}</span>
                   <Badge className={`${EMOTION_COLORS[e.emotion]} text-xs`}>{e.emotion}</Badge>
+                  {e.wound_type && <Badge className="bg-red-500/20 text-red-300 text-xs">{e.wound_type}</Badge>}
                 </div>
                 {e.description && <p className="text-gray-400 text-xs mt-0.5">{e.description}</p>}
               </div>
