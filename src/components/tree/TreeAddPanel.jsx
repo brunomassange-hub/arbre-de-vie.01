@@ -16,6 +16,19 @@ const ZONE_META = {
   root:    { label: "Les Racines", emoji: "🌱", sub: "Relations" },
 };
 
+const GUIDANCE = {
+  wound: {
+    trunk: "🩸 Quels vécus stressants ou traumatiques avez-vous traversés ?",
+    root: "🩸 Quelles relations douloureuses et séparations avez-vous vécues ?",
+    branch: "🩸 Quelles sont vos croyances limitantes ?",
+  },
+  strength: {
+    trunk: "✨ Quelles expériences positives avez-vous vécues ?",
+    root: "✨ Sur quelles relations pouvez-vous compter ?",
+    branch: "✨ Quelles activités vous apportent de la joie et du bien-être ?",
+  },
+};
+
 export default function TreeAddPanel({ zone, onClose, onSaved, polarityLock }) {
   const [polarity, setPolarity] = useState(polarityLock || "wound");
   const [saving, setSaving] = useState(false);
@@ -136,6 +149,20 @@ export default function TreeAddPanel({ zone, onClose, onSaved, polarityLock }) {
             }`}
           >✨ Force</button>
         </div>
+        )}
+
+        {/* Guidance prompt */}
+        {zone.type && GUIDANCE[polarity]?.[zone.type] && (
+          <div className="px-5 pb-3">
+            <div className="text-sm font-medium leading-relaxed rounded-xl px-4 py-2.5"
+              style={{
+                background: polarity === "wound" ? "#f0d9d5" : "#d4e8c4",
+                color: "#3e2723",
+                fontFamily: "'Playfair Display', Georgia, serif",
+              }}>
+              {GUIDANCE[polarity][zone.type]}
+            </div>
+          </div>
         )}
 
         {/* Form body */}

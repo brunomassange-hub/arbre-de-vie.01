@@ -6,6 +6,9 @@ import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { ArrowLeft, Save } from "lucide-react";
 import EnneagramSection from "@/components/cognitive/EnneagramSection";
+import MBTIQuiz from "@/components/cognitive/MBTIQuiz";
+import EnneagramQuiz from "@/components/cognitive/EnneagramQuiz";
+import { HelpCircle } from "lucide-react";
 
 // MBTI cognitive function stacks
 const MBTI_FUNCTIONS = {
@@ -50,6 +53,8 @@ export default function Cognitive() {
   const [enneagramType, setEnneagramType] = useState(null);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [showMBTIQuiz, setShowMBTIQuiz] = useState(false);
+  const [showEnneagramQuiz, setShowEnneagramQuiz] = useState(false);
 
   useEffect(() => {
     base44.entities.CognitiveProfile.list().then(data => {
@@ -90,22 +95,37 @@ export default function Cognitive() {
 
         {/* Type selector */}
         <div className="bg-white/10 backdrop-blur rounded-2xl p-5 mb-5 border border-white/20">
-          <h2 className="text-white font-semibold mb-3">Mon type MBTI</h2>
-          <div className="grid grid-cols-4 gap-2">
-            {MBTI_TYPES.map(type => (
-              <button
-                key={type}
-                onClick={() => setSelectedType(type)}
-                className={`py-2 rounded-lg text-sm font-bold transition-all ${
-                  selectedType === type
-                    ? "bg-indigo-600 text-white shadow-lg shadow-indigo-900/50"
-                    : "bg-white/10 text-gray-300 hover:bg-white/20"
-                }`}
-              >
-                {type}
-              </button>
-            ))}
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-white font-semibold">Mon type MBTI</h2>
+            <button onClick={() => setShowMBTIQuiz(!showMBTIQuiz)}
+              className={`flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg border transition ${showMBTIQuiz ? "bg-indigo-600 text-white border-indigo-400" : "bg-white/10 text-indigo-300 border-white/20 hover:bg-white/20"}`}>
+              <HelpCircle className="w-3.5 h-3.5" />
+              {showMBTIQuiz ? "Fermer le test" : "Faire le test"}
+            </button>
           </div>
+          {!showMBTIQuiz && (
+            <div className="grid grid-cols-4 gap-2">
+              {MBTI_TYPES.map(type => (
+                <button
+                  key={type}
+                  onClick={() => setSelectedType(type)}
+                  className={`py-2 rounded-lg text-sm font-bold transition-all ${
+                    selectedType === type
+                      ? "bg-indigo-600 text-white shadow-lg shadow-indigo-900/50"
+                      : "bg-white/10 text-gray-300 hover:bg-white/20"
+                  }`}
+                >
+                  {type}
+                </button>
+              ))}
+            </div>
+          )}
+          {showMBTIQuiz && (
+            <MBTIQuiz
+              onComplete={(type) => { setSelectedType(type); setShowMBTIQuiz(false); }}
+              onClose={() => setShowMBTIQuiz(false)}
+            />
+          )}
         </div>
 
         {/* Ego / Ombre split */}
@@ -180,7 +200,24 @@ export default function Cognitive() {
           </div>
         </div>
 
-        <EnneagramSection selected={enneagramType} onSelect={setEnneagramType} />
+        <div className="bg-white/10 backdrop-blur rounded-2xl p-5 mb-5 border border-white/20">
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-white font-semibold">🔮 Ennéagramme</h2>
+            <button onClick={() => setShowEnneagramQuiz(!showEnneagramQuiz)}
+              className={`flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg border transition ${showEnneagramQuiz ? "bg-amber-600 text-white border-amber-400" : "bg-white/10 text-amber-300 border-white/20 hover:bg-white/20"}`}>
+              <HelpCircle className="w-3.5 h-3.5" />
+              {showEnneagramQuiz ? "Fermer le test" : "Faire le test"}
+            </button>
+          </div>
+          {showEnneagramQuiz ? (
+            <EnneagramQuiz
+              onComplete={(typeN) => { setEnneagramType(typeN); setShowEnneagramQuiz(false); }}
+              onClose={() => setShowEnneagramQuiz(false)}
+            />
+          ) : (
+            <EnneagramSection selected={enneagramType} onSelect={setEnneagramType} />
+          )}
+        </div>
 
         {/* Notes */}
         <div className="bg-white/10 backdrop-blur rounded-2xl p-5 mb-5 border border-white/20">
