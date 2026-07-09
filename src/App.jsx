@@ -2,8 +2,6 @@ import { Toaster } from "@/components/ui/toaster"
 import { QueryClientProvider } from '@tanstack/react-query'
 import { queryClientInstance } from '@/lib/query-client'
 import { pagesConfig } from './pages.config'
-import WoundTree from './pages/WoundTree';
-import StrengthTree from './pages/StrengthTree';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
@@ -59,16 +57,6 @@ const AuthenticatedApp = () => {
           }
         />
       ))}
-      <Route path="/WoundTree" element={
-        <LayoutWrapper currentPageName="WoundTree">
-          <WoundTree />
-        </LayoutWrapper>
-      } />
-      <Route path="/StrengthTree" element={
-        <LayoutWrapper currentPageName="StrengthTree">
-          <StrengthTree />
-        </LayoutWrapper>
-      } />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );

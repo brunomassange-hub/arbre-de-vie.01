@@ -5,9 +5,8 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { Link } from "react-router-dom";
-import { createPageUrl } from "@/utils";
-import { ArrowLeft, Plus, Trash2, ChevronDown, ChevronUp } from "lucide-react";
+import { Plus, Trash2, ChevronDown, ChevronUp } from "lucide-react";
+import FullTree from "@/components/tree/FullTree";
 
 // ─── TRONC ───────────────────────────────────────────────
 const EMOTIONS = ["Peur", "Colère", "Tristesse", "Honte", "Dégoût", "Abandon", "Trahison", "Impuissance"];
@@ -304,12 +303,10 @@ export default function Garden() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#0a1628] to-[#0a2010] px-4 py-8">
       <div className="max-w-xl mx-auto">
-        <Link to={createPageUrl("Home")} className="inline-flex items-center text-green-300 mb-6 hover:text-green-200 transition text-sm">
-          <ArrowLeft className="w-4 h-4 mr-1" /> Retour à l'arbre
-        </Link>
+        <h1 className="text-3xl font-bold text-white mb-1">🩸 Blessures</h1>
+        <p className="text-gray-400 text-sm mb-4">Cliquez sur l'arbre ou les sections ci-dessous</p>
 
-        <h1 className="text-3xl font-bold text-white mb-1">🌿 Jardin Intérieur</h1>
-        <p className="text-gray-400 text-sm mb-8">Explorez et documentez votre arbre de vie</p>
+        <FullTree mode="wounds" />
 
         <Section emoji="🌲" title="Le Tronc" subtitle="Expériences de vie traumatiques, classées par âge et émotion"
           accentClass="bg-amber-900/10 border-amber-700/30">
