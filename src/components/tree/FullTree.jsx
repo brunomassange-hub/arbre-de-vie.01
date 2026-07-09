@@ -214,7 +214,7 @@ export default function FullTree({ mode }) {
                   onClick={(e) => { e.stopPropagation(); setDetail({ type, data: ev, color: col }); }}>
                   <circle cx={cx - 24} cy={y} r="10" fill={col} opacity={0.8} stroke="#fff" strokeWidth="1.5" />
                   <text x={cx - 24} y={y + 1} textAnchor="middle" dominantBaseline="middle" fontSize="8" fill="#fff" fontWeight="bold">{ev.age}</text>
-                  {ev.emotion && <text x={cx - 10} y={y + 1} dominantBaseline="middle" fontSize="7" fill={col} fontWeight="600" pointerEvents="none">{ev.emotion}</text>}
+                  {ev.title && <text x={cx - 10} y={y + 1} dominantBaseline="middle" fontSize="7" fill={col} fontWeight="600" pointerEvents="none">{ev.title.length > 20 ? ev.title.slice(0, 20) + "…" : ev.title}</text>}
                 </g>
               );
             })}
