@@ -247,19 +247,41 @@ export default function FullTree({ mode }) {
               const poly = dpts.map(p => `${p.x},${p.y}`).join(" ");
               return (
                 <g style={{ cursor: "pointer" }} onClick={(e) => { e.stopPropagation(); setShowBigFive(true); }}>
+                  {/* Colored sectors */}
+                  {BIG5.map((d, i) => {
+                    const next = (i + 1) % n;
+                    return (
+                      <polygon key={`sec-${d.key}`}
+                        points={`${cx},${ry} ${dpts[i].x},${dpts[i].y} ${dpts[next].x},${dpts[next].y}`}
+                        fill={d.color} opacity={0.5} stroke={d.color} strokeWidth="0.5" />
+                    );
+                  })}
+                  {/* Grid */}
                   {[0.5, 1].map(f => (
                     <polygon key={f} points={verts.map(v => {
                       const dx = v.x - cx, dy = v.y - ry;
                       return `${cx + dx * f},${ry + dy * f}`;
-                    }).join(" ")} fill="none" stroke="rgba(141,110,99,0.2)" strokeWidth="0.8" />
+                    }).join(" ")} fill="none" stroke="rgba(141,110,99,0.4)" strokeWidth="0.8" />
                   ))}
                   {verts.map((v, i) => (
-                    <line key={i} x1={cx} y1={ry} x2={v.x} y2={v.y} stroke="rgba(141,110,99,0.2)" strokeWidth="0.8" />
+                    <line key={i} x1={cx} y1={ry} x2={v.x} y2={v.y} stroke="rgba(141,110,99,0.35)" strokeWidth="0.8" />
                   ))}
-                  <polygon points={poly} fill="rgba(127,174,126,0.22)" stroke="#7fae7e" strokeWidth="1.5" />
+                  {/* Data polygon — black fill for contrast */}
+                  <polygon points={poly} fill="rgba(0,0,0,0.15)" stroke="#1a1a1a" strokeWidth="2" />
                   {dpts.map((p, i) => (
-                    <circle key={i} cx={p.x} cy={p.y} r="2.5" fill={BIG5[i].color} />
+                    <circle key={i} cx={p.x} cy={p.y} r="3" fill={BIG5[i].color} stroke="#1a1a1a" strokeWidth="1" />
                   ))}
+                  {/* Percentage labels */}
+                  {dpts.map((p, i) => {
+                    const dx = p.x - cx, dy = p.y - ry;
+                    const dist = Math.sqrt(dx * dx + dy * dy) || 1;
+                    const lx = p.x + (dx / dist) * 11;
+                    const ly = p.y + (dy / dist) * 11;
+                    return (
+                      <text key={`pct-${i}`} x={lx} y={ly} textAnchor="middle" dominantBaseline="middle"
+                        fontSize="7" fontWeight="700" fill="#1a1a1a" pointerEvents="none">{bigFive?.[BIG5[i].key] ?? 50}%</text>
+                    );
+                  })}
                   {verts.map((v, i) => {
                     const dx = v.x - cx, dy = v.y - ry;
                     const lx = cx + dx * 1.3, ly = ry + dy * 1.3;
