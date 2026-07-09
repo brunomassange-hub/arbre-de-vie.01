@@ -4,13 +4,15 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus, Trash2 } from "lucide-react";
+import { Plus, Trash2, Pencil, Save } from "lucide-react";
 import { CHAKRAS } from "@/lib/chakras";
 
 export default function PositiveEventsSection() {
   const [events, setEvents] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState({ age: "", title: "", description: "", emotion: "Joie" });
+  const [editingId, setEditingId] = useState(null);
+  const [editForm, setEditForm] = useState(null);
 
   useEffect(() => {
     base44.entities.PositiveEvent.list().then(d =>
@@ -30,6 +32,13 @@ export default function PositiveEventsSection() {
     await base44.entities.PositiveEvent.create({ ...form, age: Number(form.age), chakra });
     setForm({ age: "", title: "", description: "", emotion: "Joie" });
     setShowForm(false);
+    reload();
+  };
+
+  const handleUpdate = async () => {
+    const chakra = CHAKRAS.find(c => c.light === editForm.emotion)?.name || "Stabilité";
+    await base44.entities.PositiveEvent.update(editingId, { ...editForm, age: Number(editForm.age), chakra });
+    setEditingId(null); setEditForm(null);
     reload();
   };
 
@@ -80,23 +89,51 @@ export default function PositiveEventsSection() {
           const ch = CHAKRAS.find(c => c.name === ev.chakra);
           const col = ch?.color || "#7fae7e";
           return (
-            <div key={ev.id} className="flex items-start gap-3 bg-white/40 rounded-xl p-3 border border-[#e0d6c8]/60">
-              <span className="text-sm font-bold flex-shrink-0 mt-0.5" style={{ color: col }}>
-                {ev.age} ans
-              </span>
-              <div className="flex-1 min-w-0">
-                <span className="text-[#3e2723] text-sm font-semibold">{ev.title}</span>
-                {ev.description && <p className="text-[#5d4037] text-xs mt-0.5">{ev.description}</p>}
-                {ev.emotion && (
-                  <span className="inline-block mt-1 text-xs px-2 py-0.5 rounded-full"
-                    style={{ background: col + "20", color: col }}>
-                    {ev.emotion} — {ev.chakra}
+            <div key={ev.id} className="bg-white/40 rounded-xl p-3 border border-[#e0d6c8]/60">
+              {editingId === ev.id ? (
+                <div className="space-y-2">
+                  <div className="grid grid-cols-2 gap-2">
+                    <Input type="number" value={editForm.age} onChange={e => setEditForm({ ...editForm, age: e.target.value })}
+                      placeholder="Âge" className="bg-white/60 border-[#e0d6c8] text-[#3e2723] text-sm h-8" />
+                    <Select value={editForm.emotion} onValueChange={v => setEditForm({ ...editForm, emotion: v })}>
+                      <SelectTrigger className="bg-white/60 border-[#e0d6c8] text-[#3e2723] h-8 text-sm"><SelectValue /></SelectTrigger>
+                      <SelectContent>{CHAKRAS.map(c => <SelectItem key={c.light} value={c.light}>{c.light}</SelectItem>)}</SelectContent>
+                    </Select>
+                  </div>
+                  <Input value={editForm.title} onChange={e => setEditForm({ ...editForm, title: e.target.value })}
+                    placeholder="Titre" className="bg-white/60 border-[#e0d6c8] text-[#3e2723] text-sm h-8" />
+                  <Textarea value={editForm.description || ""} onChange={e => setEditForm({ ...editForm, description: e.target.value })}
+                    placeholder="Description" rows={2} className="bg-white/60 border-[#e0d6c8] text-[#3e2723] text-sm resize-none" />
+                  <div className="flex gap-2">
+                    <Button onClick={handleUpdate} size="sm" className="flex-1 bg-green-800 hover:bg-green-700 h-8"><Save className="w-3 h-3 mr-1" />Enregistrer</Button>
+                    <Button onClick={() => { setEditingId(null); setEditForm(null); }} size="sm" variant="outline" className="border-[#e0d6c8] text-[#3e2723] h-8">Annuler</Button>
+                  </div>
+                </div>
+              ) : (
+                <div className="flex items-start gap-3">
+                  <span className="text-sm font-bold flex-shrink-0 mt-0.5" style={{ color: col }}>
+                    {ev.age} ans
                   </span>
-                )}
-              </div>
-              <button onClick={() => handleDelete(ev.id)} className="text-[#a1887f] hover:text-red-600 transition flex-shrink-0">
-                <Trash2 className="w-4 h-4" />
-              </button>
+                  <div className="flex-1 min-w-0">
+                    <span className="text-[#3e2723] text-sm font-semibold">{ev.title}</span>
+                    {ev.description && <p className="text-[#5d4037] text-xs mt-0.5">{ev.description}</p>}
+                    {ev.emotion && (
+                      <span className="inline-block mt-1 text-xs px-2 py-0.5 rounded-full"
+                        style={{ background: col + "20", color: col }}>
+                        {ev.emotion} — {ev.chakra}
+                      </span>
+                    )}
+                  </div>
+                  <div className="flex gap-1 flex-shrink-0">
+                    <button onClick={() => { setEditingId(ev.id); setEditForm({ ...ev }); }} className="text-[#a1887f] hover:text-green-600 transition">
+                      <Pencil className="w-4 h-4" />
+                    </button>
+                    <button onClick={() => handleDelete(ev.id)} className="text-[#a1887f] hover:text-red-600 transition">
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           );
         })}

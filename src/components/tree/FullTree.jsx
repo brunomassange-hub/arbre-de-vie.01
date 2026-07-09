@@ -1,6 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
-import { X, Plus } from "lucide-react";
+import { X, Plus, Pencil, Save } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import TreeAddPanel from "@/components/tree/TreeAddPanel";
 import BigFiveRadarModal from "@/components/tree/BigFiveRadarModal";
 import { CHAKRAS } from "@/lib/chakras";
@@ -13,6 +17,18 @@ import LineArtArt from "@/components/tree/styles/LineArtArt";
 import IllustratedArt from "@/components/tree/styles/IllustratedArt";
 
 const SERIF = "'Playfair Display', Georgia, serif";
+
+const LINK_TYPES = ["Famille", "Ami(e)", "Partenaire", "Mentor", "Collègue", "Autre"];
+
+const ENTITY_MAP = {
+  event: "TraumaticEvent",
+  pos_event: "PositiveEvent",
+  wound_link: "Link",
+  pos_link: "PositiveLink",
+  wound_belief: "LimitingBelief",
+  pos_belief: "PositiveBelief",
+  activity: "Activity",
+};
 
 const EMOTION_COLORS = {
   Peur: "#5b6daf", Colère: "#c85450", Tristesse: "#5070b0",
@@ -49,6 +65,8 @@ export default function FullTree({ mode }) {
   const accent = isWound ? "#a1887f" : "#7fae7e";
 
   const [detail, setDetail] = useState(null);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editData, setEditData] = useState(null);
   const [addZone, setAddZone] = useState(null);
   const [treeStyle, setTreeStyle] = useState("illus");
   const [showBigFive, setShowBigFive] = useState(false);
@@ -89,6 +107,20 @@ export default function FullTree({ mode }) {
   const rootDotPositions = isWound ? ROOT_DOT_POSITIONS.wound : ROOT_DOT_POSITIONS.strength;
 
   const StyleArt = STYLES.find(s => s.id === treeStyle)?.art || CellShadedArt;
+
+  const handleDetailSave = async () => {
+    const entityName = ENTITY_MAP[detail.type];
+    const data = { ...editData };
+    if (data.age !== undefined && data.age !== "") data.age = Number(data.age);
+    if (detail.type === "event" || detail.type === "pos_event") {
+      const chakra = CHAKRAS.find(c => detail.type === "event" ? c.shadow === data.emotion : c.light === data.emotion)?.name;
+      if (chakra) data.chakra = chakra;
+    }
+    await base44.entities[entityName].update(detail.data.id, data);
+    setIsEditing(false);
+    setDetail(null);
+    loadData();
+  };
 
   const BRANCH_DISPLAY_ORDER = ["Émotionnel", "Physique", "Social", "Artistique", "Intellectuel", "Spirituel"];
   const chips = [
@@ -344,79 +376,164 @@ export default function FullTree({ mode }) {
       )}
 
       {detail && (
-        <div className="fixed inset-0 z-40 flex items-end justify-center" style={{ background: "rgba(62,39,35,0.4)" }} onClick={() => setDetail(null)}>
-          <div className="rounded-t-3xl p-6 w-full max-w-lg border-t-2 shadow-2xl"
+        <div className="fixed inset-0 z-40 flex items-end justify-center" style={{ background: "rgba(62,39,35,0.4)" }} onClick={() => { setDetail(null); setIsEditing(false); }}>
+          <div className="rounded-t-3xl p-6 w-full max-w-lg border-t-2 shadow-2xl max-h-[85vh] overflow-y-auto"
             style={{ borderColor: detail.color, background: "#faf6f0", fontFamily: SERIF }} onClick={e => e.stopPropagation()}>
             <div className="flex justify-between items-start mb-3">
-              <div>
-                {detail.type === "event" && (
-                  <>
-                    <p className="text-xs mb-0.5" style={{ color: "#8d6e63" }}>Événement — {detail.data.age} ans</p>
-                    <h2 className="text-lg font-bold" style={{ color: "#3e2723" }}>{detail.data.title}</h2>
-                    <div className="flex gap-2 flex-wrap mt-1.5">
-                      <span className="text-xs px-2 py-0.5 rounded-full" style={{ background: detail.color + "30", color: detail.color }}>{detail.data.emotion}</span>
-                      {detail.data.chakra && (() => {
-                        const ch = CHAKRAS.find(c => c.name === detail.data.chakra);
-                        return <span className="text-xs px-2 py-0.5 rounded-full" style={{ background: (ch?.color || "#888") + "30", color: ch?.color || "#888" }}>{detail.data.chakra} — {ch?.shadow}</span>;
-                      })()}
+              <div className="flex-1 mr-4">
+                {isEditing ? (
+                  <div className="space-y-3">
+                    {(detail.type === "event" || detail.type === "pos_event") && (
+                      <>
+                        <div className="grid grid-cols-2 gap-3">
+                          <Input type="number" value={editData.age ?? ""} onChange={e => setEditData({ ...editData, age: e.target.value })}
+                            placeholder="Âge" className="bg-white/60 border-[#e0d6c8] text-[#3e2723] text-sm h-9" />
+                          <Select value={editData.emotion ?? ""} onValueChange={v => setEditData({ ...editData, emotion: v })}>
+                            <SelectTrigger className="bg-white/60 border-[#e0d6c8] text-[#3e2723] h-9 text-sm"><SelectValue placeholder="Émotion" /></SelectTrigger>
+                            <SelectContent>
+                              {(detail.type === "event" ? CHAKRAS.map(c => c.shadow) : CHAKRAS.map(c => c.light)).map(em => <SelectItem key={em} value={em}>{em}</SelectItem>)}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        {detail.type === "event" && (
+                          <Select value={editData.wound_type ?? ""} onValueChange={v => setEditData({ ...editData, wound_type: v })}>
+                            <SelectTrigger className="bg-white/60 border-[#e0d6c8] text-[#3e2723] h-9 text-sm"><SelectValue placeholder="Type de blessure" /></SelectTrigger>
+                            <SelectContent>{["Trahison", "Rejet", "Abandon", "Humiliation", "Injustice"].map(w => <SelectItem key={w} value={w}>{w}</SelectItem>)}</SelectContent>
+                          </Select>
+                        )}
+                        <Input value={editData.title ?? ""} onChange={e => setEditData({ ...editData, title: e.target.value })}
+                          placeholder="Titre" className="bg-white/60 border-[#e0d6c8] text-[#3e2723] text-sm h-9" />
+                        <Textarea value={editData.description ?? ""} onChange={e => setEditData({ ...editData, description: e.target.value })}
+                          placeholder="Description" rows={2} className="bg-white/60 border-[#e0d6c8] text-[#3e2723] text-sm resize-none" />
+                      </>
+                    )}
+                    {(detail.type === "wound_link" || detail.type === "pos_link") && (
+                      <>
+                        <div className="grid grid-cols-2 gap-3">
+                          <Input value={editData.name ?? ""} onChange={e => setEditData({ ...editData, name: e.target.value })}
+                            placeholder="Prénom / Nom" className="bg-white/60 border-[#e0d6c8] text-[#3e2723] text-sm h-9" />
+                          <Select value={editData.type ?? ""} onValueChange={v => setEditData({ ...editData, type: v })}>
+                            <SelectTrigger className="bg-white/60 border-[#e0d6c8] text-[#3e2723] h-9 text-sm"><SelectValue placeholder="Type" /></SelectTrigger>
+                            <SelectContent>{LINK_TYPES.map(t => <SelectItem key={t} value={t}>{t}</SelectItem>)}</SelectContent>
+                          </Select>
+                        </div>
+                        <Textarea value={editData.description ?? ""} onChange={e => setEditData({ ...editData, description: e.target.value })}
+                          placeholder="Description" rows={2} className="bg-white/60 border-[#e0d6c8] text-[#3e2723] text-sm resize-none" />
+                      </>
+                    )}
+                    {detail.type === "wound_belief" && (
+                      <>
+                        <Input value={editData.belief ?? ""} onChange={e => setEditData({ ...editData, belief: e.target.value })}
+                          placeholder="Croyance" className="bg-white/60 border-[#e0d6c8] text-[#3e2723] text-sm h-9" />
+                        <Input value={editData.origin ?? ""} onChange={e => setEditData({ ...editData, origin: e.target.value })}
+                          placeholder="Origine" className="bg-white/60 border-[#e0d6c8] text-[#3e2723] text-sm h-9" />
+                        <Input value={editData.reframe ?? ""} onChange={e => setEditData({ ...editData, reframe: e.target.value })}
+                          placeholder="Reformulation positive" className="bg-white/60 border-[#e0d6c8] text-[#3e2723] text-sm h-9" />
+                      </>
+                    )}
+                    {detail.type === "pos_belief" && (
+                      <>
+                        <Input value={editData.belief ?? ""} onChange={e => setEditData({ ...editData, belief: e.target.value })}
+                          placeholder="Croyance positive" className="bg-white/60 border-[#e0d6c8] text-[#3e2723] text-sm h-9" />
+                        <Textarea value={editData.note ?? ""} onChange={e => setEditData({ ...editData, note: e.target.value })}
+                          placeholder="Note" rows={2} className="bg-white/60 border-[#e0d6c8] text-[#3e2723] text-sm resize-none" />
+                      </>
+                    )}
+                    {detail.type === "activity" && (
+                      <>
+                        <Input value={editData.name ?? ""} onChange={e => setEditData({ ...editData, name: e.target.value })}
+                          placeholder="Nom de l'activité" className="bg-white/60 border-[#e0d6c8] text-[#3e2723] text-sm h-9" />
+                        <Textarea value={editData.description ?? ""} onChange={e => setEditData({ ...editData, description: e.target.value })}
+                          placeholder="Description" rows={2} className="bg-white/60 border-[#e0d6c8] text-[#3e2723] text-sm resize-none" />
+                      </>
+                    )}
+                    <div className="flex gap-2">
+                      <Button onClick={handleDetailSave} size="sm" className="flex-1" style={{ background: detail.color }}>
+                        <Save className="w-3 h-3 mr-1" /> Enregistrer
+                      </Button>
+                      <Button onClick={() => setIsEditing(false)} size="sm" variant="outline" className="border-[#e0d6c8] text-[#3e2723]">Annuler</Button>
                     </div>
-                    {detail.data.description && <p className="text-sm mt-2" style={{ color: "#5d4037" }}>{detail.data.description}</p>}
-                  </>
-                )}
-                {detail.type === "pos_event" && (
+                  </div>
+                ) : (
                   <>
-                    <p className="text-xs mb-0.5" style={{ color: detail.color }}>Événement positif — {detail.data.age} ans</p>
-                    <h2 className="text-lg font-bold" style={{ color: "#3e2723" }}>{detail.data.title}</h2>
-                    <div className="flex gap-2 flex-wrap mt-1.5">
-                      {detail.data.emotion && <span className="text-xs px-2 py-0.5 rounded-full" style={{ background: detail.color + "30", color: detail.color }}>{detail.data.emotion}</span>}
-                      {detail.data.chakra && (() => {
-                        const ch = CHAKRAS.find(c => c.name === detail.data.chakra);
-                        return <span className="text-xs px-2 py-0.5 rounded-full" style={{ background: (ch?.color || "#888") + "30", color: ch?.color || "#888" }}>{detail.data.chakra} — {ch?.light}</span>;
-                      })()}
-                    </div>
-                    {detail.data.description && <p className="text-sm mt-2" style={{ color: "#5d4037" }}>{detail.data.description}</p>}
-                  </>
-                )}
-                {detail.type === "wound_link" && (
-                  <>
-                    <p className="text-xs mb-0.5" style={{ color: "#d4847a" }}>Relation douloureuse — {detail.data.type}</p>
-                    <h2 className="text-lg font-bold" style={{ color: "#3e2723" }}>{detail.data.name}</h2>
-                    {detail.data.description && <p className="text-sm mt-2" style={{ color: "#5d4037" }}>{detail.data.description}</p>}
-                  </>
-                )}
-                {detail.type === "pos_link" && (
-                  <>
-                    <p className="text-xs mb-0.5" style={{ color: "#7fae7e" }}>Relation positive — {detail.data.type}</p>
-                    <h2 className="text-lg font-bold" style={{ color: "#3e2723" }}>{detail.data.name}</h2>
-                    {detail.data.description && <p className="text-sm mt-2" style={{ color: "#5d7a3a" }}>💚 {detail.data.description}</p>}
-                  </>
-                )}
-                {detail.type === "wound_belief" && (
-                  <>
-                    <p className="text-xs mb-0.5" style={{ color: "#d4847a" }}>Croyance limitante — {detail.data.branch}</p>
-                    <h2 className="text-lg font-bold" style={{ color: "#3e2723" }}>"{detail.data.belief}"</h2>
-                    {detail.data.origin && <p className="text-sm mt-1" style={{ color: "#8d6e63" }}>Origine : {detail.data.origin}</p>}
-                    {detail.data.reframe && <p className="text-sm mt-1" style={{ color: "#7fae7e" }}>✦ {detail.data.reframe}</p>}
-                  </>
-                )}
-                {detail.type === "pos_belief" && (
-                  <>
-                    <p className="text-xs mb-0.5" style={{ color: detail.color }}>Croyance positive — {detail.data.branch}</p>
-                    <h2 className="text-lg font-bold" style={{ color: "#3e2723" }}>✦ {detail.data.belief}</h2>
-                    {detail.data.note && <p className="text-sm mt-1" style={{ color: "#5d4037" }}>{detail.data.note}</p>}
-                  </>
-                )}
-                {detail.type === "activity" && (
-                  <>
-                    <p className="text-xs mb-0.5" style={{ color: detail.color }}>Activité — {detail.data.branch}</p>
-                    <h2 className="text-lg font-bold" style={{ color: "#3e2723" }}>🍃 {detail.data.name}</h2>
-                    {detail.data.description && <p className="text-sm mt-2" style={{ color: "#5d4037" }}>{detail.data.description}</p>}
+                    {detail.type === "event" && (
+                      <>
+                        <p className="text-xs mb-0.5" style={{ color: "#8d6e63" }}>Événement — {detail.data.age} ans</p>
+                        <h2 className="text-lg font-bold" style={{ color: "#3e2723" }}>{detail.data.title}</h2>
+                        <div className="flex gap-2 flex-wrap mt-1.5">
+                          <span className="text-xs px-2 py-0.5 rounded-full" style={{ background: detail.color + "30", color: detail.color }}>{detail.data.emotion}</span>
+                          {detail.data.chakra && (() => {
+                            const ch = CHAKRAS.find(c => c.name === detail.data.chakra);
+                            return <span className="text-xs px-2 py-0.5 rounded-full" style={{ background: (ch?.color || "#888") + "30", color: ch?.color || "#888" }}>{detail.data.chakra} — {ch?.shadow}</span>;
+                          })()}
+                        </div>
+                        {detail.data.wound_type && <span className="inline-block mt-1.5 text-xs px-2 py-0.5 rounded-full bg-red-500/20 text-red-600">{detail.data.wound_type}</span>}
+                        {detail.data.description && <p className="text-sm mt-2" style={{ color: "#5d4037" }}>{detail.data.description}</p>}
+                      </>
+                    )}
+                    {detail.type === "pos_event" && (
+                      <>
+                        <p className="text-xs mb-0.5" style={{ color: detail.color }}>Événement positif — {detail.data.age} ans</p>
+                        <h2 className="text-lg font-bold" style={{ color: "#3e2723" }}>{detail.data.title}</h2>
+                        <div className="flex gap-2 flex-wrap mt-1.5">
+                          {detail.data.emotion && <span className="text-xs px-2 py-0.5 rounded-full" style={{ background: detail.color + "30", color: detail.color }}>{detail.data.emotion}</span>}
+                          {detail.data.chakra && (() => {
+                            const ch = CHAKRAS.find(c => c.name === detail.data.chakra);
+                            return <span className="text-xs px-2 py-0.5 rounded-full" style={{ background: (ch?.color || "#888") + "30", color: ch?.color || "#888" }}>{detail.data.chakra} — {ch?.light}</span>;
+                          })()}
+                        </div>
+                        {detail.data.description && <p className="text-sm mt-2" style={{ color: "#5d4037" }}>{detail.data.description}</p>}
+                      </>
+                    )}
+                    {detail.type === "wound_link" && (
+                      <>
+                        <p className="text-xs mb-0.5" style={{ color: "#d4847a" }}>Relation douloureuse — {detail.data.type}</p>
+                        <h2 className="text-lg font-bold" style={{ color: "#3e2723" }}>{detail.data.name}</h2>
+                        {detail.data.description && <p className="text-sm mt-2" style={{ color: "#5d4037" }}>{detail.data.description}</p>}
+                      </>
+                    )}
+                    {detail.type === "pos_link" && (
+                      <>
+                        <p className="text-xs mb-0.5" style={{ color: "#7fae7e" }}>Relation positive — {detail.data.type}</p>
+                        <h2 className="text-lg font-bold" style={{ color: "#3e2723" }}>{detail.data.name}</h2>
+                        {detail.data.description && <p className="text-sm mt-2" style={{ color: "#5d7a3a" }}>💚 {detail.data.description}</p>}
+                      </>
+                    )}
+                    {detail.type === "wound_belief" && (
+                      <>
+                        <p className="text-xs mb-0.5" style={{ color: "#d4847a" }}>Croyance limitante — {detail.data.branch}</p>
+                        <h2 className="text-lg font-bold" style={{ color: "#3e2723" }}>"{detail.data.belief}"</h2>
+                        {detail.data.origin && <p className="text-sm mt-1" style={{ color: "#8d6e63" }}>Origine : {detail.data.origin}</p>}
+                        {detail.data.reframe && <p className="text-sm mt-1" style={{ color: "#7fae7e" }}>✦ {detail.data.reframe}</p>}
+                      </>
+                    )}
+                    {detail.type === "pos_belief" && (
+                      <>
+                        <p className="text-xs mb-0.5" style={{ color: detail.color }}>Croyance positive — {detail.data.branch}</p>
+                        <h2 className="text-lg font-bold" style={{ color: "#3e2723" }}>✦ {detail.data.belief}</h2>
+                        {detail.data.note && <p className="text-sm mt-1" style={{ color: "#5d4037" }}>{detail.data.note}</p>}
+                      </>
+                    )}
+                    {detail.type === "activity" && (
+                      <>
+                        <p className="text-xs mb-0.5" style={{ color: detail.color }}>Activité — {detail.data.branch}</p>
+                        <h2 className="text-lg font-bold" style={{ color: "#3e2723" }}>🍃 {detail.data.name}</h2>
+                        {detail.data.description && <p className="text-sm mt-2" style={{ color: "#5d4037" }}>{detail.data.description}</p>}
+                      </>
+                    )}
                   </>
                 )}
               </div>
-              <button onClick={() => setDetail(null)} className="transition ml-4" style={{ color: "#8d6e63" }}>
-                <X className="w-5 h-5" />
-              </button>
+              <div className="flex gap-2 flex-shrink-0">
+                {!isEditing && (
+                  <button onClick={() => { setIsEditing(true); setEditData({ ...detail.data }); }} className="transition" style={{ color: "#8d6e63" }}>
+                    <Pencil className="w-5 h-5" />
+                  </button>
+                )}
+                <button onClick={() => { setDetail(null); setIsEditing(false); }} className="transition" style={{ color: "#8d6e63" }}>
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
             </div>
           </div>
         </div>

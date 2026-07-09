@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Trash2, ChevronDown, ChevronUp } from "lucide-react";
+import { Plus, Trash2, ChevronDown, ChevronUp, Pencil, Save } from "lucide-react";
 import FullTree from "@/components/tree/FullTree";
 import { CHAKRAS } from "@/lib/chakras";
 
@@ -62,6 +62,8 @@ function TroncSection() {
   const [events, setEvents] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState({ age: "", title: "", description: "", emotion: "Peur", wound_type: "" });
+  const [editingId, setEditingId] = useState(null);
+  const [editForm, setEditForm] = useState(null);
 
   useEffect(() => {
     base44.entities.TraumaticEvent.list().then(d => setEvents([...d].sort((a, b) => a.age - b.age)));
@@ -73,6 +75,13 @@ function TroncSection() {
     await base44.entities.TraumaticEvent.create({ ...form, age: Number(form.age), chakra });
     setForm({ age: "", title: "", description: "", emotion: "Peur", wound_type: "" });
     setShowForm(false);
+    base44.entities.TraumaticEvent.list().then(d => setEvents([...d].sort((a, b) => a.age - b.age)));
+  };
+
+  const handleUpdate = async () => {
+    const chakra = CHAKRAS.find(c => c.shadow === editForm.emotion)?.name || "Connexion";
+    await base44.entities.TraumaticEvent.update(editingId, { ...editForm, age: Number(editForm.age), chakra });
+    setEditingId(null); setEditForm(null);
     base44.entities.TraumaticEvent.list().then(d => setEvents([...d].sort((a, b) => a.age - b.age)));
   };
 
@@ -128,19 +137,49 @@ function TroncSection() {
                 <span className="text-white text-xs font-bold text-center leading-tight">{ev.age}<br/><span style={{fontSize:8}} className="text-gray-300">ans</span></span>
               </div>
               <div className="flex-1 bg-white/40 rounded-xl p-3 border border-[#e0d6c8]/60">
-                <div className="flex items-start justify-between gap-2">
-                  <div>
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <span className="text-[#3e2723] text-sm font-semibold">{ev.title}</span>
-                      <Badge className={`${EMOTION_COLORS[ev.emotion]} text-xs border`}>{ev.emotion}</Badge>
-                      {ev.wound_type && <Badge className="bg-red-900/20 text-red-700 border border-red-900/30 text-xs">{ev.wound_type}</Badge>}
+                {editingId === ev.id ? (
+                  <div className="space-y-2">
+                    <div className="grid grid-cols-2 gap-2">
+                      <Input type="number" value={editForm.age} onChange={e => setEditForm({ ...editForm, age: e.target.value })}
+                        placeholder="Âge" className="bg-white/60 border-[#e0d6c8] text-[#3e2723] text-sm h-8" />
+                      <Select value={editForm.emotion} onValueChange={v => setEditForm({ ...editForm, emotion: v })}>
+                        <SelectTrigger className="bg-white/60 border-[#e0d6c8] text-[#3e2723] h-8 text-sm"><SelectValue /></SelectTrigger>
+                        <SelectContent>{CHAKRAS.map(c => <SelectItem key={c.shadow} value={c.shadow}>{c.shadow}</SelectItem>)}</SelectContent>
+                      </Select>
                     </div>
-                    {ev.description && <p className="text-[#8d6e63] text-xs mt-1">{ev.description}</p>}
+                    <Select value={editForm.wound_type || ""} onValueChange={v => setEditForm({ ...editForm, wound_type: v })}>
+                      <SelectTrigger className="bg-white/60 border-[#e0d6c8] text-[#3e2723] h-8 text-sm"><SelectValue placeholder="Type de blessure" /></SelectTrigger>
+                      <SelectContent>{["Trahison", "Rejet", "Abandon", "Humiliation", "Injustice"].map(w => <SelectItem key={w} value={w}>{w}</SelectItem>)}</SelectContent>
+                    </Select>
+                    <Input value={editForm.title} onChange={e => setEditForm({ ...editForm, title: e.target.value })}
+                      placeholder="Titre" className="bg-white/60 border-[#e0d6c8] text-[#3e2723] text-sm h-8" />
+                    <Textarea value={editForm.description || ""} onChange={e => setEditForm({ ...editForm, description: e.target.value })}
+                      placeholder="Description" rows={2} className="bg-white/60 border-[#e0d6c8] text-[#3e2723] text-sm resize-none" />
+                    <div className="flex gap-2">
+                      <Button onClick={handleUpdate} size="sm" className="flex-1 bg-amber-700 hover:bg-amber-600 h-8"><Save className="w-3 h-3 mr-1" />Enregistrer</Button>
+                      <Button onClick={() => { setEditingId(null); setEditForm(null); }} size="sm" variant="outline" className="border-[#e0d6c8] text-[#3e2723] h-8">Annuler</Button>
+                    </div>
                   </div>
-                  <button onClick={() => handleDelete(ev.id)} className="text-[#a1887f] hover:text-red-600 transition flex-shrink-0">
-                    <Trash2 className="w-4 h-4" />
-                  </button>
-                </div>
+                ) : (
+                  <div className="flex items-start justify-between gap-2">
+                    <div>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="text-[#3e2723] text-sm font-semibold">{ev.title}</span>
+                        <Badge className={`${EMOTION_COLORS[ev.emotion]} text-xs border`}>{ev.emotion}</Badge>
+                        {ev.wound_type && <Badge className="bg-red-900/20 text-red-700 border border-red-900/30 text-xs">{ev.wound_type}</Badge>}
+                      </div>
+                      {ev.description && <p className="text-[#8d6e63] text-xs mt-1">{ev.description}</p>}
+                    </div>
+                    <div className="flex gap-1 flex-shrink-0">
+                      <button onClick={() => { setEditingId(ev.id); setEditForm({ ...ev }); }} className="text-[#a1887f] hover:text-amber-600 transition">
+                        <Pencil className="w-4 h-4" />
+                      </button>
+                      <button onClick={() => handleDelete(ev.id)} className="text-[#a1887f] hover:text-red-600 transition">
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           ))}
@@ -156,6 +195,8 @@ function RacinesSection() {
   const [links, setLinks] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState({ name: "", type: "Famille", description: "" });
+  const [editingId, setEditingId] = useState(null);
+  const [editForm, setEditForm] = useState(null);
 
   useEffect(() => { base44.entities.Link.list().then(setLinks); }, []);
 
@@ -164,6 +205,12 @@ function RacinesSection() {
     await base44.entities.Link.create(form);
     setForm({ name: "", type: "Famille", description: "" });
     setShowForm(false);
+    base44.entities.Link.list().then(setLinks);
+  };
+
+  const handleUpdate = async () => {
+    await base44.entities.Link.update(editingId, editForm);
+    setEditingId(null); setEditForm(null);
     base44.entities.Link.list().then(setLinks);
   };
 
@@ -201,15 +248,41 @@ function RacinesSection() {
 
       <div className="space-y-2">
         {links.map(lk => (
-          <div key={lk.id} className="flex items-start gap-3 bg-white/40 rounded-xl p-3 border border-[#e0d6c8]/60">
-            <Badge className={`${LINK_COLORS[lk.type] || LINK_COLORS["Autre"]} border text-xs flex-shrink-0 mt-0.5`}>{lk.type}</Badge>
-            <div className="flex-1 min-w-0">
-              <span className="text-[#3e2723] text-sm font-semibold">{lk.name}</span>
-              {lk.description && <p className="text-[#8d6e63] text-xs mt-0.5">{lk.description}</p>}
-            </div>
-            <button onClick={() => handleDelete(lk.id)} className="text-[#a1887f] hover:text-red-600 transition flex-shrink-0">
-              <Trash2 className="w-4 h-4" />
-            </button>
+          <div key={lk.id} className="bg-white/40 rounded-xl p-3 border border-[#e0d6c8]/60">
+            {editingId === lk.id ? (
+              <div className="space-y-2">
+                <div className="grid grid-cols-2 gap-2">
+                  <Input value={editForm.name} onChange={e => setEditForm({ ...editForm, name: e.target.value })}
+                    placeholder="Prénom / Nom" className="bg-white/60 border-[#e0d6c8] text-[#3e2723] text-sm h-8" />
+                  <Select value={editForm.type} onValueChange={v => setEditForm({ ...editForm, type: v })}>
+                    <SelectTrigger className="bg-white/60 border-[#e0d6c8] text-[#3e2723] h-8 text-sm"><SelectValue /></SelectTrigger>
+                    <SelectContent>{LINK_TYPES.map(t => <SelectItem key={t} value={t}>{t}</SelectItem>)}</SelectContent>
+                  </Select>
+                </div>
+                <Textarea value={editForm.description || ""} onChange={e => setEditForm({ ...editForm, description: e.target.value })}
+                  placeholder="Description" rows={2} className="bg-white/60 border-[#e0d6c8] text-[#3e2723] text-sm resize-none" />
+                <div className="flex gap-2">
+                  <Button onClick={handleUpdate} size="sm" className="flex-1 bg-rose-800 hover:bg-rose-700 h-8"><Save className="w-3 h-3 mr-1" />Enregistrer</Button>
+                  <Button onClick={() => { setEditingId(null); setEditForm(null); }} size="sm" variant="outline" className="border-[#e0d6c8] text-[#3e2723] h-8">Annuler</Button>
+                </div>
+              </div>
+            ) : (
+              <div className="flex items-start gap-3">
+                <Badge className={`${LINK_COLORS[lk.type] || LINK_COLORS["Autre"]} border text-xs flex-shrink-0 mt-0.5`}>{lk.type}</Badge>
+                <div className="flex-1 min-w-0">
+                  <span className="text-[#3e2723] text-sm font-semibold">{lk.name}</span>
+                  {lk.description && <p className="text-[#8d6e63] text-xs mt-0.5">{lk.description}</p>}
+                </div>
+                <div className="flex gap-1 flex-shrink-0">
+                  <button onClick={() => { setEditingId(lk.id); setEditForm({ ...lk }); }} className="text-[#a1887f] hover:text-rose-600 transition">
+                    <Pencil className="w-4 h-4" />
+                  </button>
+                  <button onClick={() => handleDelete(lk.id)} className="text-[#a1887f] hover:text-red-600 transition">
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         ))}
         {!links.length && <p className="text-[#8d6e63] text-sm text-center py-4">Aucune relation enregistrée.</p>}
@@ -224,6 +297,8 @@ function BranchesSection() {
   const [openAxis, setOpenAxis] = useState(null);
   const [showFormFor, setShowFormFor] = useState(null);
   const [form, setForm] = useState({ belief: "", origin: "", reframe: "" });
+  const [editingId, setEditingId] = useState(null);
+  const [editForm, setEditForm] = useState(null);
 
   useEffect(() => { base44.entities.LimitingBelief.list().then(setBeliefs); }, []);
 
@@ -232,6 +307,12 @@ function BranchesSection() {
     await base44.entities.LimitingBelief.create({ ...form, branch });
     setForm({ belief: "", origin: "", reframe: "" });
     setShowFormFor(null);
+    base44.entities.LimitingBelief.list().then(setBeliefs);
+  };
+
+  const handleUpdate = async () => {
+    await base44.entities.LimitingBelief.update(editingId, editForm);
+    setEditingId(null); setEditForm(null);
     base44.entities.LimitingBelief.list().then(setBeliefs);
   };
 
@@ -265,16 +346,36 @@ function BranchesSection() {
               <div className="px-4 pb-4 space-y-2">
                 {axisBelief.map(b => (
                   <div key={b.id} className="bg-[#f5f0e8] rounded-lg p-3 border border-[#e0d6c8]/60">
-                    <div className="flex items-start justify-between gap-2">
-                      <div className="flex-1 min-w-0">
-                        <p className="text-white text-sm font-medium">"{b.belief}"</p>
-                        {b.origin && <p className="text-[#8d6e63] text-xs mt-1">Origine : {b.origin}</p>}
-                        {b.reframe && <p className="text-green-600 text-xs mt-1">✦ {b.reframe}</p>}
+                    {editingId === b.id ? (
+                      <div className="space-y-2">
+                        <Input value={editForm.belief} onChange={e => setEditForm({ ...editForm, belief: e.target.value })}
+                          placeholder="Croyance" className="bg-white/60 border-[#e0d6c8] text-[#3e2723] text-sm h-8" />
+                        <Input value={editForm.origin || ""} onChange={e => setEditForm({ ...editForm, origin: e.target.value })}
+                          placeholder="Origine" className="bg-white/60 border-[#e0d6c8] text-[#3e2723] text-sm h-8" />
+                        <Input value={editForm.reframe || ""} onChange={e => setEditForm({ ...editForm, reframe: e.target.value })}
+                          placeholder="Reformulation positive" className="bg-white/60 border-[#e0d6c8] text-[#3e2723] text-sm h-8" />
+                        <div className="flex gap-2">
+                          <Button onClick={handleUpdate} size="sm" className="flex-1 bg-green-800 hover:bg-green-700 h-8"><Save className="w-3 h-3 mr-1" />Enregistrer</Button>
+                          <Button onClick={() => { setEditingId(null); setEditForm(null); }} size="sm" variant="outline" className="border-[#e0d6c8] text-[#3e2723] h-8">Annuler</Button>
+                        </div>
                       </div>
-                      <button onClick={() => handleDelete(b.id)} className="text-[#a1887f] hover:text-red-600 transition flex-shrink-0">
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </div>
+                    ) : (
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="flex-1 min-w-0">
+                          <p className="text-[#3e2723] text-sm font-medium">"{b.belief}"</p>
+                          {b.origin && <p className="text-[#8d6e63] text-xs mt-1">Origine : {b.origin}</p>}
+                          {b.reframe && <p className="text-green-600 text-xs mt-1">✦ {b.reframe}</p>}
+                        </div>
+                        <div className="flex gap-1 flex-shrink-0">
+                          <button onClick={() => { setEditingId(b.id); setEditForm({ ...b }); }} className="text-[#a1887f] hover:text-green-600 transition">
+                            <Pencil className="w-4 h-4" />
+                          </button>
+                          <button onClick={() => handleDelete(b.id)} className="text-[#a1887f] hover:text-red-600 transition">
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 ))}
 

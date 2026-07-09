@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Trash2, Save, X } from "lucide-react";
+import { Plus, Trash2, Save, X, Pencil } from "lucide-react";
 import FullTree from "@/components/tree/FullTree";
 import PositiveEventsSection from "@/components/sections/PositiveEventsSection";
 
@@ -195,6 +195,8 @@ function RacinesPositivesSection() {
   const [links, setLinks] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState({ name: "", type: "Famille", description: "" });
+  const [editingId, setEditingId] = useState(null);
+  const [editForm, setEditForm] = useState(null);
 
   useEffect(() => { base44.entities.PositiveLink.list().then(setLinks); }, []);
 
@@ -203,6 +205,12 @@ function RacinesPositivesSection() {
     await base44.entities.PositiveLink.create(form);
     setForm({ name: "", type: "Famille", description: "" });
     setShowForm(false);
+    base44.entities.PositiveLink.list().then(setLinks);
+  };
+
+  const handleUpdate = async () => {
+    await base44.entities.PositiveLink.update(editingId, editForm);
+    setEditingId(null); setEditForm(null);
     base44.entities.PositiveLink.list().then(setLinks);
   };
 
@@ -240,15 +248,41 @@ function RacinesPositivesSection() {
 
       <div className="space-y-2">
         {links.map(lk => (
-          <div key={lk.id} className="flex items-start gap-3 bg-white/40 rounded-xl p-3 border border-[#e0d6c8]/60">
-            <Badge className={`${LINK_COLORS[lk.type] || LINK_COLORS["Autre"]} border text-xs flex-shrink-0 mt-0.5`}>{lk.type}</Badge>
-            <div className="flex-1 min-w-0">
-              <span className="text-[#3e2723] text-sm font-semibold">{lk.name}</span>
-              {lk.description && <p className="text-emerald-600 text-xs mt-0.5">💚 {lk.description}</p>}
-            </div>
-            <button onClick={() => handleDelete(lk.id)} className="text-[#a1887f] hover:text-red-600 transition flex-shrink-0">
-              <Trash2 className="w-4 h-4" />
-            </button>
+          <div key={lk.id} className="bg-white/40 rounded-xl p-3 border border-[#e0d6c8]/60">
+            {editingId === lk.id ? (
+              <div className="space-y-2">
+                <div className="grid grid-cols-2 gap-2">
+                  <Input value={editForm.name} onChange={e => setEditForm({ ...editForm, name: e.target.value })}
+                    placeholder="Prénom / Nom" className="bg-white/60 border-[#e0d6c8] text-[#3e2723] text-sm h-8" />
+                  <Select value={editForm.type} onValueChange={v => setEditForm({ ...editForm, type: v })}>
+                    <SelectTrigger className="bg-white/60 border-[#e0d6c8] text-[#3e2723] h-8 text-sm"><SelectValue /></SelectTrigger>
+                    <SelectContent>{LINK_TYPES.map(t => <SelectItem key={t} value={t}>{t}</SelectItem>)}</SelectContent>
+                  </Select>
+                </div>
+                <Textarea value={editForm.description || ""} onChange={e => setEditForm({ ...editForm, description: e.target.value })}
+                  placeholder="Ce que cette relation vous apporte..." rows={2} className="bg-white/60 border-[#e0d6c8] text-[#3e2723] text-sm resize-none" />
+                <div className="flex gap-2">
+                  <Button onClick={handleUpdate} size="sm" className="flex-1 bg-emerald-800 hover:bg-emerald-700 h-8"><Save className="w-3 h-3 mr-1" />Enregistrer</Button>
+                  <Button onClick={() => { setEditingId(null); setEditForm(null); }} size="sm" variant="outline" className="border-[#e0d6c8] text-[#3e2723] h-8">Annuler</Button>
+                </div>
+              </div>
+            ) : (
+              <div className="flex items-start gap-3">
+                <Badge className={`${LINK_COLORS[lk.type] || LINK_COLORS["Autre"]} border text-xs flex-shrink-0 mt-0.5`}>{lk.type}</Badge>
+                <div className="flex-1 min-w-0">
+                  <span className="text-[#3e2723] text-sm font-semibold">{lk.name}</span>
+                  {lk.description && <p className="text-emerald-600 text-xs mt-0.5">💚 {lk.description}</p>}
+                </div>
+                <div className="flex gap-1 flex-shrink-0">
+                  <button onClick={() => { setEditingId(lk.id); setEditForm({ ...lk }); }} className="text-[#a1887f] hover:text-emerald-600 transition">
+                    <Pencil className="w-4 h-4" />
+                  </button>
+                  <button onClick={() => handleDelete(lk.id)} className="text-[#a1887f] hover:text-red-600 transition">
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         ))}
         {!links.length && <p className="text-[#8d6e63] text-sm text-center py-4">Aucune relation enregistrée.</p>}
