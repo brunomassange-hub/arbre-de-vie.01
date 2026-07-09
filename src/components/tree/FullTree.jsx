@@ -82,7 +82,7 @@ export default function FullTree({ mode }) {
 
   useEffect(() => { loadData(); }, [mode]);
 
-  const trunkEvents = isWound ? events.slice(0, 6) : posEvents.slice(0, 6);
+  const trunkEvents = (isWound ? events.slice(0, 6) : posEvents.slice(0, 6)).slice().reverse();
   const rootDots = (isWound ? woundLinks : posLinks).slice(0, 6);
   const rootDotPositions = isWound ? ROOT_DOT_POSITIONS.wound : ROOT_DOT_POSITIONS.strength;
 
