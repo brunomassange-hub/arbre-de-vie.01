@@ -49,8 +49,8 @@ function Section({ emoji, title, subtitle, accentClass, children }) {
     <div className="mb-8">
       <div className={`rounded-2xl border ${accentClass} p-5`}>
         <div className="mb-4">
-          <h2 className="text-xl font-bold text-white">{emoji} {title}</h2>
-          <p className="text-gray-400 text-sm">{subtitle}</p>
+          <h2 className="text-xl font-bold" style={{ fontFamily: "'Playfair Display', serif", color: "#3e2723" }}>{emoji} {title}</h2>
+          <p className="text-sm" style={{ color: "#8d6e63" }}>{subtitle}</p>
         </div>
         {children}
       </div>
@@ -89,27 +89,27 @@ function TroncSection() {
       </Button>
 
       {showForm && (
-        <div className="bg-black/20 rounded-xl p-4 mb-4 border border-amber-700/30 space-y-3">
+        <div className="bg-[#f5f0e8] rounded-xl p-4 mb-4 border border-amber-700/30 space-y-3">
           <div className="grid grid-cols-2 gap-3">
             <Input type="number" value={form.age} onChange={e => setForm({ ...form, age: e.target.value })}
-              placeholder="Âge" className="bg-white/10 border-white/20 text-white placeholder:text-gray-500" />
+              placeholder="Âge" className="bg-white/60 border-[#e0d6c8] text-[#3e2723] placeholder:text-[#8d6e63]/50" />
             <Select value={form.emotion} onValueChange={v => setForm({ ...form, emotion: v })}>
-              <SelectTrigger className="bg-white/10 border-white/20 text-white"><SelectValue /></SelectTrigger>
+              <SelectTrigger className="bg-white/60 border-[#e0d6c8] text-[#3e2723]"><SelectValue /></SelectTrigger>
               <SelectContent>{EMOTIONS.map(e => <SelectItem key={e} value={e}>{e}</SelectItem>)}</SelectContent>
             </Select>
           </div>
           <Select value={form.chakra} onValueChange={v => setForm({ ...form, chakra: v })}>
-            <SelectTrigger className="bg-white/10 border-white/20 text-white"><SelectValue /></SelectTrigger>
+            <SelectTrigger className="bg-white/60 border-[#e0d6c8] text-[#3e2723]"><SelectValue /></SelectTrigger>
             <SelectContent>{CHAKRAS.map(c => <SelectItem key={c.name} value={c.name}>{c.name} — {c.shadow}</SelectItem>)}</SelectContent>
           </Select>
           <Input value={form.title} onChange={e => setForm({ ...form, title: e.target.value })}
-            placeholder="Titre de l'événement" className="bg-white/10 border-white/20 text-white placeholder:text-gray-500" />
+            placeholder="Titre de l'événement" className="bg-white/60 border-[#e0d6c8] text-[#3e2723] placeholder:text-[#8d6e63]/50" />
           <Textarea value={form.description} onChange={e => setForm({ ...form, description: e.target.value })}
             placeholder="Description (optionnel)" rows={2}
-            className="bg-white/10 border-white/20 text-white placeholder:text-gray-500 resize-none" />
+            className="bg-white/60 border-[#e0d6c8] text-[#3e2723] placeholder:text-[#8d6e63]/50 resize-none" />
           <div className="flex gap-2">
             <Button onClick={handleCreate} size="sm" className="flex-1 bg-amber-700 hover:bg-amber-600">Ajouter</Button>
-            <Button onClick={() => setShowForm(false)} size="sm" variant="outline" className="border-white/20 text-white hover:bg-white/10">Annuler</Button>
+            <Button onClick={() => setShowForm(false)} size="sm" variant="outline" className="border-[#e0d6c8] text-[#3e2723] hover:bg-white/60">Annuler</Button>
           </div>
         </div>
       )}
@@ -122,23 +122,23 @@ function TroncSection() {
               <div className="w-10 h-10 rounded-full bg-amber-800 border border-amber-600 flex items-center justify-center flex-shrink-0 z-10">
                 <span className="text-white text-xs font-bold text-center leading-tight">{ev.age}<br/><span style={{fontSize:8}} className="text-gray-300">ans</span></span>
               </div>
-              <div className="flex-1 bg-white/5 rounded-xl p-3 border border-white/10">
+              <div className="flex-1 bg-white/40 rounded-xl p-3 border border-[#e0d6c8]/60">
                 <div className="flex items-start justify-between gap-2">
                   <div>
                     <div className="flex items-center gap-2 flex-wrap">
-                      <span className="text-white text-sm font-semibold">{ev.title}</span>
+                      <span className="text-[#3e2723] text-sm font-semibold">{ev.title}</span>
                       <Badge className={`${EMOTION_COLORS[ev.emotion]} text-xs border`}>{ev.emotion}</Badge>
                     </div>
-                    {ev.description && <p className="text-gray-400 text-xs mt-1">{ev.description}</p>}
+                    {ev.description && <p className="text-[#8d6e63] text-xs mt-1">{ev.description}</p>}
                   </div>
-                  <button onClick={() => handleDelete(ev.id)} className="text-gray-600 hover:text-red-400 transition flex-shrink-0">
+                  <button onClick={() => handleDelete(ev.id)} className="text-[#a1887f] hover:text-red-600 transition flex-shrink-0">
                     <Trash2 className="w-4 h-4" />
                   </button>
                 </div>
               </div>
             </div>
           ))}
-          {!events.length && <p className="text-gray-500 text-sm text-center py-4">Aucun événement enregistré.</p>}
+          {!events.length && <p className="text-[#8d6e63] text-sm text-center py-4">Aucun événement enregistré.</p>}
         </div>
       </div>
     </>
@@ -174,39 +174,39 @@ function RacinesSection() {
       </Button>
 
       {showForm && (
-        <div className="bg-black/20 rounded-xl p-4 mb-4 border border-rose-700/30 space-y-3">
+        <div className="bg-[#f5f0e8] rounded-xl p-4 mb-4 border border-rose-700/30 space-y-3">
           <div className="grid grid-cols-2 gap-3">
             <Input value={form.name} onChange={e => setForm({ ...form, name: e.target.value })}
-              placeholder="Prénom / Nom" className="bg-white/10 border-white/20 text-white placeholder:text-gray-500" />
+              placeholder="Prénom / Nom" className="bg-white/60 border-[#e0d6c8] text-[#3e2723] placeholder:text-[#8d6e63]/50" />
             <Select value={form.type} onValueChange={v => setForm({ ...form, type: v })}>
-              <SelectTrigger className="bg-white/10 border-white/20 text-white"><SelectValue /></SelectTrigger>
+              <SelectTrigger className="bg-white/60 border-[#e0d6c8] text-[#3e2723]"><SelectValue /></SelectTrigger>
               <SelectContent>{LINK_TYPES.map(t => <SelectItem key={t} value={t}>{t}</SelectItem>)}</SelectContent>
             </Select>
           </div>
           <Textarea value={form.description} onChange={e => setForm({ ...form, description: e.target.value })}
             placeholder="Ce qui était douloureux dans cette relation..." rows={2}
-            className="bg-white/10 border-white/20 text-white placeholder:text-gray-500 resize-none" />
+            className="bg-white/60 border-[#e0d6c8] text-[#3e2723] placeholder:text-[#8d6e63]/50 resize-none" />
           <div className="flex gap-2">
             <Button onClick={handleCreate} size="sm" className="flex-1 bg-rose-800 hover:bg-rose-700">Ajouter</Button>
-            <Button onClick={() => setShowForm(false)} size="sm" variant="outline" className="border-white/20 text-white hover:bg-white/10">Annuler</Button>
+            <Button onClick={() => setShowForm(false)} size="sm" variant="outline" className="border-[#e0d6c8] text-[#3e2723] hover:bg-white/60">Annuler</Button>
           </div>
         </div>
       )}
 
       <div className="space-y-2">
         {links.map(lk => (
-          <div key={lk.id} className="flex items-start gap-3 bg-white/5 rounded-xl p-3 border border-white/10">
+          <div key={lk.id} className="flex items-start gap-3 bg-white/40 rounded-xl p-3 border border-[#e0d6c8]/60">
             <Badge className={`${LINK_COLORS[lk.type] || LINK_COLORS["Autre"]} border text-xs flex-shrink-0 mt-0.5`}>{lk.type}</Badge>
             <div className="flex-1 min-w-0">
-              <span className="text-white text-sm font-semibold">{lk.name}</span>
-              {lk.description && <p className="text-gray-400 text-xs mt-0.5">{lk.description}</p>}
+              <span className="text-[#3e2723] text-sm font-semibold">{lk.name}</span>
+              {lk.description && <p className="text-[#8d6e63] text-xs mt-0.5">{lk.description}</p>}
             </div>
-            <button onClick={() => handleDelete(lk.id)} className="text-gray-600 hover:text-red-400 transition flex-shrink-0">
+            <button onClick={() => handleDelete(lk.id)} className="text-[#a1887f] hover:text-red-600 transition flex-shrink-0">
               <Trash2 className="w-4 h-4" />
             </button>
           </div>
         ))}
-        {!links.length && <p className="text-gray-500 text-sm text-center py-4">Aucune relation enregistrée.</p>}
+        {!links.length && <p className="text-[#8d6e63] text-sm text-center py-4">Aucune relation enregistrée.</p>}
       </div>
     </>
   );
@@ -250,22 +250,22 @@ function BranchesSection() {
               <div className="flex items-center gap-2">
                 <span className="text-lg">{axis.icon}</span>
                 <span className={`font-semibold ${axis.color}`}>{axis.name}</span>
-                <span className="text-gray-500 text-xs">({axisBelief.length} croyance{axisBelief.length !== 1 ? "s" : ""})</span>
+                <span className="text-[#8d6e63] text-xs">({axisBelief.length} croyance{axisBelief.length !== 1 ? "s" : ""})</span>
               </div>
-              {isOpen ? <ChevronUp className="w-4 h-4 text-gray-400" /> : <ChevronDown className="w-4 h-4 text-gray-400" />}
+              {isOpen ? <ChevronUp className="w-4 h-4 text-[#8d6e63]" /> : <ChevronDown className="w-4 h-4 text-[#8d6e63]" />}
             </button>
 
             {isOpen && (
               <div className="px-4 pb-4 space-y-2">
                 {axisBelief.map(b => (
-                  <div key={b.id} className="bg-black/20 rounded-lg p-3 border border-white/10">
+                  <div key={b.id} className="bg-[#f5f0e8] rounded-lg p-3 border border-[#e0d6c8]/60">
                     <div className="flex items-start justify-between gap-2">
                       <div className="flex-1 min-w-0">
                         <p className="text-white text-sm font-medium">"{b.belief}"</p>
-                        {b.origin && <p className="text-gray-400 text-xs mt-1">Origine : {b.origin}</p>}
-                        {b.reframe && <p className="text-green-400 text-xs mt-1">✦ {b.reframe}</p>}
+                        {b.origin && <p className="text-[#8d6e63] text-xs mt-1">Origine : {b.origin}</p>}
+                        {b.reframe && <p className="text-green-600 text-xs mt-1">✦ {b.reframe}</p>}
                       </div>
-                      <button onClick={() => handleDelete(b.id)} className="text-gray-600 hover:text-red-400 transition flex-shrink-0">
+                      <button onClick={() => handleDelete(b.id)} className="text-[#a1887f] hover:text-red-600 transition flex-shrink-0">
                         <Trash2 className="w-4 h-4" />
                       </button>
                     </div>
@@ -273,17 +273,17 @@ function BranchesSection() {
                 ))}
 
                 {isFormOpen ? (
-                  <div className="bg-black/20 rounded-lg p-3 border border-white/10 space-y-2">
+                  <div className="bg-[#f5f0e8] rounded-lg p-3 border border-[#e0d6c8]/60 space-y-2">
                     <Input value={form.belief} onChange={e => setForm({ ...form, belief: e.target.value })}
-                      placeholder="La croyance limitante..." className="bg-white/10 border-white/20 text-white placeholder:text-gray-500 text-sm" />
+                      placeholder="La croyance limitante..." className="bg-white/60 border-[#e0d6c8] text-[#3e2723] placeholder:text-[#8d6e63]/50 text-sm" />
                     <Input value={form.origin} onChange={e => setForm({ ...form, origin: e.target.value })}
-                      placeholder="D'où vient-elle ? (optionnel)" className="bg-white/10 border-white/20 text-white placeholder:text-gray-500 text-sm" />
+                      placeholder="D'où vient-elle ? (optionnel)" className="bg-white/60 border-[#e0d6c8] text-[#3e2723] placeholder:text-[#8d6e63]/50 text-sm" />
                     <Input value={form.reframe} onChange={e => setForm({ ...form, reframe: e.target.value })}
-                      placeholder="Reformulation positive (optionnel)" className="bg-white/10 border-white/20 text-white placeholder:text-gray-500 text-sm" />
+                      placeholder="Reformulation positive (optionnel)" className="bg-white/60 border-[#e0d6c8] text-[#3e2723] placeholder:text-[#8d6e63]/50 text-sm" />
                     <div className="flex gap-2">
                       <Button onClick={() => handleCreate(axis.name)} size="sm" className="flex-1 bg-green-800 hover:bg-green-700 text-xs">Ajouter</Button>
                       <Button onClick={() => { setShowFormFor(null); setForm({ belief: "", origin: "", reframe: "" }); }}
-                        size="sm" variant="outline" className="border-white/20 text-white hover:bg-white/10 text-xs">Annuler</Button>
+                        size="sm" variant="outline" className="border-[#e0d6c8] text-[#3e2723] hover:bg-white/60 text-xs">Annuler</Button>
                     </div>
                   </div>
                 ) : (
@@ -306,25 +306,25 @@ function BranchesSection() {
 // ─── PAGE PRINCIPALE ─────────────────────────────────────
 export default function Garden() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#0a1628] to-[#0a2010] px-4 py-8">
+    <div className="min-h-screen px-4 py-8" style={{ background: "#faf6f0" }}>
       <div className="max-w-xl mx-auto">
-        <h1 className="text-3xl font-bold text-white mb-1">🩸 Blessures</h1>
-        <p className="text-gray-400 text-sm mb-4">Cliquez sur l'arbre ou les sections ci-dessous</p>
+        <h1 className="text-3xl font-bold mb-1" style={{ fontFamily: "'Playfair Display', serif", color: "#3e2723" }}>🩸 Blessures</h1>
+        <p className="text-sm mb-4" style={{ color: "#8d6e63" }}>Cliquez sur l'arbre ou les sections ci-dessous</p>
 
         <FullTree mode="wounds" />
 
         <Section emoji="🌲" title="Le Tronc" subtitle="Expériences de vie traumatiques, classées par âge et émotion"
-          accentClass="bg-amber-900/10 border-amber-700/30">
+          accentClass="bg-amber-50 border-amber-200">
           <TroncSection />
         </Section>
 
         <Section emoji="🌱" title="Les Racines" subtitle="Relations douloureuses qui ont façonné votre histoire"
-          accentClass="bg-rose-900/10 border-rose-700/30">
+          accentClass="bg-rose-50 border-rose-200">
           <RacinesSection />
         </Section>
 
         <Section emoji="🍃" title="Les Branches" subtitle="Croyances limitantes selon les 6 axes de vie"
-          accentClass="bg-green-900/10 border-green-700/30">
+          accentClass="bg-green-50 border-green-200">
           <BranchesSection />
         </Section>
       </div>

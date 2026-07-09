@@ -42,8 +42,8 @@ function Section({ emoji, title, subtitle, accentClass, children }) {
     <div className="mb-8">
       <div className={`rounded-2xl border ${accentClass} p-5`}>
         <div className="mb-4">
-          <h2 className="text-xl font-bold text-white">{emoji} {title}</h2>
-          <p className="text-gray-400 text-sm">{subtitle}</p>
+          <h2 className="text-xl font-bold" style={{ fontFamily: "'Playfair Display', serif", color: "#3e2723" }}>{emoji} {title}</h2>
+          <p className="text-sm" style={{ color: "#8d6e63" }}>{subtitle}</p>
         </div>
         {children}
       </div>
@@ -117,11 +117,11 @@ function BigFiveSection() {
               <polygon key={f} points={points.map(p => {
                 const dx = p.ax - cx, dy = p.ay - cy;
                 return `${cx + dx * f},${cy + dy * f}`;
-              }).join(" ")} fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="1" />
+              }).join(" ")} fill="none" stroke="rgba(141,110,99,0.15)" strokeWidth="1" />
             ))}
             {/* Axes */}
             {points.map((p, i) => (
-              <line key={i} x1={cx} y1={cy} x2={p.ax} y2={p.ay} stroke="rgba(255,255,255,0.1)" strokeWidth="1" />
+              <line key={i} x1={cx} y1={cy} x2={p.ax} y2={p.ay} stroke="rgba(141,110,99,0.2)" strokeWidth="1" />
             ))}
             {/* Data polygon */}
             <polygon points={polygon} fill="rgba(34,197,94,0.2)" stroke="#22c55e" strokeWidth="2" />
@@ -147,12 +147,12 @@ function BigFiveSection() {
             <div key={d.key}>
               <div className="flex justify-between text-xs mb-1">
                 <span style={{ color: d.color }} className="font-semibold">{d.label}</span>
-                <span className="text-gray-400">{scores[d.key]}%</span>
+                <span className="text-[#8d6e63]">{scores[d.key]}%</span>
               </div>
               <input type="range" min={0} max={100} value={scores[d.key]}
                 onChange={e => setScores({ ...scores, [d.key]: Number(e.target.value) })}
                 className="w-full accent-green-500 h-1.5 rounded-full cursor-pointer" />
-              <p className="text-gray-600 text-xs mt-0.5">{d.desc}</p>
+              <p className="text-[#a1887f] text-xs mt-0.5">{d.desc}</p>
             </div>
           ))}
         </div>
@@ -160,12 +160,12 @@ function BigFiveSection() {
 
       {/* Qualités */}
       <div className="mt-5">
-        <p className="text-white text-sm font-semibold mb-2">✨ Mes qualités</p>
+        <p className="text-[#3e2723] text-sm font-semibold mb-2">✨ Mes qualités</p>
         <div className="flex flex-wrap gap-2 mb-3">
           {qualites.map((q, i) => (
             <span key={i} className="bg-green-900/40 border border-green-600/30 text-green-300 text-xs px-2.5 py-1 rounded-full flex items-center gap-1">
               {q}
-              <button onClick={() => removeQualite(i)} className="hover:text-red-400 transition">
+              <button onClick={() => removeQualite(i)} className="hover:text-red-600 transition">
                 <X className="w-3 h-3" />
               </button>
             </span>
@@ -174,7 +174,7 @@ function BigFiveSection() {
         <div className="flex gap-2">
           <Input value={newQualite} onChange={e => setNewQualite(e.target.value)}
             onKeyDown={e => e.key === "Enter" && addQualite()}
-            placeholder="Ajouter une qualité..." className="bg-white/10 border-white/20 text-white placeholder:text-gray-500 text-sm flex-1" />
+            placeholder="Ajouter une qualité..." className="bg-white/60 border-[#e0d6c8] text-[#3e2723] placeholder:text-[#8d6e63]/50 text-sm flex-1" />
           <Button onClick={addQualite} size="sm" className="bg-green-800 hover:bg-green-700">
             <Plus className="w-3 h-3" />
           </Button>
@@ -218,39 +218,39 @@ function RacinesPositivesSection() {
       </Button>
 
       {showForm && (
-        <div className="bg-black/20 rounded-xl p-4 mb-4 border border-emerald-700/30 space-y-3">
+        <div className="bg-[#f5f0e8] rounded-xl p-4 mb-4 border border-emerald-700/30 space-y-3">
           <div className="grid grid-cols-2 gap-3">
             <Input value={form.name} onChange={e => setForm({ ...form, name: e.target.value })}
-              placeholder="Prénom / Nom" className="bg-white/10 border-white/20 text-white placeholder:text-gray-500" />
+              placeholder="Prénom / Nom" className="bg-white/60 border-[#e0d6c8] text-[#3e2723] placeholder:text-[#8d6e63]/50" />
             <Select value={form.type} onValueChange={v => setForm({ ...form, type: v })}>
-              <SelectTrigger className="bg-white/10 border-white/20 text-white"><SelectValue /></SelectTrigger>
+              <SelectTrigger className="bg-white/60 border-[#e0d6c8] text-[#3e2723]"><SelectValue /></SelectTrigger>
               <SelectContent>{LINK_TYPES.map(t => <SelectItem key={t} value={t}>{t}</SelectItem>)}</SelectContent>
             </Select>
           </div>
           <Textarea value={form.description} onChange={e => setForm({ ...form, description: e.target.value })}
             placeholder="Ce que cette relation vous apporte de positif..." rows={2}
-            className="bg-white/10 border-white/20 text-white placeholder:text-gray-500 resize-none" />
+            className="bg-white/60 border-[#e0d6c8] text-[#3e2723] placeholder:text-[#8d6e63]/50 resize-none" />
           <div className="flex gap-2">
             <Button onClick={handleCreate} size="sm" className="flex-1 bg-emerald-800 hover:bg-emerald-700">Ajouter</Button>
-            <Button onClick={() => setShowForm(false)} size="sm" variant="outline" className="border-white/20 text-white hover:bg-white/10">Annuler</Button>
+            <Button onClick={() => setShowForm(false)} size="sm" variant="outline" className="border-[#e0d6c8] text-[#3e2723] hover:bg-white/60">Annuler</Button>
           </div>
         </div>
       )}
 
       <div className="space-y-2">
         {links.map(lk => (
-          <div key={lk.id} className="flex items-start gap-3 bg-white/5 rounded-xl p-3 border border-white/10">
+          <div key={lk.id} className="flex items-start gap-3 bg-white/40 rounded-xl p-3 border border-[#e0d6c8]/60">
             <Badge className={`${LINK_COLORS[lk.type] || LINK_COLORS["Autre"]} border text-xs flex-shrink-0 mt-0.5`}>{lk.type}</Badge>
             <div className="flex-1 min-w-0">
-              <span className="text-white text-sm font-semibold">{lk.name}</span>
-              {lk.description && <p className="text-emerald-400 text-xs mt-0.5">💚 {lk.description}</p>}
+              <span className="text-[#3e2723] text-sm font-semibold">{lk.name}</span>
+              {lk.description && <p className="text-emerald-600 text-xs mt-0.5">💚 {lk.description}</p>}
             </div>
-            <button onClick={() => handleDelete(lk.id)} className="text-gray-600 hover:text-red-400 transition flex-shrink-0">
+            <button onClick={() => handleDelete(lk.id)} className="text-[#a1887f] hover:text-red-600 transition flex-shrink-0">
               <Trash2 className="w-4 h-4" />
             </button>
           </div>
         ))}
-        {!links.length && <p className="text-gray-500 text-sm text-center py-4">Aucune relation enregistrée.</p>}
+        {!links.length && <p className="text-[#8d6e63] text-sm text-center py-4">Aucune relation enregistrée.</p>}
       </div>
     </>
   );
@@ -259,20 +259,20 @@ function RacinesPositivesSection() {
 // ─── PAGE PRINCIPALE ─────────────────────────────────────
 export default function Growth() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#0a1628] to-[#0a2010] px-4 py-8">
+    <div className="min-h-screen px-4 py-8" style={{ background: "#faf6f0" }}>
       <div className="max-w-xl mx-auto">
-        <h1 className="text-3xl font-bold text-white mb-1">✨ Forces</h1>
-        <p className="text-gray-400 text-sm mb-4">Cliquez sur l'arbre ou les sections ci-dessous</p>
+        <h1 className="text-3xl font-bold mb-1" style={{ fontFamily: "'Playfair Display', serif", color: "#3e2723" }}>✨ Forces</h1>
+        <p className="text-sm mb-4" style={{ color: "#8d6e63" }}>Cliquez sur l'arbre ou les sections ci-dessous</p>
 
         <FullTree mode="strengths" />
 
         <Section emoji="🌲" title="Le Tronc — Big Five" subtitle="Votre profil de personnalité et vos qualités"
-          accentClass="bg-green-900/10 border-green-700/30">
+          accentClass="bg-green-50 border-green-200">
           <BigFiveSection />
         </Section>
 
         <Section emoji="🌱" title="Les Racines" subtitle="Relations positives et nourrissantes"
-          accentClass="bg-emerald-900/10 border-emerald-700/30">
+          accentClass="bg-emerald-50 border-emerald-200">
           <RacinesPositivesSection />
         </Section>
       </div>

@@ -105,19 +105,19 @@ export default function TreeAddPanel({ zone, onClose, onSaved, polarityLock }) {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/60 z-50 flex items-end justify-center" onClick={onClose}>
+    <div className="fixed inset-0 bg-[#3e2723]/40 z-50 flex items-end justify-center" onClick={onClose}>
       <div
-        className="bg-[#0d1a0d] rounded-t-2xl w-full max-w-lg border-t-2 shadow-2xl max-h-[85vh] overflow-y-auto"
-        style={{ borderColor: polarity === "wound" ? "#ef4444" : "#22c55e" }}
+        className="bg-[#faf6f0] rounded-t-2xl w-full max-w-lg border-t-2 shadow-2xl max-h-[85vh] overflow-y-auto"
+        style={{ borderColor: polarity === "wound" ? "#a1887f" : "#7fae7e" }}
         onClick={e => e.stopPropagation()}
       >
         {/* Header */}
         <div className="flex items-center justify-between px-5 pt-5 pb-2">
           <div>
-            <p className="text-xs text-gray-400">{meta.emoji} {meta.label}{branchName ? ` — ${branchName}` : ""}</p>
-            <p className="text-gray-500 text-xs">{meta.sub}</p>
+            <p className="text-xs text-[#8d6e63]">{meta.emoji} {meta.label}{branchName ? ` — ${branchName}` : ""}</p>
+            <p className="text-[#8d6e63] text-xs">{meta.sub}</p>
           </div>
-          <button onClick={onClose} className="text-gray-400 hover:text-white"><X className="w-5 h-5" /></button>
+          <button onClick={onClose} className="text-[#8d6e63] hover:text-white"><X className="w-5 h-5" /></button>
         </div>
 
         {/* Polarity toggle */}
@@ -126,13 +126,13 @@ export default function TreeAddPanel({ zone, onClose, onSaved, polarityLock }) {
           <button
             onClick={() => setPolarity("wound")}
             className={`flex-1 py-2 rounded-lg text-xs font-semibold transition border ${
-              polarity === "wound" ? "bg-red-900/60 text-red-200 border-red-700" : "bg-white/5 text-gray-400 border-white/10"
+              polarity === "wound" ? "bg-red-100 text-red-700 border-red-300" : "bg-white/40 text-[#8d6e63] border-[#e0d6c8]/60"
             }`}
           >🩸 Blessure</button>
           <button
             onClick={() => setPolarity("strength")}
             className={`flex-1 py-2 rounded-lg text-xs font-semibold transition border ${
-              polarity === "strength" ? "bg-green-900/60 text-green-200 border-green-700" : "bg-white/5 text-gray-400 border-white/10"
+              polarity === "strength" ? "bg-green-100 text-green-700 border-green-300" : "bg-white/40 text-[#8d6e63] border-[#e0d6c8]/60"
             }`}
           >✨ Force</button>
         </div>
@@ -144,21 +144,21 @@ export default function TreeAddPanel({ zone, onClose, onSaved, polarityLock }) {
             <>
               <div className="grid grid-cols-2 gap-3">
                 <Input type="number" value={eventForm.age} onChange={e => setEventForm({ ...eventForm, age: e.target.value })}
-                  placeholder="Âge" className="bg-white/10 border-white/20 text-white placeholder:text-gray-500" />
+                  placeholder="Âge" className="bg-white/60 border-[#e0d6c8] text-[#3e2723] placeholder:text-[#8d6e63]/50" />
                 <Select value={eventForm.emotion} onValueChange={v => setEventForm({ ...eventForm, emotion: v })}>
-                  <SelectTrigger className="bg-white/10 border-white/20 text-white"><SelectValue /></SelectTrigger>
+                  <SelectTrigger className="bg-white/60 border-[#e0d6c8] text-[#3e2723]"><SelectValue /></SelectTrigger>
                   <SelectContent>{EMOTIONS.map(e => <SelectItem key={e} value={e}>{e}</SelectItem>)}</SelectContent>
                 </Select>
               </div>
               <Select value={eventForm.chakra} onValueChange={v => setEventForm({ ...eventForm, chakra: v })}>
-                <SelectTrigger className="bg-white/10 border-white/20 text-white"><SelectValue /></SelectTrigger>
+                <SelectTrigger className="bg-white/60 border-[#e0d6c8] text-[#3e2723]"><SelectValue /></SelectTrigger>
                 <SelectContent>{CHAKRAS.map(c => <SelectItem key={c.name} value={c.name}>{c.name} — {c.shadow}</SelectItem>)}</SelectContent>
               </Select>
               <Input value={eventForm.title} onChange={e => setEventForm({ ...eventForm, title: e.target.value })}
-                placeholder="Titre de l'événement" className="bg-white/10 border-white/20 text-white placeholder:text-gray-500" />
+                placeholder="Titre de l'événement" className="bg-white/60 border-[#e0d6c8] text-[#3e2723] placeholder:text-[#8d6e63]/50" />
               <Textarea value={eventForm.description} onChange={e => setEventForm({ ...eventForm, description: e.target.value })}
                 placeholder="Description (optionnel)" rows={2}
-                className="bg-white/10 border-white/20 text-white placeholder:text-gray-500 resize-none" />
+                className="bg-white/60 border-[#e0d6c8] text-[#3e2723] placeholder:text-[#8d6e63]/50 resize-none" />
             </>
           )}
 
@@ -166,35 +166,35 @@ export default function TreeAddPanel({ zone, onClose, onSaved, polarityLock }) {
             <>
               <div className="flex gap-2">
                 <button onClick={() => setTrunkSubType("quality")}
-                  className={`flex-1 py-2 rounded-lg text-xs font-semibold transition border ${trunkSubType === "quality" ? "bg-green-900/60 text-green-200 border-green-700" : "bg-white/5 text-gray-400 border-white/10"}`}>
+                  className={`flex-1 py-2 rounded-lg text-xs font-semibold transition border ${trunkSubType === "quality" ? "bg-green-100 text-green-700 border-green-300" : "bg-white/40 text-[#8d6e63] border-[#e0d6c8]/60"}`}>
                   ✨ Qualité
                 </button>
                 <button onClick={() => setTrunkSubType("event")}
-                  className={`flex-1 py-2 rounded-lg text-xs font-semibold transition border ${trunkSubType === "event" ? "bg-green-900/60 text-green-200 border-green-700" : "bg-white/5 text-gray-400 border-white/10"}`}>
+                  className={`flex-1 py-2 rounded-lg text-xs font-semibold transition border ${trunkSubType === "event" ? "bg-green-100 text-green-700 border-green-300" : "bg-white/40 text-[#8d6e63] border-[#e0d6c8]/60"}`}>
                   🌳 Événement positif
                 </button>
               </div>
               {trunkSubType === "quality" ? (
                 <>
-                  <p className="text-gray-400 text-xs">Ajoutez une qualité personnelle à votre tronc.</p>
+                  <p className="text-[#8d6e63] text-xs">Ajoutez une qualité personnelle à votre tronc.</p>
                   <Input value={quality} onChange={e => setQuality(e.target.value)}
-                    placeholder="Ex: Résilient, Créatif, Empathique..." className="bg-white/10 border-white/20 text-white placeholder:text-gray-500" />
+                    placeholder="Ex: Résilient, Créatif, Empathique..." className="bg-white/60 border-[#e0d6c8] text-[#3e2723] placeholder:text-[#8d6e63]/50" />
                 </>
               ) : (
                 <>
                   <div className="grid grid-cols-2 gap-3">
                     <Input type="number" value={posEventForm.age} onChange={e => setPosEventForm({ ...posEventForm, age: e.target.value })}
-                      placeholder="Âge" className="bg-white/10 border-white/20 text-white placeholder:text-gray-500" />
+                      placeholder="Âge" className="bg-white/60 border-[#e0d6c8] text-[#3e2723] placeholder:text-[#8d6e63]/50" />
                     <Select value={posEventForm.chakra} onValueChange={v => setPosEventForm({ ...posEventForm, chakra: v })}>
-                      <SelectTrigger className="bg-white/10 border-white/20 text-white"><SelectValue /></SelectTrigger>
+                      <SelectTrigger className="bg-white/60 border-[#e0d6c8] text-[#3e2723]"><SelectValue /></SelectTrigger>
                       <SelectContent>{CHAKRAS.map(c => <SelectItem key={c.name} value={c.name}>{c.name} — {c.light}</SelectItem>)}</SelectContent>
                     </Select>
                   </div>
                   <Input value={posEventForm.title} onChange={e => setPosEventForm({ ...posEventForm, title: e.target.value })}
-                    placeholder="Titre de l'événement" className="bg-white/10 border-white/20 text-white placeholder:text-gray-500" />
+                    placeholder="Titre de l'événement" className="bg-white/60 border-[#e0d6c8] text-[#3e2723] placeholder:text-[#8d6e63]/50" />
                   <Textarea value={posEventForm.description} onChange={e => setPosEventForm({ ...posEventForm, description: e.target.value })}
                     placeholder="Description (optionnel)" rows={2}
-                    className="bg-white/10 border-white/20 text-white placeholder:text-gray-500 resize-none" />
+                    className="bg-white/60 border-[#e0d6c8] text-[#3e2723] placeholder:text-[#8d6e63]/50 resize-none" />
                 </>
               )}
             </>
@@ -204,26 +204,26 @@ export default function TreeAddPanel({ zone, onClose, onSaved, polarityLock }) {
             <>
               <div className="grid grid-cols-2 gap-3">
                 <Input value={linkForm.name} onChange={e => setLinkForm({ ...linkForm, name: e.target.value })}
-                  placeholder="Prénom / Nom" className="bg-white/10 border-white/20 text-white placeholder:text-gray-500" />
+                  placeholder="Prénom / Nom" className="bg-white/60 border-[#e0d6c8] text-[#3e2723] placeholder:text-[#8d6e63]/50" />
                 <Select value={linkForm.type} onValueChange={v => setLinkForm({ ...linkForm, type: v })}>
-                  <SelectTrigger className="bg-white/10 border-white/20 text-white"><SelectValue /></SelectTrigger>
+                  <SelectTrigger className="bg-white/60 border-[#e0d6c8] text-[#3e2723]"><SelectValue /></SelectTrigger>
                   <SelectContent>{LINK_TYPES.map(t => <SelectItem key={t} value={t}>{t}</SelectItem>)}</SelectContent>
                 </Select>
               </div>
               <Textarea value={linkForm.description} onChange={e => setLinkForm({ ...linkForm, description: e.target.value })}
                 placeholder={polarity === "wound" ? "Ce qui était douloureux..." : "Ce que cette relation vous apporte de positif..."}
-                rows={2} className="bg-white/10 border-white/20 text-white placeholder:text-gray-500 resize-none" />
+                rows={2} className="bg-white/60 border-[#e0d6c8] text-[#3e2723] placeholder:text-[#8d6e63]/50 resize-none" />
             </>
           )}
 
           {zone.type === "branch" && polarity === "wound" && (
             <>
               <Input value={beliefForm.belief} onChange={e => setBeliefForm({ ...beliefForm, belief: e.target.value })}
-                placeholder="La croyance limitante..." className="bg-white/10 border-white/20 text-white placeholder:text-gray-500" />
+                placeholder="La croyance limitante..." className="bg-white/60 border-[#e0d6c8] text-[#3e2723] placeholder:text-[#8d6e63]/50" />
               <Input value={beliefForm.origin} onChange={e => setBeliefForm({ ...beliefForm, origin: e.target.value })}
-                placeholder="D'où vient-elle ? (optionnel)" className="bg-white/10 border-white/20 text-white placeholder:text-gray-500" />
+                placeholder="D'où vient-elle ? (optionnel)" className="bg-white/60 border-[#e0d6c8] text-[#3e2723] placeholder:text-[#8d6e63]/50" />
               <Input value={beliefForm.reframe} onChange={e => setBeliefForm({ ...beliefForm, reframe: e.target.value })}
-                placeholder="Reformulation positive (optionnel)" className="bg-white/10 border-white/20 text-white placeholder:text-gray-500" />
+                placeholder="Reformulation positive (optionnel)" className="bg-white/60 border-[#e0d6c8] text-[#3e2723] placeholder:text-[#8d6e63]/50" />
             </>
           )}
 
@@ -231,27 +231,27 @@ export default function TreeAddPanel({ zone, onClose, onSaved, polarityLock }) {
             <>
               <div className="flex gap-2">
                 <button onClick={() => setBranchSubType("belief")}
-                  className={`flex-1 py-2 rounded-lg text-xs font-semibold transition border ${branchSubType === "belief" ? "bg-green-900/60 text-green-200 border-green-700" : "bg-white/5 text-gray-400 border-white/10"}`}>
+                  className={`flex-1 py-2 rounded-lg text-xs font-semibold transition border ${branchSubType === "belief" ? "bg-green-100 text-green-700 border-green-300" : "bg-white/40 text-[#8d6e63] border-[#e0d6c8]/60"}`}>
                   ✦ Croyance
                 </button>
                 <button onClick={() => setBranchSubType("activity")}
-                  className={`flex-1 py-2 rounded-lg text-xs font-semibold transition border ${branchSubType === "activity" ? "bg-green-900/60 text-green-200 border-green-700" : "bg-white/5 text-gray-400 border-white/10"}`}>
+                  className={`flex-1 py-2 rounded-lg text-xs font-semibold transition border ${branchSubType === "activity" ? "bg-green-100 text-green-700 border-green-300" : "bg-white/40 text-[#8d6e63] border-[#e0d6c8]/60"}`}>
                   🍃 Activité
                 </button>
               </div>
               {branchSubType === "belief" ? (
                 <>
                   <Input value={beliefForm.belief} onChange={e => setBeliefForm({ ...beliefForm, belief: e.target.value })}
-                    placeholder="La croyance positive..." className="bg-white/10 border-white/20 text-white placeholder:text-gray-500" />
+                    placeholder="La croyance positive..." className="bg-white/60 border-[#e0d6c8] text-[#3e2723] placeholder:text-[#8d6e63]/50" />
                   <Input value={beliefForm.note} onChange={e => setBeliefForm({ ...beliefForm, note: e.target.value })}
-                    placeholder="Note (optionnel)" className="bg-white/10 border-white/20 text-white placeholder:text-gray-500" />
+                    placeholder="Note (optionnel)" className="bg-white/60 border-[#e0d6c8] text-[#3e2723] placeholder:text-[#8d6e63]/50" />
                 </>
               ) : (
                 <>
                   <Input value={activityForm.name} onChange={e => setActivityForm({ ...activityForm, name: e.target.value })}
-                    placeholder="Nom de l'activité..." className="bg-white/10 border-white/20 text-white placeholder:text-gray-500" />
+                    placeholder="Nom de l'activité..." className="bg-white/60 border-[#e0d6c8] text-[#3e2723] placeholder:text-[#8d6e63]/50" />
                   <Input value={activityForm.description} onChange={e => setActivityForm({ ...activityForm, description: e.target.value })}
-                    placeholder="Pourquoi elle me fait du bien (optionnel)" className="bg-white/10 border-white/20 text-white placeholder:text-gray-500" />
+                    placeholder="Pourquoi elle me fait du bien (optionnel)" className="bg-white/60 border-[#e0d6c8] text-[#3e2723] placeholder:text-[#8d6e63]/50" />
                 </>
               )}
             </>
