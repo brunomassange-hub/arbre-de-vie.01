@@ -82,22 +82,23 @@ export default function BigFiveRadarModal({ profile, onClose, onSaved }) {
         {/* Radar chart */}
         <div className="flex justify-center mb-4 rounded-xl p-2" style={{ background: "linear-gradient(135deg, #ffffff 0%, #f5f0e8 100%)", boxShadow: "inset 0 1px 4px rgba(141,110,99,0.15)" }}>
           <svg width="260" height="260" viewBox="0 0 260 260">
+            {/* Full pentagon in black (background, always visible) */}
+            <polygon points={vertices.map(v => `${v.x},${v.y}`).join(" ")} fill="#1a1a1a" />
+            {/* Grid lines on top of black */}
             {[0.25, 0.5, 0.75, 1].map(f => (
               <polygon key={f} points={vertices.map(v => {
                 const dx = v.x - cxR, dy = v.y - cyR;
                 return `${cxR + dx * f},${cyR + dy * f}`;
-              }).join(" ")} fill="none" stroke="rgba(141,110,99,0.35)" strokeWidth="1" />
+              }).join(" ")} fill="none" stroke="rgba(255,255,255,0.18)" strokeWidth="1" />
             ))}
             {vertices.map((v, i) => (
-              <line key={i} x1={cxR} y1={cyR} x2={v.x} y2={v.y} stroke="rgba(141,110,99,0.3)" strokeWidth="1" />
+              <line key={i} x1={cxR} y1={cyR} x2={v.x} y2={v.y} stroke="rgba(255,255,255,0.15)" strokeWidth="1" />
             ))}
-            {/* Full pentagon in black (always visible) */}
-            <polygon points={vertices.map(v => `${v.x},${v.y}`).join(" ")} fill="#1a1a1a" />
-            {/* Colored wedges (center → score) on top */}
+            {/* Colored wedges (center → score) fully opaque on top */}
             {BIG5.map((d, i) => {
               const ni = (i + 1) % n;
               const pts = `${cxR},${cyR} ${dataPoints[i].x},${dataPoints[i].y} ${dataPoints[ni].x},${dataPoints[ni].y}`;
-              return <polygon key={`i${i}`} points={pts} fill={d.color} fillOpacity="0.82" stroke={d.color} strokeWidth="1.5" />;
+              return <polygon key={`i${i}`} points={pts} fill={d.color} stroke="none" />;
             })}
             {/* Data point dots */}
             {dataPoints.map((p, i) => (
