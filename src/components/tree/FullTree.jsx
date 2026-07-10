@@ -223,7 +223,8 @@ export default function FullTree({ mode }) {
 
             {/* Trunk events */}
             {trunkEvents.map((ev, i) => {
-              const y = trunkTop + 40 + i * 28;
+              const spacing = trunkEvents.length > 7 ? (isWound ? 24 : 20) : 28;
+              const y = trunkTop + 30 + i * spacing;
               const chakra = CHAKRAS.find(c => c.name === ev.chakra);
               const col = chakra?.color || (isWound ? "#a1887f" : "#7fae7e");
               const type = isWound ? "event" : "pos_event";
