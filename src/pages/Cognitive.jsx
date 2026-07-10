@@ -9,6 +9,7 @@ import EnneagramSection from "@/components/cognitive/EnneagramSection";
 import MBTIQuiz from "@/components/cognitive/MBTIQuiz";
 import EnneagramQuiz from "@/components/cognitive/EnneagramQuiz";
 import MBTITypeInfo from "@/components/cognitive/MBTITypeInfo";
+import MBTIImprovements from "@/components/cognitive/MBTIImprovements";
 import { FUNCTION_DESCRIPTIONS } from "@/lib/mbti-data";
 import { FUNCTION_SHORT } from "@/lib/mbti-data";
 import { HelpCircle } from "lucide-react";
@@ -122,6 +123,9 @@ export default function Cognitive() {
 
         {/* Type description: strengths, weaknesses, functioning */}
         <MBTITypeInfo selectedType={selectedType} />
+
+        {/* Personalized improvement axes based on MBTI type */}
+        <MBTIImprovements selectedType={selectedType} />
 
         {/* Ego / Ombre split */}
         <div className="grid grid-cols-2 gap-4 mb-5">

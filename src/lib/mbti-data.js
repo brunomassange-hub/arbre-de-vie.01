@@ -10,6 +10,138 @@ export const FUNCTION_SHORT = {
   Ne: "Déduction",
 };
 
+// Personalized improvement axes for each MBTI type
+export const TYPE_IMPROVEMENTS = {
+  INTP: {
+    axes: [
+      { titre: "Développer la connexion émotionnelle", detail: "Votre fonction inférieure (Fe) est l'empathie sociale. Pratiquez l'écoute active, partagez vos émotions avec confiance, et autorisez-vous à ressentir avant d'analyser." },
+      { titre: "Passer à l'action", detail: "Votre Ne génère beaucoup d'idées mais votre Ti peut paralysier par analyse. Fixez-vous des deadlines courtes et lancez-vous avant que ce soit parfait." },
+      { titre: "Ancrer vos habitudes", detail: "Votre Si tertiaire a besoin de routines stables. Créez des rituels quotidiens simples pour ne pas vous éparpiller." },
+      { titre: "Accepter l'imperfection", detail: "Lâchez le besoin de cohérence absolue. Acceptez que certaines choses soient 'assez bonnes' pour avancer." },
+    ],
+  },
+  INTJ: {
+    axes: [
+      { titre: "Rester ancré dans le présent", detail: "Votre Se inférieur vous déconnecte du moment présent. Pratiquez la pleine conscience, le sport, ou des activités manuelles pour vous reconnecter au corps." },
+      { titre: "Cultiver la sensibilité", detail: "Votre Fi tertiaire est votre connexion aux valeurs. Prenez le temps d'identifier ce qui compte vraiment pour vous, au-delà de l'efficacité." },
+      { titre: "Partager votre vision", detail: "Votre Ni est puissant mais interne. Apprenez à communiquer votre vision de manière accessible aux autres pour les embarquer." },
+      { titre: "Accepter l'imprévu", detail: "Lâchez le contrôle planificateur. Autorisez-vous à improviser et à voir où la spontanéité vous mène." },
+    ],
+  },
+  INFP: {
+    axes: [
+      { titre: "Structurer vos projets", detail: "Votre Te inférieur est l'organisation externe. Utilisez des outils de gestion, décomposez vos idéaux en étapes concrètes et mesurables." },
+      { titre: "Ancrer vos routines", detail: "Votre Si tertiaire a besoin de stabilité. Créez des repères quotidiens pour ne pas vous perdre dans vos rêveries." },
+      { titre: "Gérer la sensibilité", detail: "Votre Fi est intense. Apprenez à ne pas tout prendre personnellement et à distinguer vos émotions de celles des autres." },
+      { titre: "Passer à l'action", detail: "Ne attendez pas que tout soit aligné avec vos valeurs pour agir. Autorisez-vous des compromis pragmatiques." },
+    ],
+  },
+  INFJ: {
+    axes: [
+      { titre: "Vivre le moment présent", detail: "Votre Se inférieur vous coupe du réel. Pratiquez des activités sensorielles : marche, cuisine, art, pour ancrer votre esprit visionary dans le corps." },
+      { titre: "Affiner votre logique", detail: "Votre Ti tertiaire gagne à être entraîné. Exercez votre esprit critique et analytique pour équilibrer vos intuitions." },
+      { titre: "Poser des limites", detail: "Votre Fe vous pousse à tout faire pour les autres. Apprenez à dire non et à protéger votre énergie." },
+      { titre: "Partager votre vision", detail: "Votre Ni est riche mais solitaire. Trouvez des moyens concrets de partager vos insights avec le monde." },
+    ],
+  },
+  ENTP: {
+    axes: [
+      { titre: "Terminer vos projets", detail: "Votre Si inférieur a besoin de constance. Engagez-vous à terminer avant de commencer la prochaine idée. Créez des routines de suivi." },
+      { titre: "Développer l'empathie", detail: "Votre Fe tertiaire vous connecte aux autres. Pratiquez l'écoute avant l'argumentation, et validez les émotions avant de débattre." },
+      { titre: "Approfondir plutôt qu'élargir", detail: "Votre Ne veut tout explorer. Choisissez un domaine et creusez-le vraiment avec votre Ti pour atteindre une vraie maîtrise." },
+      { titre: "Ralentir le mental", detail: "Votre esprit va vite. Pratiquez la méditation ou l'écriture pour canaliser et ne pas vous éparpiller." },
+    ],
+  },
+  ENTJ: {
+    axes: [
+      { titre: "Développer la sensibilité", detail: "Votre Fi inférieur est votre accès aux émotions. Pratiquez l'introspection émotionnelle, identifiez ce que vous ressentez, et tenez compte des émotions des autres." },
+      { titre: "Savourer le présent", detail: "Votre Se tertiaire vous connecte au moment. Autorisez-vous à ralentir, à profiter sans optimiser." },
+      { titre: "Déléguer et faire confiance", detail: "Votre Te veut tout contrôler. Apprenez à faire confiance aux autres et à accepter que votre façon ne soit pas la seule." },
+      { titre: "Écouter avant de décider", detail: "Votre Ni est puissant mais rapide. Prenez le temps d'écouter d'autres perspectives avant de trancher." },
+    ],
+  },
+  ENFP: {
+    axes: [
+      { titre: "Structurer et organiser", detail: "Votre Te tertiaire a besoin d'entraînement. Utilisez des plannings, des listes et des échéances pour concrétiser vos nombreux projets." },
+      { titre: "Stabiliser vos habitudes", detail: "Votre Si inférieur est le défi de la constance. Créez des routines ancrées pour ne pas vous éparpiller." },
+      { titre: "Canaliser l'enthousiasme", detail: "Votre Ne vous emporte partout. Apprenez à dire non aux nouvelles opportunités pour finir ce que vous avez commencé." },
+      { titre: "Gérer le stress émotionnel", detail: "Votre Fi est profond. Apprenez à vous recentrer quand les émotions vous submergent." },
+    ],
+  },
+  ENFJ: {
+    axes: [
+      { titre: "Développer la logique interne", detail: "Votre Ti inférieur gagne à être cultivé. Exercez l'analyse objective et le raisonnement logique pour équilibrer l'empathie." },
+      { titre: "S'ancrer dans le présent", detail: "Votre Se tertiaire vous relie au réel. Pratiquez des activités corporelles et sensorielles pour sortir du mental." },
+      { titre: "Poser des limites", detail: "Votre Fe vous pousse à tout faire pour autrui. Apprenez à dire non sans culpabilité et à vous occuper de vous d'abord." },
+      { titre: "Décider par soi-même", detail: "Votre Ni vous guide mais peut être influencé par le groupe. Cultivez votre propre vision indépendamment des attentes des autres." },
+    ],
+  },
+  ISTP: {
+    axes: [
+      { titre: "Développer la connexion sociale", detail: "Votre Fe inférieure est l'empathie. Pratiquez l'expression émotionnelle, partagez ce que vous ressentez avec vos proches." },
+      { titre: "Cultiver la vision long-terme", detail: "Votre Ni tertiaire voit les patterns. Prenez le temps de réfléchir à votre direction de vie, pas seulement à l'instant." },
+      { titre: "Approfondir plutôt que diversifier", detail: "Votre Se veut explorer. Choisissez une compétence et maîtrisez-la vraiment avec votre Ti." },
+      { titre: "Communiquer vos pensées", detail: "Votre Ti est interne. Apprenez à expliquer votre raisonnement aux autres pour mieux collaborer." },
+    ],
+  },
+  ISTJ: {
+    axes: [
+      { titre: "Cultiver l'ouverture d'esprit", detail: "Votre Ne inférieur est l'exploration. Essayez de nouvelles choses, lisez des perspectives différentes, sortez de votre zone de confort." },
+      { titre: "Développer la sensibilité", detail: "Votre Fi tertiaire est votre monde intérieur. Prenez le temps d'identifier vos émotions et vos valeurs profondes." },
+      { titre: "Accepter le changement", detail: "Votre Si stabilise mais peut rigidifier. Pratiquez la flexibilité face à l'imprévu." },
+      { titre: "Déléguer et faire confiance", detail: "Votre Te veut tout contrôler. Apprenez à faire confiance aux autres pour faire les choses différemment." },
+    ],
+  },
+  ISFP: {
+    axes: [
+      { titre: "Structurer vos projets", detail: "Votre Te inférieur est l'organisation. Créez des plans concrets, des deadlines, décomposez vos aspirations en étapes." },
+      { titre: "Développer la vision long-terme", detail: "Votre Ni tertiaire voit les tendances. Prenez le temps de réfléchir à votre direction de vie au-delà du moment présent." },
+      { titre: "Exprimer vos besoins", detail: "Votre Fi est profond mais interne. Apprenez à communiquer ce qui compte pour vous au lieu d'éviter les conflits." },
+      { titre: "Sortir de la zone de confort", detail: "Votre Se aime le confort du connu. Essayez de nouvelles expériences pour vous enrichir." },
+    ],
+  },
+  ISFJ: {
+    axes: [
+      { titre: "Développer l'ouverture", detail: "Votre Ne inférieur est l'exploration des possibles. Essayez de nouvelles approches, lisez, voyagez pour élargir vos horizons." },
+      { titre: "Affiner la logique interne", detail: "Votre Ti tertiaire gagne à être entraîné. Exercez le raisonnement analytique et l'esprit critique." },
+      { titre: "Poser des limites", detail: "Votre Fe vous pousse à tout faire pour les autres. Apprenez à dire non et à exprimer vos propres besoins." },
+      { titre: "Sortir de la routine", detail: "Votre Si stabilise mais peut enfermer. Introduisez de la nouveauté dans votre quotidien." },
+    ],
+  },
+  ESTP: {
+    axes: [
+      { titre: "Développer la vision long-terme", detail: "Votre Ni inférieur voit les patterns futurs. Prenez le temps de réfléchir à votre direction de vie, pas seulement à l'action immédiate." },
+      { titre: "Approfondir l'empathie", detail: "Votre Fe tertiaire vous connecte aux autres. Pratiquez l'écoute profonde avant l'action." },
+      { titre: "Planifier avant d'agir", detail: "Votre Se veut l'action immédiate. Apprenez à réfléchir avant de vous lancer pour éviter les impasses." },
+      { titre: "Canaliser l'impulsivité", detail: "Pratiquez la patience. Attendez 24h avant les grandes décisions pour laisser votre Ti analyser." },
+    ],
+  },
+  ESTJ: {
+    axes: [
+      { titre: "Développer la sensibilité", detail: "Votre Fi inférieur est votre accès aux émotions. Pratiquez l'introspection, identifiez vos sentiments et tenez compte de ceux des autres." },
+      { titre: "Cultiver l'ouverture", detail: "Votre Ne tertiaire est l'exploration. Essayez de nouvelles méthodes, écoutez les perspectives différentes." },
+      { titre: "Lâcher le contrôle", detail: "Votre Te veut tout structurer. Apprenez à faire confiance aux autres et à accepter l'imprévu." },
+      { titre: "Ralentir et écouter", detail: "Prenez le temps d'écouter avant de trancher. Les autres ont des idées valables même si elles diffèrent des vôtres." },
+    ],
+  },
+  ESFP: {
+    axes: [
+      { titre: "Développer la vision long-terme", detail: "Votre Ni inférieur voit les tendances. Prenez le temps de réfléchir à votre direction de vie au-delà du moment présent." },
+      { titre: "Structurer et organiser", detail: "Votre Te tertiaire a besoin d'entraînement. Créez des plannings, des listes et des routines pour concrétiser." },
+      { titre: "Approfondir plutôt que diversifier", detail: "Votre Se veut tout expérimenter. Choisissez un domaine et approfondissez-le vraiment avec votre Fi." },
+      { titre: "Faire face aux conflits", detail: "Votre Fi évite les tensions. Apprenez à aborder les difficultés au lieu de les fuir dans le plaisir." },
+    ],
+  },
+  ESFJ: {
+    axes: [
+      { titre: "Développer la logique interne", detail: "Votre Ti inférieur gagne à être cultivé. Exercez l'analyse objective pour équilibrer l'empathie et l'harmonie sociale." },
+      { titre: "Cultiver l'ouverture", detail: "Votre Ne tertiaire est l'exploration. Essayez de nouvelles idées, remettez en question les conventions." },
+      { titre: "Poser des limites", detail: "Votre Fe vous pousse à tout faire pour autrui. Apprenez à dire non et à vous occuper de vous." },
+      { titre: "Décider par soi-même", detail: "Votre Si stabilise mais peut soumettre au groupe. Cultivez votre propre avis indépendamment des attentes." },
+    ],
+  },
+};
+
 // Enhanced MBTI cognitive function descriptions
 export const FUNCTION_DESCRIPTIONS = {
   Ti: {
