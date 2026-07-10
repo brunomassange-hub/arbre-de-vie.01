@@ -205,14 +205,9 @@ export default function FullTree({ mode }) {
                   <circle cx={rx} cy={ry} r="9" fill={bgColor} stroke={color} strokeWidth="1.5" />
                   <text x={rx} y={ry + 1} textAnchor="middle" dominantBaseline="middle" fontSize="8" fill="#3e2723">{isWound ? "💔" : "💚"}</text>
                   {isWound && lk.name && (
-                    <text x={rx} y={ry - 14} textAnchor="middle" dominantBaseline="middle" fontSize="7" fill="#5d4037" fontWeight="600" pointerEvents="none">{lk.name.length > 12 ? lk.name.slice(0, 12) + "…" : lk.name}</text>
+                    <text x={rx} y={ry - 13} textAnchor="middle" dominantBaseline="middle" fontSize="8" fill="#3e2723" fontWeight="700" pointerEvents="none" style={{ paintOrder: "stroke", stroke: "#faf6f0", strokeWidth: 2 }}>{lk.name.length > 10 ? lk.name.slice(0, 10) + "…" : lk.name}</text>
                   )}
-                  {isWound && lk.type && (
-                    <text x={rx} y={ry + 18} textAnchor="middle" dominantBaseline="middle" fontSize="6" fill={color} fontWeight="500" pointerEvents="none">{lk.type}</text>
-                  )}
-                  {!isWound && lk.type && (
-                    <text x={rx} y={ry - 14} textAnchor="middle" dominantBaseline="middle" fontSize="7" fill={color} fontWeight="600" pointerEvents="none">{lk.type}</text>
-                  )}
+                  <text x={rx} y={ry + 16} textAnchor="middle" dominantBaseline="middle" fontSize="8" fill={isWound ? "#8d6e63" : color} fontWeight="700" pointerEvents="none" style={{ paintOrder: "stroke", stroke: "#faf6f0", strokeWidth: 2 }}>{lk.type || ""}</text>
                 </g>
               );
             })}
