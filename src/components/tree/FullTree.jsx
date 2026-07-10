@@ -366,17 +366,10 @@ export default function FullTree({ mode }) {
                   })}
 
                   {bActivities.slice(0, 8).map((a, i) => {
-                    // Distribute activities around the branch tip on a larger radius.
-                    // Avoid the label zone (above the tip for both sides).
-                    const n = bActivities.length;
-                    const angles = [];
-                    for (let k = 0; k < n; k++) {
-                      // Start from bottom (PI/2) and spread around, skipping the top where label is
-                      const spread = (Math.PI * 1.4); // ~252° of circle
-                      const startAngle = Math.PI / 2 - spread / 2; // center at bottom
-                      angles.push(startAngle + (k / Math.max(n - 1, 1)) * spread);
-                    }
-                    const angle = angles[i] + (bd.side === "left" ? 0 : 0);
+                    // Distribute activities on the bottom semicircle only (0 to PI)
+                    // so they never overlap the branch label which sits above the tip.
+                    const n = Math.min(bActivities.length, 8);
+                    const angle = n === 1 ? Math.PI / 2 : (i / (n - 1)) * Math.PI;
                     const lr = 22;
                     const lx = end.x + lr * Math.cos(angle) + (bd.side === "left" ? -4 : 4);
                     const ly = end.y + lr * Math.sin(angle);
