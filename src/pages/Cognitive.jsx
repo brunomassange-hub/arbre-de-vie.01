@@ -10,6 +10,7 @@ import MBTIQuiz from "@/components/cognitive/MBTIQuiz";
 import EnneagramQuiz from "@/components/cognitive/EnneagramQuiz";
 import MBTITypeInfo from "@/components/cognitive/MBTITypeInfo";
 import { FUNCTION_DESCRIPTIONS } from "@/lib/mbti-data";
+import { FUNCTION_SHORT } from "@/lib/mbti-data";
 import { HelpCircle } from "lucide-react";
 
 // MBTI cognitive function stacks
@@ -138,7 +139,8 @@ export default function Cognitive() {
                   <div key={fn} className="bg-white/10 rounded-xl p-3 border border-white/10">
                     <div className="flex items-center gap-2 mb-1">
                       <span className="text-lg font-black" style={{ color: info.color }}>{fn}</span>
-                      <span className="text-xs text-gray-500">{POSITION_LABELS[i]}</span>
+                      <span className="text-xs font-semibold" style={{ color: info.color + "cc" }}>{FUNCTION_SHORT[fn]}</span>
+                      <span className="text-xs text-gray-500 ml-auto">{POSITION_LABELS[i]}</span>
                     </div>
                     <p className="text-white text-xs font-medium">{info.label}</p>
                     <p className="text-gray-400 text-xs mt-0.5 leading-relaxed">{info.desc}</p>
@@ -163,7 +165,8 @@ export default function Cognitive() {
                   <div key={fn} className="bg-white/5 rounded-xl p-3 border border-white/5 opacity-80">
                     <div className="flex items-center gap-2 mb-1">
                       <span className="text-lg font-black" style={{ color: info.color + "99" }}>{fn}</span>
-                      <span className="text-xs text-gray-600">{SHADOW_LABELS[i]}</span>
+                      <span className="text-xs font-semibold" style={{ color: info.color + "aa" }}>{FUNCTION_SHORT[fn]}</span>
+                      <span className="text-xs text-gray-600 ml-auto">{SHADOW_LABELS[i]}</span>
                     </div>
                     <p className="text-gray-300 text-xs font-medium">{info.label}</p>
                     <p className="text-gray-500 text-xs mt-0.5 leading-relaxed">{info.desc}</p>

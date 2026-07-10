@@ -1,3 +1,15 @@
+// Short labels for each cognitive function
+export const FUNCTION_SHORT = {
+  Ti: "Logique",
+  Te: "Rationalité",
+  Fi: "Authenticité",
+  Fe: "Empathie",
+  Si: "Souvenir",
+  Se: "Sensation",
+  Ni: "Intuition",
+  Ne: "Déduction",
+};
+
 // Enhanced MBTI cognitive function descriptions
 export const FUNCTION_DESCRIPTIONS = {
   Ti: {
