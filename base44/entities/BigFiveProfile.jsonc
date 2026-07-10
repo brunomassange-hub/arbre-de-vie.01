@@ -25,9 +25,30 @@
     "qualites": {
       "type": "array",
       "items": {
-        "type": "string"
+        "type": "object",
+        "properties": {
+          "trait": {
+            "type": "string",
+            "enum": [
+              "ouverture",
+              "agreabilite",
+              "conscience",
+              "nervosite",
+              "extraversion"
+            ],
+            "description": "Le trait Big Five associ\u00e9"
+          },
+          "text": {
+            "type": "string",
+            "description": "La qualit\u00e9 personnelle"
+          }
+        },
+        "required": [
+          "trait",
+          "text"
+        ]
       },
-      "description": "Liste de qualit\u00e9s personnelles"
+      "description": "Liste de qualit\u00e9s personnelles associ\u00e9es \u00e0 un trait Big Five"
     }
   },
   "required": []

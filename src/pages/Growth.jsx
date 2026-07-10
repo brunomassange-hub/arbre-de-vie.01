@@ -58,6 +58,7 @@ function BigFiveSection() {
   const [scores, setScores] = useState({ ouverture: 50, agreabilite: 50, conscience: 50, nervosite: 50, extraversion: 50 });
   const [qualites, setQualites] = useState([]);
   const [newQualite, setNewQualite] = useState("");
+  const [newQualiteTrait, setNewQualiteTrait] = useState("agreabilite");
   const [saved, setSaved] = useState(false);
 
   useEffect(() => {
@@ -71,7 +72,10 @@ function BigFiveSection() {
           nervosite: d[0].nervosite ?? 50,
           extraversion: d[0].extraversion ?? 50,
         });
-        setQualites(d[0].qualites || []);
+        // Normalize: old format was string[], new is {trait, text}[]
+        setQualites((d[0].qualites || []).map(q =>
+          typeof q === "string" ? { trait: "agreabilite", text: q } : q
+        ));
       }
     });
   }, []);
@@ -86,7 +90,7 @@ function BigFiveSection() {
 
   const addQualite = () => {
     if (!newQualite.trim()) return;
-    setQualites([...qualites, newQualite.trim()]);
+    setQualites([...qualites, { trait: newQualiteTrait, text: newQualite.trim() }]);
     setNewQualite("");
   };
 
@@ -179,27 +183,45 @@ function BigFiveSection() {
         </div>
       </div>
 
-      {/* Qualités */}
-      <div className="mt-5">
-        <p className="text-[#3e2723] text-sm font-semibold mb-2">✨ Mes qualités</p>
-        <div className="flex flex-wrap gap-2 mb-3">
-          {qualites.map((q, i) => (
-            <span key={i} className="bg-green-900/40 border border-green-600/30 text-green-300 text-xs px-2.5 py-1 rounded-full flex items-center gap-1">
-              {q}
-              <button onClick={() => removeQualite(i)} className="hover:text-red-600 transition">
-                <X className="w-3 h-3" />
-              </button>
-            </span>
-          ))}
-        </div>
-        <div className="flex gap-2">
-          <Input value={newQualite} onChange={e => setNewQualite(e.target.value)}
-            onKeyDown={e => e.key === "Enter" && addQualite()}
-            placeholder="Ajouter une qualité..." className="bg-white/60 border-[#e0d6c8] text-[#3e2723] placeholder:text-[#8d6e63]/50 text-sm flex-1" />
-          <Button onClick={addQualite} size="sm" className="bg-green-800 hover:bg-green-700">
-            <Plus className="w-3 h-3" />
-          </Button>
-        </div>
+      {/* Qualités par trait */}
+      <div className="mt-5 space-y-3">
+        <p className="text-[#3e2723] text-sm font-semibold">✨ Mes qualités par trait</p>
+        {BIG5.map(d => {
+          const traitQualites = qualites.filter(q => q.trait === d.key);
+          return (
+            <div key={d.key} className="rounded-xl border p-3" style={{ borderColor: d.color + "40", background: d.color + "0a" }}>
+              <p className="text-xs font-semibold mb-2" style={{ color: d.color }}>{d.label}</p>
+              {traitQualites.length > 0 && (
+                <div className="flex flex-wrap gap-1.5 mb-2">
+                  {traitQualites.map((q, i) => {
+                    const globalIdx = qualites.indexOf(q);
+                    return (
+                      <span key={i} className="text-xs px-2.5 py-1 rounded-full flex items-center gap-1"
+                        style={{ background: d.color + "20", color: d.color, border: `1px solid ${d.color}40` }}>
+                        {q.text}
+                        <button onClick={() => removeQualite(globalIdx)} className="hover:text-red-600 transition">
+                          <X className="w-3 h-3" />
+                        </button>
+                      </span>
+                    );
+                  })}
+                </div>
+              )}
+              <div className="flex gap-2">
+                <Input value={newQualiteTrait === d.key ? newQualite : ""}
+                  onChange={e => { setNewQualiteTrait(d.key); setNewQualite(e.target.value); }}
+                  onKeyDown={e => e.key === "Enter" && addQualite()}
+                  onFocus={() => setNewQualiteTrait(d.key)}
+                  placeholder={`Ajouter une qualité de ${d.label.toLowerCase()}...`}
+                  className="bg-white/60 border-[#e0d6c8] text-[#3e2723] placeholder:text-[#8d6e63]/50 text-sm h-8" />
+                <Button onClick={() => { setNewQualiteTrait(d.key); addQualite(); }} size="sm"
+                  className="h-8" style={{ background: d.color, borderColor: d.color }}>
+                  <Plus className="w-3 h-3" />
+                </Button>
+              </div>
+            </div>
+          );
+        })}
       </div>
 
       <Button onClick={handleSave} className="mt-4 w-full bg-green-800 hover:bg-green-700 text-white">
