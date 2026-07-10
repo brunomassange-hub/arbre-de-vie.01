@@ -10,7 +10,7 @@ import BigFiveRadarModal from "@/components/tree/BigFiveRadarModal";
 import { CHAKRAS } from "@/lib/chakras";
 import {
   cx, trunkTop, trunkBot, BRANCH_DEFS, BRANCH_COLORS,
-  getBranchGeometry, ROOT_DEFS, ROOT_DOT_POSITIONS, TRUNK_PATH, bezier
+  getBranchGeometry, ROOT_DEFS, ROOT_CATEGORIES, TRUNK_PATH, bezier
 } from "@/components/tree/treeStyles";
 import CellShadedArt from "@/components/tree/styles/CellShadedArt";
 import LineArtArt from "@/components/tree/styles/LineArtArt";
@@ -103,8 +103,7 @@ export default function FullTree({ mode }) {
   useEffect(() => { loadData(); }, [mode]);
 
   const trunkEvents = (isWound ? events.slice(0, 6) : posEvents.slice(0, 6)).slice().reverse();
-  const rootDots = (isWound ? woundLinks : posLinks).slice(0, 6);
-  const rootDotPositions = isWound ? ROOT_DOT_POSITIONS.wound : ROOT_DOT_POSITIONS.strength;
+  const allRootLinks = isWound ? woundLinks : posLinks;
 
   const StyleArt = STYLES.find(s => s.id === treeStyle)?.art || CellShadedArt;
 
@@ -177,37 +176,56 @@ export default function FullTree({ mode }) {
             {/* Style-specific tree art */}
             <StyleArt isWound={isWound} />
 
-            {/* Root click areas */}
-            {ROOT_DEFS.map((r, i) => (
-              <path key={`rc-${i}`}
-                d={`M ${cx} ${trunkBot} Q ${cx + r.cp1x} ${trunkBot + r.cp1y} ${cx + r.dx} ${trunkBot + r.dy}`}
-                stroke="transparent" strokeWidth="22" fill="none" strokeLinecap="round"
-                style={{ cursor: "pointer" }} onClick={() => setAddZone({ type: "root" })} />
-            ))}
-            {/* Root interactive badge */}
-            {rootDots.length === 0 && (
-              <g style={{ cursor: "pointer" }} onClick={() => setAddZone({ type: "root" })}>
-                <circle cx={cx} cy={trunkBot + 35} r="10" fill="#faf6f0" stroke={isWound ? "#bcaaa4" : "#a5d6a7"} strokeWidth="1.5" className="tree-pulse" />
-                <text x={cx} y={trunkBot + 36} textAnchor="middle" dominantBaseline="middle" fontSize="11" fill={isWound ? "#bcaaa4" : "#a5d6a7"} fontWeight="bold">+</text>
-              </g>
-            )}
-
-            {/* Root dots */}
-            {rootDots.map((lk, i) => {
-              const pos = rootDotPositions[i] || { x: 0, y: 0 };
-              const rx = cx + pos.x;
-              const ry = trunkBot + pos.y;
+            {/* Root click areas + labels + dots */}
+            {ROOT_DEFS.map((r, i) => {
+              const category = ROOT_CATEGORIES[i];
+              const rootLinks = allRootLinks.filter(lk => lk.type === category);
               const color = isWound ? "#d4847a" : "#7fae7e";
               const bgColor = isWound ? "#f0d9d5" : "#d4e8c4";
+              const tipX = cx + r.dx;
+              const tipY = trunkBot + r.dy;
+
               return (
-                <g key={lk.id} style={{ cursor: "pointer" }}
-                  onClick={(e) => { e.stopPropagation(); setDetail({ type: isWound ? "wound_link" : "pos_link", data: lk, color }); }}>
-                  <circle cx={rx} cy={ry} r="9" fill={bgColor} stroke={color} strokeWidth="1.5" />
-                  <text x={rx} y={ry + 1} textAnchor="middle" dominantBaseline="middle" fontSize="8" fill="#3e2723">{isWound ? "💔" : "💚"}</text>
-                  {isWound && lk.name && (
-                    <text x={rx} y={ry - 13} textAnchor="middle" dominantBaseline="middle" fontSize="8" fill="#3e2723" fontWeight="700" pointerEvents="none" style={{ paintOrder: "stroke", stroke: "#faf6f0", strokeWidth: 2 }}>{lk.name.length > 10 ? lk.name.slice(0, 10) + "…" : lk.name}</text>
+                <g key={`root-${i}`}>
+                  {/* Click area */}
+                  <path d={`M ${cx} ${trunkBot} Q ${cx + r.cp1x} ${trunkBot + r.cp1y} ${tipX} ${tipY}`}
+                    stroke="transparent" strokeWidth="22" fill="none" strokeLinecap="round"
+                    style={{ cursor: "pointer" }} onClick={() => setAddZone({ type: "root", category })} />
+
+                  {/* Category label at tip */}
+                  <text x={tipX} y={tipY + 15} textAnchor="middle" dominantBaseline="middle"
+                    fontSize="8" fontWeight="700" fill={isWound ? "#8d6e63" : color} pointerEvents="none"
+                    style={{ paintOrder: "stroke", stroke: "#faf6f0", strokeWidth: 2.5, fontFamily: SERIF }}>
+                    {category}
+                  </text>
+
+                  {/* Links along root */}
+                  {rootLinks.slice(0, 5).map((lk, j) => {
+                    const t = 0.35 + j * 0.13;
+                    const p = bezier(t, cx, trunkBot, cx + r.cp1x, trunkBot + r.cp1y, tipX, tipY);
+                    return (
+                      <g key={lk.id} style={{ cursor: "pointer" }}
+                        onClick={(e) => { e.stopPropagation(); setDetail({ type: isWound ? "wound_link" : "pos_link", data: lk, color }); }}>
+                        <circle cx={p.x} cy={p.y} r="7" fill={bgColor} stroke={color} strokeWidth="1.5" />
+                        <text x={p.x} y={p.y + 1} textAnchor="middle" dominantBaseline="middle" fontSize="7" fill="#3e2723">{isWound ? "💔" : "💚"}</text>
+                        {lk.name && (
+                          <text x={p.x} y={p.y - 11} textAnchor="middle" dominantBaseline="middle"
+                            fontSize="7" fill="#3e2723" fontWeight="600" pointerEvents="none"
+                            style={{ paintOrder: "stroke", stroke: "#faf6f0", strokeWidth: 2 }}>
+                            {lk.name.length > 12 ? lk.name.slice(0, 12) + "…" : lk.name}
+                          </text>
+                        )}
+                      </g>
+                    );
+                  })}
+
+                  {/* Empty badge */}
+                  {rootLinks.length === 0 && (
+                    <g style={{ cursor: "pointer" }} onClick={() => setAddZone({ type: "root", category })}>
+                      <circle cx={tipX} cy={tipY} r="7" fill="#faf6f0" stroke={isWound ? "#bcaaa4" : "#a5d6a7"} strokeWidth="1.5" className="tree-pulse" />
+                      <text x={tipX} y={tipY + 1} textAnchor="middle" dominantBaseline="middle" fontSize="9" fill={isWound ? "#bcaaa4" : "#a5d6a7"} fontWeight="bold">+</text>
+                    </g>
                   )}
-                  <text x={rx} y={ry + 16} textAnchor="middle" dominantBaseline="middle" fontSize="8" fill={isWound ? "#8d6e63" : color} fontWeight="700" pointerEvents="none" style={{ paintOrder: "stroke", stroke: "#faf6f0", strokeWidth: 2 }}>{lk.type || ""}</text>
                 </g>
               );
             })}

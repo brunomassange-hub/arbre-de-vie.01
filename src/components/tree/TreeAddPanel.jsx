@@ -37,7 +37,8 @@ export default function TreeAddPanel({ zone, onClose, onSaved, polarityLock }) {
   // Trunk wound form
   const [eventForm, setEventForm] = useState({ age: "", title: "", description: "", emotion: "Peur", wound_type: "" });
   // Link form (root)
-  const [linkForm, setLinkForm] = useState({ name: "", type: "Famille", description: "" });
+  const lockedCategory = zone?.category;
+  const [linkForm, setLinkForm] = useState({ name: "", type: lockedCategory || "Famille", description: "" });
   // Belief form (branch)
   const [beliefForm, setBeliefForm] = useState({ belief: "", age: "", origin: "", reframe: "", note: "" });
   // Quality form (trunk strength)
@@ -241,13 +242,20 @@ export default function TreeAddPanel({ zone, onClose, onSaved, polarityLock }) {
 
           {zone.type === "root" && (
             <>
-              <div className="grid grid-cols-2 gap-3">
+              <div className={lockedCategory ? "space-y-3" : "grid grid-cols-2 gap-3"}>
                 <Input value={linkForm.name} onChange={e => setLinkForm({ ...linkForm, name: e.target.value })}
                   placeholder="Prénom / Nom" className="bg-white/60 border-[#e0d6c8] text-[#3e2723] placeholder:text-[#8d6e63]/50" />
-                <Select value={linkForm.type} onValueChange={v => setLinkForm({ ...linkForm, type: v })}>
-                  <SelectTrigger className="bg-white/60 border-[#e0d6c8] text-[#3e2723]"><SelectValue /></SelectTrigger>
-                  <SelectContent>{LINK_TYPES.map(t => <SelectItem key={t} value={t}>{t}</SelectItem>)}</SelectContent>
-                </Select>
+                {!lockedCategory && (
+                  <Select value={linkForm.type} onValueChange={v => setLinkForm({ ...linkForm, type: v })}>
+                    <SelectTrigger className="bg-white/60 border-[#e0d6c8] text-[#3e2723]"><SelectValue /></SelectTrigger>
+                    <SelectContent>{LINK_TYPES.map(t => <SelectItem key={t} value={t}>{t}</SelectItem>)}</SelectContent>
+                  </Select>
+                )}
+                {lockedCategory && (
+                  <div className="text-xs text-[#8d6e63] bg-white/40 rounded-lg px-3 py-2 border border-[#e0d6c8]/60">
+                    Catégorie : <span className="font-semibold">{lockedCategory}</span>
+                  </div>
+                )}
               </div>
               <Textarea value={linkForm.description} onChange={e => setLinkForm({ ...linkForm, description: e.target.value })}
                 placeholder={polarity === "wound" ? "Ce qui était douloureux..." : "Ce que cette relation vous apporte de positif..."}

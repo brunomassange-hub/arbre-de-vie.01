@@ -38,6 +38,8 @@ export const ROOT_DEFS = [
   { dx: 110, dy: 75, cp1x: 55, cp1y: 25 },
 ];
 
+export const ROOT_CATEGORIES = ["Famille", "Ami(e)", "Partenaire", "Mentor", "Collègue", "Autre"];
+
 export const ROOT_DOT_POSITIONS = {
   wound: [
     { x: -110, y: 75 }, { x: -65, y: 85 }, { x: -18, y: 90 },
