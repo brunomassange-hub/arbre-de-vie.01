@@ -204,6 +204,12 @@ export default function FullTree({ mode }) {
                   onClick={(e) => { e.stopPropagation(); setDetail({ type: isWound ? "wound_link" : "pos_link", data: lk, color }); }}>
                   <circle cx={rx} cy={ry} r="9" fill={bgColor} stroke={color} strokeWidth="1.5" />
                   <text x={rx} y={ry + 1} textAnchor="middle" dominantBaseline="middle" fontSize="8" fill="#3e2723">{isWound ? "💔" : "💚"}</text>
+                  {isWound && lk.name && (
+                    <text x={rx} y={ry - 14} textAnchor="middle" dominantBaseline="middle" fontSize="7" fill="#5d4037" fontWeight="600" pointerEvents="none">{lk.name.length > 12 ? lk.name.slice(0, 12) + "…" : lk.name}</text>
+                  )}
+                  {!isWound && lk.type && (
+                    <text x={rx} y={ry - 14} textAnchor="middle" dominantBaseline="middle" fontSize="7" fill={color} fontWeight="600" pointerEvents="none">{lk.type}</text>
+                  )}
                 </g>
               );
             })}
