@@ -124,9 +124,9 @@ export default function TreeAddPanel({ zone, onClose, onSaved, polarityLock }) {
   };
 
   return (
-    <div className="fixed inset-0 bg-[#3e2723]/40 z-50 flex items-end justify-center" onClick={onClose}>
+    <div className="fixed inset-0 bg-[#3e2723]/40 z-[60] flex items-end justify-center" onClick={onClose}>
       <div
-        className="bg-[#faf6f0] rounded-t-2xl w-full max-w-lg border-t-2 shadow-2xl max-h-[85vh] overflow-y-auto"
+        className="bg-[#faf6f0] rounded-t-2xl w-full max-w-lg border-t-2 shadow-2xl max-h-[85vh] overflow-y-auto pb-4"
         style={{ borderColor: polarity === "wound" ? "#a1887f" : "#7fae7e" }}
         onClick={e => e.stopPropagation()}
       >
