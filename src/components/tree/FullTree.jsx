@@ -366,19 +366,33 @@ export default function FullTree({ mode }) {
                   })}
 
                   {bActivities.slice(0, 8).map((a, i) => {
-                    const angle = (i / 8) * Math.PI * 2 + (bd.side === "left" ? Math.PI : 0);
-                    const lr = 14;
-                    const lx = end.x + lr * Math.cos(angle);
+                    // Distribute activities around the branch tip on a larger radius.
+                    // Avoid the label zone (above the tip for both sides).
+                    const n = bActivities.length;
+                    const angles = [];
+                    for (let k = 0; k < n; k++) {
+                      // Start from bottom (PI/2) and spread around, skipping the top where label is
+                      const spread = (Math.PI * 1.4); // ~252° of circle
+                      const startAngle = Math.PI / 2 - spread / 2; // center at bottom
+                      angles.push(startAngle + (k / Math.max(n - 1, 1)) * spread);
+                    }
+                    const angle = angles[i] + (bd.side === "left" ? 0 : 0);
+                    const lr = 22;
+                    const lx = end.x + lr * Math.cos(angle) + (bd.side === "left" ? -4 : 4);
                     const ly = end.y + lr * Math.sin(angle);
-                    const txt = a.name.length > 12 ? a.name.slice(0, 12) + "…" : a.name;
-                    const labelOffset = bd.side === "left" ? -11 : 11;
+                    const txt = a.name.length > 10 ? a.name.slice(0, 10) + "…" : a.name;
+                    // Label goes outward from center
+                    const labelDx = Math.cos(angle);
+                    const labelDy = Math.sin(angle);
+                    const labelX = lx + labelDx * 11;
+                    const labelY = ly + labelDy * 4 + 1;
                     return (
                       <g key={a.id} style={{ cursor: "pointer" }}
                         onClick={(e) => { e.stopPropagation(); setDetail({ type: "activity", data: a, color }); }}>
                         <ellipse cx={lx} cy={ly} rx={8} ry={5} fill={color} opacity={0.75}
                           transform={`rotate(${(angle * 180 / Math.PI)} ${lx} ${ly})`} />
-                        <text x={lx + labelOffset} y={ly + 1} dominantBaseline="middle"
-                          textAnchor={bd.side === "left" ? "end" : "start"}
+                        <text x={labelX} y={labelY} dominantBaseline="middle"
+                          textAnchor={labelDx < -0.3 ? "end" : labelDx > 0.3 ? "start" : "middle"}
                           fontSize="6.5" fill={color} fontWeight="600" pointerEvents="none"
                           style={{ paintOrder: "stroke", stroke: "#faf6f0", strokeWidth: 2.5, fontFamily: SERIF }}>{txt}</text>
                       </g>
