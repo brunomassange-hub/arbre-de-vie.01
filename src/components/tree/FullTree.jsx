@@ -370,11 +370,17 @@ export default function FullTree({ mode }) {
                     const lr = 14;
                     const lx = end.x + lr * Math.cos(angle);
                     const ly = end.y + lr * Math.sin(angle);
+                    const txt = a.name.length > 12 ? a.name.slice(0, 12) + "…" : a.name;
+                    const labelOffset = bd.side === "left" ? -11 : 11;
                     return (
                       <g key={a.id} style={{ cursor: "pointer" }}
                         onClick={(e) => { e.stopPropagation(); setDetail({ type: "activity", data: a, color }); }}>
                         <ellipse cx={lx} cy={ly} rx={8} ry={5} fill={color} opacity={0.75}
                           transform={`rotate(${(angle * 180 / Math.PI)} ${lx} ${ly})`} />
+                        <text x={lx + labelOffset} y={ly + 1} dominantBaseline="middle"
+                          textAnchor={bd.side === "left" ? "end" : "start"}
+                          fontSize="6.5" fill={color} fontWeight="600" pointerEvents="none"
+                          style={{ paintOrder: "stroke", stroke: "#faf6f0", strokeWidth: 2.5, fontFamily: SERIF }}>{txt}</text>
                       </g>
                     );
                   })}
