@@ -18,6 +18,10 @@
       "type": "string",
       "description": "La croyance positive"
     },
+    "age": {
+      "type": "number",
+      "description": "\u00c2ge auquel cette croyance s'est form\u00e9e"
+    },
     "note": {
       "type": "string",
       "description": "Note ou contexte suppl\u00e9mentaire"

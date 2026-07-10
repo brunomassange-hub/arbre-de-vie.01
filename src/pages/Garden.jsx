@@ -296,7 +296,7 @@ function BranchesSection() {
   const [beliefs, setBeliefs] = useState([]);
   const [openAxis, setOpenAxis] = useState(null);
   const [showFormFor, setShowFormFor] = useState(null);
-  const [form, setForm] = useState({ belief: "", origin: "", reframe: "" });
+  const [form, setForm] = useState({ belief: "", age: "", origin: "", reframe: "" });
   const [editingId, setEditingId] = useState(null);
   const [editForm, setEditForm] = useState(null);
 
@@ -304,14 +304,18 @@ function BranchesSection() {
 
   const handleCreate = async (branch) => {
     if (!form.belief.trim()) return;
-    await base44.entities.LimitingBelief.create({ ...form, branch });
-    setForm({ belief: "", origin: "", reframe: "" });
+    const data = { ...form, branch };
+    if (data.age) data.age = Number(data.age); else delete data.age;
+    await base44.entities.LimitingBelief.create(data);
+    setForm({ belief: "", age: "", origin: "", reframe: "" });
     setShowFormFor(null);
     base44.entities.LimitingBelief.list().then(setBeliefs);
   };
 
   const handleUpdate = async () => {
-    await base44.entities.LimitingBelief.update(editingId, editForm);
+    const data = { ...editForm };
+    if (data.age) data.age = Number(data.age); else delete data.age;
+    await base44.entities.LimitingBelief.update(editingId, data);
     setEditingId(null); setEditForm(null);
     base44.entities.LimitingBelief.list().then(setBeliefs);
   };
@@ -350,6 +354,8 @@ function BranchesSection() {
                       <div className="space-y-2">
                         <Input value={editForm.belief} onChange={e => setEditForm({ ...editForm, belief: e.target.value })}
                           placeholder="Croyance" className="bg-white/60 border-[#e0d6c8] text-[#3e2723] text-sm h-8" />
+                        <Input type="number" value={editForm.age ?? ""} onChange={e => setEditForm({ ...editForm, age: e.target.value })}
+                          placeholder="Âge (optionnel)" className="bg-white/60 border-[#e0d6c8] text-[#3e2723] text-sm h-8" />
                         <Input value={editForm.origin || ""} onChange={e => setEditForm({ ...editForm, origin: e.target.value })}
                           placeholder="Origine" className="bg-white/60 border-[#e0d6c8] text-[#3e2723] text-sm h-8" />
                         <Input value={editForm.reframe || ""} onChange={e => setEditForm({ ...editForm, reframe: e.target.value })}
@@ -363,6 +369,7 @@ function BranchesSection() {
                       <div className="flex items-start justify-between gap-2">
                         <div className="flex-1 min-w-0">
                           <p className="text-[#3e2723] text-sm font-medium">"{b.belief}"</p>
+                          {b.age != null && <p className="text-[#8d6e63] text-xs mt-0.5">Âge : {b.age} ans</p>}
                           {b.origin && <p className="text-[#8d6e63] text-xs mt-1">Origine : {b.origin}</p>}
                           {b.reframe && <p className="text-green-600 text-xs mt-1">✦ {b.reframe}</p>}
                         </div>
@@ -383,13 +390,15 @@ function BranchesSection() {
                   <div className="bg-[#f5f0e8] rounded-lg p-3 border border-[#e0d6c8]/60 space-y-2">
                     <Input value={form.belief} onChange={e => setForm({ ...form, belief: e.target.value })}
                       placeholder="La croyance limitante..." className="bg-white/60 border-[#e0d6c8] text-[#3e2723] placeholder:text-[#8d6e63]/50 text-sm" />
+                    <Input type="number" value={form.age} onChange={e => setForm({ ...form, age: e.target.value })}
+                      placeholder="Âge (optionnel)" className="bg-white/60 border-[#e0d6c8] text-[#3e2723] placeholder:text-[#8d6e63]/50 text-sm" />
                     <Input value={form.origin} onChange={e => setForm({ ...form, origin: e.target.value })}
                       placeholder="D'où vient-elle ? (optionnel)" className="bg-white/60 border-[#e0d6c8] text-[#3e2723] placeholder:text-[#8d6e63]/50 text-sm" />
                     <Input value={form.reframe} onChange={e => setForm({ ...form, reframe: e.target.value })}
                       placeholder="Reformulation positive (optionnel)" className="bg-white/60 border-[#e0d6c8] text-[#3e2723] placeholder:text-[#8d6e63]/50 text-sm" />
                     <div className="flex gap-2">
                       <Button onClick={() => handleCreate(axis.name)} size="sm" className="flex-1 bg-green-800 hover:bg-green-700 text-xs">Ajouter</Button>
-                      <Button onClick={() => { setShowFormFor(null); setForm({ belief: "", origin: "", reframe: "" }); }}
+                      <Button onClick={() => { setShowFormFor(null); setForm({ belief: "", age: "", origin: "", reframe: "" }); }}
                         size="sm" variant="outline" className="border-[#e0d6c8] text-[#3e2723] hover:bg-white/60 text-xs">Annuler</Button>
                     </div>
                   </div>

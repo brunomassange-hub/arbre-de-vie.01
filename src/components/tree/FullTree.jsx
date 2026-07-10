@@ -473,6 +473,8 @@ export default function FullTree({ mode }) {
                       <>
                         <Input value={editData.belief ?? ""} onChange={e => setEditData({ ...editData, belief: e.target.value })}
                           placeholder="Croyance" className="bg-white/60 border-[#e0d6c8] text-[#3e2723] text-sm h-9" />
+                        <Input type="number" value={editData.age ?? ""} onChange={e => setEditData({ ...editData, age: e.target.value })}
+                          placeholder="Âge (optionnel)" className="bg-white/60 border-[#e0d6c8] text-[#3e2723] text-sm h-9" />
                         <Input value={editData.origin ?? ""} onChange={e => setEditData({ ...editData, origin: e.target.value })}
                           placeholder="Origine" className="bg-white/60 border-[#e0d6c8] text-[#3e2723] text-sm h-9" />
                         <Input value={editData.reframe ?? ""} onChange={e => setEditData({ ...editData, reframe: e.target.value })}
@@ -483,6 +485,8 @@ export default function FullTree({ mode }) {
                       <>
                         <Input value={editData.belief ?? ""} onChange={e => setEditData({ ...editData, belief: e.target.value })}
                           placeholder="Croyance positive" className="bg-white/60 border-[#e0d6c8] text-[#3e2723] text-sm h-9" />
+                        <Input type="number" value={editData.age ?? ""} onChange={e => setEditData({ ...editData, age: e.target.value })}
+                          placeholder="Âge (optionnel)" className="bg-white/60 border-[#e0d6c8] text-[#3e2723] text-sm h-9" />
                         <Textarea value={editData.note ?? ""} onChange={e => setEditData({ ...editData, note: e.target.value })}
                           placeholder="Note" rows={2} className="bg-white/60 border-[#e0d6c8] text-[#3e2723] text-sm resize-none" />
                       </>
@@ -551,6 +555,7 @@ export default function FullTree({ mode }) {
                       <>
                         <p className="text-xs mb-0.5" style={{ color: "#d4847a" }}>Croyance limitante — {detail.data.branch}</p>
                         <h2 className="text-lg font-bold" style={{ color: "#3e2723" }}>"{detail.data.belief}"</h2>
+                        {detail.data.age != null && <p className="text-sm mt-1" style={{ color: "#8d6e63" }}>Âge : {detail.data.age} ans</p>}
                         {detail.data.origin && <p className="text-sm mt-1" style={{ color: "#8d6e63" }}>Origine : {detail.data.origin}</p>}
                         {detail.data.reframe && <p className="text-sm mt-1" style={{ color: "#7fae7e" }}>✦ {detail.data.reframe}</p>}
                       </>
@@ -559,6 +564,7 @@ export default function FullTree({ mode }) {
                       <>
                         <p className="text-xs mb-0.5" style={{ color: detail.color }}>Croyance positive — {detail.data.branch}</p>
                         <h2 className="text-lg font-bold" style={{ color: "#3e2723" }}>✦ {detail.data.belief}</h2>
+                        {detail.data.age != null && <p className="text-sm mt-1" style={{ color: "#8d6e63" }}>Âge : {detail.data.age} ans</p>}
                         {detail.data.note && <p className="text-sm mt-1" style={{ color: "#5d4037" }}>{detail.data.note}</p>}
                       </>
                     )}

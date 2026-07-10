@@ -25,14 +25,16 @@ export default function Beliefs() {
   const [beliefs, setBeliefs] = useState([]);
   const [showForm, setShowForm] = useState(!!preselectedBranch);
   const [expanded, setExpanded] = useState({});
-  const [form, setForm] = useState({ branch: preselectedBranch || "Physique", belief: "", origin: "", reframe: "" });
+  const [form, setForm] = useState({ branch: preselectedBranch || "Physique", belief: "", age: "", origin: "", reframe: "" });
 
   useEffect(() => { base44.entities.LimitingBelief.list().then(setBeliefs); }, []);
 
   const handleCreate = async () => {
     if (!form.belief.trim()) return;
-    await base44.entities.LimitingBelief.create(form);
-    setForm({ branch: form.branch, belief: "", origin: "", reframe: "" });
+    const data = { ...form };
+    if (data.age) data.age = Number(data.age); else delete data.age;
+    await base44.entities.LimitingBelief.create(data);
+    setForm({ branch: form.branch, belief: "", age: "", origin: "", reframe: "" });
     setShowForm(false);
     base44.entities.LimitingBelief.list().then(setBeliefs);
   };
@@ -75,6 +77,9 @@ export default function Beliefs() {
               </Select>
               <Input value={form.belief} onChange={e => setForm({ ...form, belief: e.target.value })}
                 placeholder="La croyance limitante (ex: Je ne suis pas capable...)"
+                className="bg-white/10 border-white/20 text-white placeholder:text-gray-500" />
+              <Input type="number" value={form.age} onChange={e => setForm({ ...form, age: e.target.value })}
+                placeholder="Âge (optionnel)"
                 className="bg-white/10 border-white/20 text-white placeholder:text-gray-500" />
               <Input value={form.origin} onChange={e => setForm({ ...form, origin: e.target.value })}
                 placeholder="Origine (optionnel : d'où vient cette croyance ?)"
@@ -126,6 +131,7 @@ export default function Beliefs() {
                       <div key={b.id} className="bg-white/5 rounded-lg p-3 flex items-start gap-2">
                         <div className="flex-1 min-w-0">
                           <p className="text-white text-sm font-medium">"{b.belief}"</p>
+                          {b.age != null && <p className="text-gray-500 text-xs mt-0.5">Âge : {b.age} ans</p>}
                           {b.origin && <p className="text-gray-400 text-xs mt-1">↳ Origine : {b.origin}</p>}
                           {b.reframe && <p className="text-green-400 text-xs mt-1">✦ {b.reframe}</p>}
                         </div>

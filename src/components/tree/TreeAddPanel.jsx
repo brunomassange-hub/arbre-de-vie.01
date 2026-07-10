@@ -39,7 +39,7 @@ export default function TreeAddPanel({ zone, onClose, onSaved, polarityLock }) {
   // Link form (root)
   const [linkForm, setLinkForm] = useState({ name: "", type: "Famille", description: "" });
   // Belief form (branch)
-  const [beliefForm, setBeliefForm] = useState({ belief: "", origin: "", reframe: "", note: "" });
+  const [beliefForm, setBeliefForm] = useState({ belief: "", age: "", origin: "", reframe: "", note: "" });
   // Quality form (trunk strength)
   const [quality, setQuality] = useState("");
   const [posEventForm, setPosEventForm] = useState({ age: "", title: "", description: "", emotion: "Amour" });
@@ -90,12 +90,17 @@ export default function TreeAddPanel({ zone, onClose, onSaved, polarityLock }) {
           setActivityForm({ name: "", description: "" });
         } else {
           if (!beliefForm.belief.trim()) return;
+          const bData = { belief: beliefForm.belief, branch: branchName };
+          if (beliefForm.age) bData.age = Number(beliefForm.age);
           if (polarity === "wound") {
-            await base44.entities.LimitingBelief.create({ belief: beliefForm.belief, origin: beliefForm.origin, reframe: beliefForm.reframe, branch: branchName });
+            bData.origin = beliefForm.origin;
+            bData.reframe = beliefForm.reframe;
+            await base44.entities.LimitingBelief.create(bData);
           } else {
-            await base44.entities.PositiveBelief.create({ belief: beliefForm.belief, note: beliefForm.note, branch: branchName });
+            bData.note = beliefForm.note;
+            await base44.entities.PositiveBelief.create(bData);
           }
-          setBeliefForm({ belief: "", origin: "", reframe: "", note: "" });
+          setBeliefForm({ belief: "", age: "", origin: "", reframe: "", note: "" });
         }
       }
       onSaved?.();
@@ -254,6 +259,8 @@ export default function TreeAddPanel({ zone, onClose, onSaved, polarityLock }) {
             <>
               <Input value={beliefForm.belief} onChange={e => setBeliefForm({ ...beliefForm, belief: e.target.value })}
                 placeholder="La croyance limitante..." className="bg-white/60 border-[#e0d6c8] text-[#3e2723] placeholder:text-[#8d6e63]/50" />
+              <Input type="number" value={beliefForm.age} onChange={e => setBeliefForm({ ...beliefForm, age: e.target.value })}
+                placeholder="Âge (optionnel)" className="bg-white/60 border-[#e0d6c8] text-[#3e2723] placeholder:text-[#8d6e63]/50" />
               <Input value={beliefForm.origin} onChange={e => setBeliefForm({ ...beliefForm, origin: e.target.value })}
                 placeholder="D'où vient-elle ? (optionnel)" className="bg-white/60 border-[#e0d6c8] text-[#3e2723] placeholder:text-[#8d6e63]/50" />
               <Input value={beliefForm.reframe} onChange={e => setBeliefForm({ ...beliefForm, reframe: e.target.value })}
@@ -277,6 +284,8 @@ export default function TreeAddPanel({ zone, onClose, onSaved, polarityLock }) {
                 <>
                   <Input value={beliefForm.belief} onChange={e => setBeliefForm({ ...beliefForm, belief: e.target.value })}
                     placeholder="La croyance positive..." className="bg-white/60 border-[#e0d6c8] text-[#3e2723] placeholder:text-[#8d6e63]/50" />
+                  <Input type="number" value={beliefForm.age} onChange={e => setBeliefForm({ ...beliefForm, age: e.target.value })}
+                    placeholder="Âge (optionnel)" className="bg-white/60 border-[#e0d6c8] text-[#3e2723] placeholder:text-[#8d6e63]/50" />
                   <Input value={beliefForm.note} onChange={e => setBeliefForm({ ...beliefForm, note: e.target.value })}
                     placeholder="Note (optionnel)" className="bg-white/60 border-[#e0d6c8] text-[#3e2723] placeholder:text-[#8d6e63]/50" />
                 </>
