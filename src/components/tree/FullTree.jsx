@@ -317,22 +317,32 @@ export default function FullTree({ mode }) {
 
                   {wBeliefs.slice(0, 4).map((b, i) => {
                     const p = bezierFn(0.3 + i * 0.2);
+                    const txt = b.belief.length > 28 ? b.belief.slice(0, 28) + "…" : b.belief;
                     return (
                       <g key={b.id} style={{ cursor: "pointer" }}
                         onClick={(e) => { e.stopPropagation(); setDetail({ type: "wound_belief", data: b, color: "#d4847a" }); }}>
-                        <circle cx={p.x} cy={p.y} r="8" fill="#f0d9d5" stroke="#d4847a" strokeWidth="1.5" />
-                        <text x={p.x} y={p.y + 1} textAnchor="middle" dominantBaseline="middle" fontSize="8" fill="#5d4037">✕</text>
+                        <circle cx={p.x} cy={p.y} r="7" fill="#f0d9d5" stroke="#d4847a" strokeWidth="1.5" />
+                        <text x={p.x} y={p.y + 1} textAnchor="middle" dominantBaseline="middle" fontSize="7" fill="#5d4037">✕</text>
+                        <text x={p.x + (bd.side === "left" ? -11 : 11)} y={p.y + 1} dominantBaseline="middle"
+                          textAnchor={bd.side === "left" ? "end" : "start"}
+                          fontSize="6.5" fill="#5d4037" fontWeight="600" pointerEvents="none"
+                          style={{ paintOrder: "stroke", stroke: "#faf6f0", strokeWidth: 2.5, fontFamily: SERIF }}>{txt}</text>
                       </g>
                     );
                   })}
 
                   {sBeliefs.slice(0, 4).map((b, i) => {
                     const p = bezierFn(0.35 + i * 0.18);
+                    const txt = b.belief.length > 28 ? b.belief.slice(0, 28) + "…" : b.belief;
                     return (
                       <g key={b.id} style={{ cursor: "pointer" }}
                         onClick={(e) => { e.stopPropagation(); setDetail({ type: "pos_belief", data: b, color }); }}>
-                        <circle cx={p.x} cy={p.y} r="8" fill="#d4e8c4" stroke={color} strokeWidth="1.5" />
-                        <text x={p.x} y={p.y + 1} textAnchor="middle" dominantBaseline="middle" fontSize="8" fill={color}>✦</text>
+                        <circle cx={p.x} cy={p.y} r="7" fill="#d4e8c4" stroke={color} strokeWidth="1.5" />
+                        <text x={p.x} y={p.y + 1} textAnchor="middle" dominantBaseline="middle" fontSize="7" fill={color}>✦</text>
+                        <text x={p.x + (bd.side === "left" ? -11 : 11)} y={p.y + 1} dominantBaseline="middle"
+                          textAnchor={bd.side === "left" ? "end" : "start"}
+                          fontSize="6.5" fill={color} fontWeight="600" pointerEvents="none"
+                          style={{ paintOrder: "stroke", stroke: "#faf6f0", strokeWidth: 2.5, fontFamily: SERIF }}>{txt}</text>
                       </g>
                     );
                   })}
