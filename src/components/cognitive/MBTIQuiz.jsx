@@ -90,8 +90,9 @@ export default function MBTIQuiz({ onComplete, onClose }) {
                   <span className="text-gray-300">{DIM_LABELS[dim].right}</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <div className="flex-1 bg-white/10 rounded-full h-2 overflow-hidden">
-                    <div className="h-full bg-indigo-500 rounded-full" style={{ width: `${leftPct}%` }} />
+                  <div className="flex-1 rounded-full h-2 overflow-hidden flex">
+                    <div className="h-full bg-indigo-500 rounded-l-full" style={{ width: `${leftPct}%` }} />
+                    <div className="h-full bg-amber-500 rounded-r-full" style={{ width: `${100 - leftPct}%` }} />
                   </div>
                   <span className="text-xs text-white font-bold w-12 text-center">{leftCount} – {rightCount}</span>
                 </div>
