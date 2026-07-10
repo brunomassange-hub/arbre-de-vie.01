@@ -207,6 +207,9 @@ export default function FullTree({ mode }) {
                   {isWound && lk.name && (
                     <text x={rx} y={ry - 14} textAnchor="middle" dominantBaseline="middle" fontSize="7" fill="#5d4037" fontWeight="600" pointerEvents="none">{lk.name.length > 12 ? lk.name.slice(0, 12) + "…" : lk.name}</text>
                   )}
+                  {isWound && lk.type && (
+                    <text x={rx} y={ry + 18} textAnchor="middle" dominantBaseline="middle" fontSize="6" fill={color} fontWeight="500" pointerEvents="none">{lk.type}</text>
+                  )}
                   {!isWound && lk.type && (
                     <text x={rx} y={ry - 14} textAnchor="middle" dominantBaseline="middle" fontSize="7" fill={color} fontWeight="600" pointerEvents="none">{lk.type}</text>
                   )}
@@ -242,7 +245,7 @@ export default function FullTree({ mode }) {
             {/* Big Five radar — bottom of trunk, above roots */}
             {!isWound && (() => {
               const rx = 34;
-              const ry = trunkBot + 32;
+              const ry = trunkBot - rx - 14;
               const n = 5;
               const angs = BIG5.map((_, i) => (Math.PI * 2 * i) / n - Math.PI / 2);
               const verts = angs.map(a => ({ x: cx + rx * Math.cos(a), y: ry + rx * Math.sin(a) }));
