@@ -8,6 +8,8 @@ import { ArrowLeft, Save } from "lucide-react";
 import EnneagramSection from "@/components/cognitive/EnneagramSection";
 import MBTIQuiz from "@/components/cognitive/MBTIQuiz";
 import EnneagramQuiz from "@/components/cognitive/EnneagramQuiz";
+import MBTITypeInfo from "@/components/cognitive/MBTITypeInfo";
+import { FUNCTION_DESCRIPTIONS } from "@/lib/mbti-data";
 import { HelpCircle } from "lucide-react";
 
 // MBTI cognitive function stacks
@@ -28,17 +30,6 @@ const MBTI_FUNCTIONS = {
   ESTJ: { ego: ["Te", "Si", "Ne", "Fi"], shadow: ["Ti", "Se", "Ni", "Fe"] },
   ESFP: { ego: ["Se", "Fi", "Te", "Ni"], shadow: ["Si", "Fe", "Ti", "Ne"] },
   ESFJ: { ego: ["Fe", "Si", "Ne", "Ti"], shadow: ["Fi", "Se", "Ni", "Te"] },
-};
-
-const FUNCTION_DESCRIPTIONS = {
-  Ti: { label: "Pensée Introvertie", desc: "Logique interne, analyse systémique, cohérence personnelle", color: "#3b82f6" },
-  Te: { label: "Pensée Extravertie", desc: "Rationalité externe, organisation, efficacité factuelle", color: "#2563eb" },
-  Ni: { label: "Intuition Introvertie", desc: "Intuition profonde, vision long-terme, pressentiments", color: "#8b5cf6" },
-  Ne: { label: "Intuition Extravertie", desc: "Déduction, connexion d'idées, exploration de possibilités", color: "#7c3aed" },
-  Si: { label: "Sensation Introvertie", desc: "Souvenir, impressions, comparaison avec le passé", color: "#f59e0b" },
-  Se: { label: "Sensation Extravertie", desc: "Sensation du moment, action immédiate, présence physique", color: "#d97706" },
-  Fi: { label: "Sentiment Introverti", desc: "Authenticité, valeurs personnelles profondes, intégrité", color: "#ec4899" },
-  Fe: { label: "Sentiment Extraverti", desc: "Empathie, harmonie sociale, conscience des émotions d'autrui", color: "#db2777" },
 };
 
 const POSITION_LABELS = ["Dominante", "Auxiliaire", "Tertiaire", "Inférieure"];
@@ -128,6 +119,9 @@ export default function Cognitive() {
           )}
         </div>
 
+        {/* Type description: strengths, weaknesses, functioning */}
+        <MBTITypeInfo selectedType={selectedType} />
+
         {/* Ego / Ombre split */}
         <div className="grid grid-cols-2 gap-4 mb-5">
           {/* EGO */}
@@ -148,6 +142,7 @@ export default function Cognitive() {
                     </div>
                     <p className="text-white text-xs font-medium">{info.label}</p>
                     <p className="text-gray-400 text-xs mt-0.5 leading-relaxed">{info.desc}</p>
+                    <p className="text-gray-500 text-[11px] mt-1.5 leading-relaxed border-t border-white/10 pt-1.5">{info.fonctionnement}</p>
                   </div>
                 );
               })}
@@ -172,6 +167,7 @@ export default function Cognitive() {
                     </div>
                     <p className="text-gray-300 text-xs font-medium">{info.label}</p>
                     <p className="text-gray-500 text-xs mt-0.5 leading-relaxed">{info.desc}</p>
+                    <p className="text-gray-600 text-[11px] mt-1.5 leading-relaxed border-t border-white/5 pt-1.5">{info.fonctionnement}</p>
                   </div>
                 );
               })}
