@@ -91,17 +91,13 @@ export default function BigFiveRadarModal({ profile, onClose, onSaved }) {
             {vertices.map((v, i) => (
               <line key={i} x1={cxR} y1={cyR} x2={v.x} y2={v.y} stroke="rgba(141,110,99,0.3)" strokeWidth="1" />
             ))}
-            {/* Outer wedges (score→100%) in dark */}
-            {BIG5.map((_, i) => {
-              const ni = (i + 1) % n;
-              const pts = `${dataPoints[i].x},${dataPoints[i].y} ${vertices[i].x},${vertices[i].y} ${vertices[ni].x},${vertices[ni].y} ${dataPoints[ni].x},${dataPoints[ni].y}`;
-              return <polygon key={`o${i}`} points={pts} fill="#1a1a1a" opacity="0.85" />;
-            })}
-            {/* Inner wedges (0→score%) colored per trait */}
+            {/* Full pentagon in black (always visible) */}
+            <polygon points={vertices.map(v => `${v.x},${v.y}`).join(" ")} fill="#1a1a1a" />
+            {/* Colored wedges (center → score) on top */}
             {BIG5.map((d, i) => {
               const ni = (i + 1) % n;
               const pts = `${cxR},${cyR} ${dataPoints[i].x},${dataPoints[i].y} ${dataPoints[ni].x},${dataPoints[ni].y}`;
-              return <polygon key={`i${i}`} points={pts} fill={d.color} fillOpacity="0.75" stroke={d.color} strokeWidth="1.5" />;
+              return <polygon key={`i${i}`} points={pts} fill={d.color} fillOpacity="0.82" stroke={d.color} strokeWidth="1.5" />;
             })}
             {/* Data point dots */}
             {dataPoints.map((p, i) => (
