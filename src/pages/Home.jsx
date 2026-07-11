@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { createPageUrl } from "@/utils";
 import { useNavigate } from "react-router-dom";
-import ZoomContainer from "@/components/tree/ZoomContainer";
 
 const CHAKRAS = [
   { light: "Spiritualité", shadow: "Solitude Paix", color: "#9333ea" },
@@ -98,11 +97,87 @@ export default function Home() {
 
         {/* CENTER: Tree SVG */}
         <div className="flex-1 relative flex items-center justify-center">
-          <ZoomContainer className="w-full h-full" style={{ maxHeight: 560 }}>
           <svg viewBox="0 0 400 520" className="w-full h-full" style={{ maxHeight: 560 }}>
-...
+            {/* Background tree image - using a drawn SVG tree */}
+            {/* Ground */}
+            <ellipse cx="200" cy="510" rx="160" ry="18" fill="#c8b89a" opacity="0.4" />
+
+            {/* Roots */}
+            <path d="M200 460 Q160 480 120 500" stroke="#5d3a1a" strokeWidth="8" fill="none" strokeLinecap="round"/>
+            <path d="M200 460 Q180 490 160 510" stroke="#5d3a1a" strokeWidth="6" fill="none" strokeLinecap="round"/>
+            <path d="M200 460 Q200 490 200 515" stroke="#5d3a1a" strokeWidth="7" fill="none" strokeLinecap="round"/>
+            <path d="M200 460 Q220 490 240 510" stroke="#5d3a1a" strokeWidth="6" fill="none" strokeLinecap="round"/>
+            <path d="M200 460 Q240 480 280 500" stroke="#5d3a1a" strokeWidth="8" fill="none" strokeLinecap="round"/>
+            <path d="M120 500 Q100 508 85 505" stroke="#5d3a1a" strokeWidth="4" fill="none" strokeLinecap="round"/>
+            <path d="M280 500 Q300 508 315 505" stroke="#5d3a1a" strokeWidth="4" fill="none" strokeLinecap="round"/>
+            <path d="M160 510 Q145 515 130 512" stroke="#5d3a1a" strokeWidth="3" fill="none" strokeLinecap="round"/>
+            <path d="M240 510 Q255 515 270 512" stroke="#5d3a1a" strokeWidth="3" fill="none" strokeLinecap="round"/>
+
+            {/* Trunk */}
+            <path d="M175 460 Q170 420 165 380 Q160 340 155 300" stroke="#5d3a1a" strokeWidth="28" fill="none" strokeLinecap="round"/>
+            <path d="M225 460 Q230 420 235 380 Q240 340 245 300" stroke="#5d3a1a" strokeWidth="28" fill="none" strokeLinecap="round"/>
+            <rect x="170" y="295" width="60" height="165" rx="4" fill="#5d3a1a"/>
+
+            {/* Main branches */}
+            {/* Left branches */}
+            <path d="M180 350 Q140 320 100 290" stroke="#5d3a1a" strokeWidth="14" fill="none" strokeLinecap="round"/>
+            <path d="M175 310 Q130 270 90 240" stroke="#5d3a1a" strokeWidth="10" fill="none" strokeLinecap="round"/>
+            <path d="M178 270 Q140 230 110 190" stroke="#5d3a1a" strokeWidth="8" fill="none" strokeLinecap="round"/>
+            <path d="M185 230 Q155 190 130 155" stroke="#5d3a1a" strokeWidth="7" fill="none" strokeLinecap="round"/>
+            <path d="M190 190 Q170 155 155 120" stroke="#5d3a1a" strokeWidth="5" fill="none" strokeLinecap="round"/>
+            {/* Right branches */}
+            <path d="M220 350 Q260 320 300 290" stroke="#5d3a1a" strokeWidth="14" fill="none" strokeLinecap="round"/>
+            <path d="M225 310 Q270 270 310 240" stroke="#5d3a1a" strokeWidth="10" fill="none" strokeLinecap="round"/>
+            <path d="M222 270 Q260 230 290 190" stroke="#5d3a1a" strokeWidth="8" fill="none" strokeLinecap="round"/>
+            <path d="M215 230 Q245 190 270 155" stroke="#5d3a1a" strokeWidth="7" fill="none" strokeLinecap="round"/>
+            <path d="M210 190 Q230 155 245 120" stroke="#5d3a1a" strokeWidth="5" fill="none" strokeLinecap="round"/>
+            {/* Center top */}
+            <path d="M200 280 Q200 220 200 160" stroke="#5d3a1a" strokeWidth="8" fill="none" strokeLinecap="round"/>
+            <path d="M200 160 Q200 120 200 80" stroke="#5d3a1a" strokeWidth="5" fill="none" strokeLinecap="round"/>
+
+            {/* Foliage blobs */}
+            {[
+              [200, 100, 90], [150, 130, 70], [250, 130, 70],
+              [110, 180, 65], [290, 180, 65], [140, 220, 60],
+              [260, 220, 60], [90, 240, 55], [310, 240, 55],
+              [170, 160, 55], [230, 160, 55], [200, 140, 60],
+              [120, 155, 50], [280, 155, 50],
+            ].map(([x, y, r], i) => (
+              <ellipse key={i} cx={x} cy={y} rx={r * 1.1} ry={r * 0.85}
+                fill="#2d4a1e" opacity={0.85 - i * 0.02} />
+            ))}
+
+            {/* Sephirot nodes */}
+            {SEPHIROTS.map((s) => {
+              const x = (s.x / 100) * 400;
+              const y = (s.y / 100) * 520;
+              const isSelected = selected?.id === s.id;
+              const hasBg = s.bg;
+
+              return (
+                <g key={s.id} onClick={() => setSelected(isSelected ? null : s)} style={{ cursor: "pointer" }}>
+                  <rect
+                    x={x - 38} y={y - 13}
+                    width={76} height={26}
+                    rx={5}
+                    fill={hasBg ? s.bg : "white"}
+                    stroke={isSelected ? "#f59e0b" : s.textColor}
+                    strokeWidth={isSelected ? 2.5 : 1.5}
+                    opacity={0.95}
+                  />
+                  <text
+                    x={x} y={y + 5}
+                    textAnchor="middle"
+                    fontSize="11"
+                    fontWeight="700"
+                    fill={hasBg ? "#fff" : s.textColor}
+                  >
+                    {s.name}
+                  </text>
+                </g>
+              );
+            })}
           </svg>
-          </ZoomContainer>
         </div>
 
         {/* RIGHT: Maslow */}

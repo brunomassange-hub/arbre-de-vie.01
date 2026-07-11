@@ -7,7 +7,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import TreeAddPanel from "@/components/tree/TreeAddPanel";
 import BigFiveRadarModal from "@/components/tree/BigFiveRadarModal";
-import ZoomContainer from "@/components/tree/ZoomContainer";
 import { CHAKRAS } from "@/lib/chakras";
 import {
   cx, trunkTop, trunkBot, BRANCH_DEFS, BRANCH_COLORS,
@@ -173,13 +172,247 @@ export default function FullTree({ mode }) {
         </div>
 
         <div className="rounded-2xl overflow-hidden border border-[#e0d6c8] shadow-sm" style={{ background: "#faf6f0" }}>
-          <ZoomContainer style={{ maxHeight: 540 }}>
           <svg viewBox="0 0 400 520" className="w-full" style={{ maxHeight: 540 }}>
             {/* Style-specific tree art */}
             <StyleArt isWound={isWound} />
-...
+
+            {/* Root click areas + labels + dots */}
+            {ROOT_DEFS.map((r, i) => {
+              const category = ROOT_CATEGORIES[i];
+              const rootLinks = allRootLinks.filter(lk => lk.type === category);
+              const color = isWound ? "#d4847a" : "#7fae7e";
+              const bgColor = isWound ? "#f0d9d5" : "#d4e8c4";
+              const tipX = cx + r.dx;
+              const tipY = trunkBot + r.dy;
+
+              return (
+                <g key={`root-${i}`}>
+                  {/* Click area */}
+                  <path d={`M ${cx} ${trunkBot} Q ${cx + r.cp1x} ${trunkBot + r.cp1y} ${tipX} ${tipY}`}
+                    stroke="transparent" strokeWidth="22" fill="none" strokeLinecap="round"
+                    style={{ cursor: "pointer" }} onClick={() => setAddZone({ type: "root", category })} />
+
+                  {/* Category label at tip */}
+                  <text x={tipX} y={tipY + 15} textAnchor="middle" dominantBaseline="middle"
+                    fontSize="8" fontWeight="700" fill={isWound ? "#8d6e63" : color} pointerEvents="none"
+                    style={{ paintOrder: "stroke", stroke: "#faf6f0", strokeWidth: 2.5, fontFamily: SERIF }}>
+                    {category}
+                  </text>
+
+                  {/* Links along root */}
+                  {rootLinks.slice(0, 5).map((lk, j) => {
+                    const t = 0.35 + j * 0.13;
+                    const p = bezier(t, cx, trunkBot, cx + r.cp1x, trunkBot + r.cp1y, tipX, tipY);
+                    return (
+                      <g key={lk.id} style={{ cursor: "pointer" }}
+                        onClick={(e) => { e.stopPropagation(); setDetail({ type: isWound ? "wound_link" : "pos_link", data: lk, color }); }}>
+                        <circle cx={p.x} cy={p.y} r="7" fill={bgColor} stroke={color} strokeWidth="1.5" />
+                        <text x={p.x} y={p.y + 1} textAnchor="middle" dominantBaseline="middle" fontSize="7" fill="#3e2723">{isWound ? "💔" : "💚"}</text>
+                        {lk.name && (
+                          <text x={p.x} y={p.y - 11} textAnchor="middle" dominantBaseline="middle"
+                            fontSize="7" fill="#3e2723" fontWeight="600" pointerEvents="none"
+                            style={{ paintOrder: "stroke", stroke: "#faf6f0", strokeWidth: 2 }}>
+                            {lk.name.length > 12 ? lk.name.slice(0, 12) + "…" : lk.name}
+                          </text>
+                        )}
+                      </g>
+                    );
+                  })}
+
+                  {/* Empty badge */}
+                  {rootLinks.length === 0 && (
+                    <g style={{ cursor: "pointer" }} onClick={() => setAddZone({ type: "root", category })}>
+                      <circle cx={tipX} cy={tipY} r="7" fill="#faf6f0" stroke={isWound ? "#bcaaa4" : "#a5d6a7"} strokeWidth="1.5" className="tree-pulse" />
+                      <text x={tipX} y={tipY + 1} textAnchor="middle" dominantBaseline="middle" fontSize="9" fill={isWound ? "#bcaaa4" : "#a5d6a7"} fontWeight="bold">+</text>
+                    </g>
+                  )}
+                </g>
+              );
+            })}
+
+            {/* Trunk click area */}
+            <path d={TRUNK_PATH} fill="transparent" style={{ cursor: "pointer" }} onClick={() => setAddZone({ type: "trunk" })} />
+
+            {/* Trunk badge */}
+            <g style={{ cursor: "pointer" }} onClick={() => setAddZone({ type: "trunk" })}>
+              <circle cx={cx} cy={trunkTop + 12} r="11" fill="#faf6f0" stroke={accent} strokeWidth="2" />
+              <text x={cx} y={trunkTop + 13} textAnchor="middle" dominantBaseline="middle" fontSize="11" fill={accent} fontWeight="bold">+</text>
+            </g>
+
+            {/* Trunk events */}
+            {trunkEvents.map((ev, i) => {
+              const spacing = trunkEvents.length > 7 ? (isWound ? 24 : 20) : 28;
+              const y = trunkTop + 30 + i * spacing;
+              const chakra = CHAKRAS.find(c => c.name === ev.chakra);
+              const col = chakra?.color || (isWound ? "#a1887f" : "#7fae7e");
+              const type = isWound ? "event" : "pos_event";
+              return (
+                <g key={ev.id} style={{ cursor: "pointer" }}
+                  onClick={(e) => { e.stopPropagation(); setDetail({ type, data: ev, color: col }); }}>
+                  <circle cx={cx - 24} cy={y} r="10" fill={col} opacity={0.8} stroke="#fff" strokeWidth="1.5" />
+                  <text x={cx - 24} y={y + 1} textAnchor="middle" dominantBaseline="middle" fontSize="8" fill="#fff" fontWeight="bold">{ev.age}</text>
+                  {ev.title && <text x={cx - 10} y={y + 1} dominantBaseline="middle" fontSize="7" fill={col} fontWeight="600" pointerEvents="none">{ev.title.length > 20 ? ev.title.slice(0, 20) + "…" : ev.title}</text>}
+                </g>
+              );
+            })}
+
+            {/* Big Five radar — bottom of trunk, above roots */}
+            {!isWound && (() => {
+              const rx = 34;
+              const ry = trunkBot - rx - 14;
+              const n = 5;
+              const angs = BIG5.map((_, i) => (Math.PI * 2 * i) / n - Math.PI / 2);
+              const verts = angs.map(a => ({ x: cx + rx * Math.cos(a), y: ry + rx * Math.sin(a) }));
+              const dpts = BIG5.map((d, i) => {
+                const val = ((bigFive?.[d.key] ?? 50) / 100) * rx;
+                return { x: cx + val * Math.cos(angs[i]), y: ry + val * Math.sin(angs[i]) };
+              });
+              const poly = dpts.map(p => `${p.x},${p.y}`).join(" ");
+              return (
+                <g style={{ cursor: "pointer" }} onClick={(e) => { e.stopPropagation(); setShowBigFive(true); }}>
+                  {/* Colored sectors */}
+                  {BIG5.map((d, i) => {
+                    const next = (i + 1) % n;
+                    return (
+                      <polygon key={`sec-${d.key}`}
+                        points={`${cx},${ry} ${dpts[i].x},${dpts[i].y} ${dpts[next].x},${dpts[next].y}`}
+                        fill={d.color} opacity={0.5} stroke={d.color} strokeWidth="0.5" />
+                    );
+                  })}
+                  {/* Grid */}
+                  {[0.5, 1].map(f => (
+                    <polygon key={f} points={verts.map(v => {
+                      const dx = v.x - cx, dy = v.y - ry;
+                      return `${cx + dx * f},${ry + dy * f}`;
+                    }).join(" ")} fill="none" stroke="rgba(141,110,99,0.4)" strokeWidth="0.8" />
+                  ))}
+                  {verts.map((v, i) => (
+                    <line key={i} x1={cx} y1={ry} x2={v.x} y2={v.y} stroke="rgba(141,110,99,0.35)" strokeWidth="0.8" />
+                  ))}
+                  {/* Data polygon — black fill for contrast */}
+                  <polygon points={poly} fill="rgba(0,0,0,0.15)" stroke="#1a1a1a" strokeWidth="2" />
+                  {dpts.map((p, i) => (
+                    <circle key={i} cx={p.x} cy={p.y} r="3" fill={BIG5[i].color} stroke="#1a1a1a" strokeWidth="1" />
+                  ))}
+                  {/* Percentage labels */}
+                  {dpts.map((p, i) => {
+                    const dx = p.x - cx, dy = p.y - ry;
+                    const dist = Math.sqrt(dx * dx + dy * dy) || 1;
+                    const lx = p.x + (dx / dist) * 11;
+                    const ly = p.y + (dy / dist) * 11;
+                    return (
+                      <text key={`pct-${i}`} x={lx} y={ly} textAnchor="middle" dominantBaseline="middle"
+                        fontSize="7" fontWeight="700" fill="#1a1a1a" pointerEvents="none">{bigFive?.[BIG5[i].key] ?? 50}%</text>
+                    );
+                  })}
+                  {verts.map((v, i) => {
+                    const dx = v.x - cx, dy = v.y - ry;
+                    const lx = cx + dx * 1.3, ly = ry + dy * 1.3;
+                    return (
+                      <text key={i} x={lx} y={ly} textAnchor="middle" dominantBaseline="middle"
+                        fontSize="6" fontWeight="700" fill={BIG5[i].color} pointerEvents="none">{BIG5[i].label}</text>
+                    );
+                  })}
+                  <text x={cx} y={ry - rx - 6} textAnchor="middle" fontSize="6.5" fill="#8d6e63" fontWeight="600" pointerEvents="none">🧬 Big Five — toucher pour ajuster</text>
+                </g>
+              );
+            })()}
+
+            {/* Branch click areas + beliefs + activities + labels */}
+            {BRANCH_DEFS.map((bd) => {
+              const { startX, startY, midX, midY, end } = getBranchGeometry(bd);
+              const color = BRANCH_COLORS[bd.name];
+              const wBeliefs = isWound ? limitBeliefs.filter(b => b.branch === bd.name) : [];
+              const sBeliefs = !isWound ? posBeliefs.filter(b => b.branch === bd.name) : [];
+              const bActivities = !isWound ? activities.filter(a => a.branch === bd.name) : [];
+              const bezierFn = (t) => bezier(t, startX, startY, midX, midY, end.x, end.y);
+
+              return (
+                <g key={bd.name}>
+                  <path d={`M ${startX} ${startY} Q ${midX} ${midY} ${end.x} ${end.y}`}
+                    stroke="transparent" strokeWidth="22" fill="none" strokeLinecap="round"
+                    style={{ cursor: "pointer" }} onClick={() => setAddZone({ type: "branch", name: bd.name })} />
+
+                  {wBeliefs.slice(0, 4).map((b, i) => {
+                    const p = bezierFn(0.3 + i * 0.2);
+                    const txt = b.belief.length > 28 ? b.belief.slice(0, 28) + "…" : b.belief;
+                    return (
+                      <g key={b.id} style={{ cursor: "pointer" }}
+                        onClick={(e) => { e.stopPropagation(); setDetail({ type: "wound_belief", data: b, color: "#d4847a" }); }}>
+                        <circle cx={p.x} cy={p.y} r="7" fill="#f0d9d5" stroke="#d4847a" strokeWidth="1.5" />
+                        <text x={p.x} y={p.y + 1} textAnchor="middle" dominantBaseline="middle" fontSize="7" fill="#5d4037">✕</text>
+                        <text x={p.x + (bd.side === "left" ? -11 : 11)} y={p.y + 1} dominantBaseline="middle"
+                          textAnchor={bd.side === "left" ? "end" : "start"}
+                          fontSize="6.5" fill="#5d4037" fontWeight="600" pointerEvents="none"
+                          style={{ paintOrder: "stroke", stroke: "#faf6f0", strokeWidth: 2.5, fontFamily: SERIF }}>{txt}</text>
+                      </g>
+                    );
+                  })}
+
+                  {sBeliefs.slice(0, 4).map((b, i) => {
+                    const p = bezierFn(0.35 + i * 0.18);
+                    const txt = b.belief.length > 28 ? b.belief.slice(0, 28) + "…" : b.belief;
+                    return (
+                      <g key={b.id} style={{ cursor: "pointer" }}
+                        onClick={(e) => { e.stopPropagation(); setDetail({ type: "pos_belief", data: b, color }); }}>
+                        <circle cx={p.x} cy={p.y} r="7" fill="#d4e8c4" stroke={color} strokeWidth="1.5" />
+                        <text x={p.x} y={p.y + 1} textAnchor="middle" dominantBaseline="middle" fontSize="7" fill={color}>✦</text>
+                        <text x={p.x + (bd.side === "left" ? -11 : 11)} y={p.y + 1} dominantBaseline="middle"
+                          textAnchor={bd.side === "left" ? "end" : "start"}
+                          fontSize="6.5" fill={color} fontWeight="600" pointerEvents="none"
+                          style={{ paintOrder: "stroke", stroke: "#faf6f0", strokeWidth: 2.5, fontFamily: SERIF }}>{txt}</text>
+                      </g>
+                    );
+                  })}
+
+                  {bActivities.slice(0, 8).map((a, i) => {
+                    // Distribute activities on the bottom semicircle only (0 to PI)
+                    // so they never overlap the branch label which sits above the tip.
+                    const n = Math.min(bActivities.length, 8);
+                    const angle = n === 1 ? Math.PI / 2 : (i / (n - 1)) * Math.PI;
+                    const lr = 22;
+                    const lx = end.x + lr * Math.cos(angle) + (bd.side === "left" ? -4 : 4);
+                    const ly = end.y + lr * Math.sin(angle);
+                    const txt = a.name.length > 10 ? a.name.slice(0, 10) + "…" : a.name;
+                    // Label goes outward from center
+                    const labelDx = Math.cos(angle);
+                    const labelDy = Math.sin(angle);
+                    const labelX = lx + labelDx * 11;
+                    const labelY = ly + labelDy * 4 + 1;
+                    return (
+                      <g key={a.id} style={{ cursor: "pointer" }}
+                        onClick={(e) => { e.stopPropagation(); setDetail({ type: "activity", data: a, color }); }}>
+                        <ellipse cx={lx} cy={ly} rx={8} ry={5} fill={color} opacity={0.75}
+                          transform={`rotate(${(angle * 180 / Math.PI)} ${lx} ${ly})`} />
+                        <text x={labelX} y={labelY} dominantBaseline="middle"
+                          textAnchor={labelDx < -0.3 ? "end" : labelDx > 0.3 ? "start" : "middle"}
+                          fontSize="6.5" fill={color} fontWeight="600" pointerEvents="none"
+                          style={{ paintOrder: "stroke", stroke: "#faf6f0", strokeWidth: 2.5, fontFamily: SERIF }}>{txt}</text>
+                      </g>
+                    );
+                  })}
+
+                  {bActivities.length > 0 && (
+                    <circle cx={end.x} cy={end.y} r={14} fill={color} opacity={0.12} pointerEvents="none" />
+                  )}
+
+                  {/* Branch interactive badge */}
+                  {wBeliefs.length === 0 && sBeliefs.length === 0 && bActivities.length === 0 && (
+                    <g style={{ cursor: "pointer" }} onClick={() => setAddZone({ type: "branch", name: bd.name })}>
+                      <circle cx={end.x} cy={end.y} r="9" fill="#faf6f0" stroke={color} strokeWidth="1.5" className="tree-pulse" />
+                      <text x={end.x} y={end.y + 1} textAnchor="middle" dominantBaseline="middle" fontSize="10" fill={color} fontWeight="bold">+</text>
+                    </g>
+                  )}
+                  <text x={end.x + (bd.side === "left" ? -6 : 6)} y={end.y - 12}
+                    textAnchor={bd.side === "left" ? "end" : "start"}
+                    fontSize="9" fontWeight="600" fill={color} opacity={0.85} pointerEvents="none"
+                    style={{ fontFamily: SERIF }}>
+                    {bd.name}
+                  </text>
+                </g>
+              );
+            })}
           </svg>
-          </ZoomContainer>
         </div>
 
         {/* Hint chips */}
