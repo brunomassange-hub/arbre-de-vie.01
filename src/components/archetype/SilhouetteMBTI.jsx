@@ -38,6 +38,17 @@ const DOTS = [
   { fn: "Si", x: 120, y: 175 },  // Ventre — côté gauche du sujet (droite écran), entre Fi et Se
 ];
 
+// Chakra labels aligned with function dot y-positions
+const CHAKRA_LABELS = [
+  { y: 17, name: "Spiritualité", sub: "Solitude / Paix", color: "#800080" },
+  { y: 39, name: "Intuition", sub: "Colère / Clarté", color: "#3b6ee0" },
+  { y: 72, name: "Communication", sub: "Anxiété / Assertivité", color: "#008080" },
+  { y: 130, name: "Connexion", sub: "Amour / Peur", color: "#008000" },
+  { y: 150, name: "Pouvoir", sub: "Pouvoir / Culpabilité", color: "#FFA500" },
+  { y: 175, name: "Créativité", sub: "Plaisir / Honte", color: "#D2691E" },
+  { y: 200, name: "Stabilité", sub: "Tristesse / Joie", color: "#dc3030" },
+];
+
 export default function SilhouetteMBTI() {
   const [mbtiType, setMbtiType] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -73,7 +84,7 @@ export default function SilhouetteMBTI() {
           : "Définissez votre type MBTI sur la page Personnalité"}
       </p>
 
-      <svg viewBox="0 0 200 420" className="w-full mx-auto" style={{ maxWidth: 260 }}>
+      <svg viewBox="-90 0 290 420" className="w-full mx-auto" style={{ maxWidth: 320 }}>
         {/* Silhouette body */}
         <g fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.14)" strokeWidth="1.5">
           {/* Head */}
@@ -99,6 +110,19 @@ export default function SilhouetteMBTI() {
         <text x="100" y="192" textAnchor="middle" fontSize="6" fill="rgba(255,255,255,0.2)">
           Bassin
         </text>
+
+        {/* Chakra labels — left side, aligned with function dots */}
+        {CHAKRA_LABELS.map(({ y, name, sub, color }) => (
+          <g key={name}>
+            <line x1="-5" y1={y} x2="20" y2={y} stroke={color} strokeWidth="0.5" strokeDasharray="1.5,1.5" opacity="0.5" />
+            <text x="-8" y={y + 1.5} textAnchor="end" fontSize="7" fontWeight="bold" fill={color}>
+              {name}
+            </text>
+            <text x="-8" y={y + 10} textAnchor="end" fontSize="5" fill="#6b7b94" fontStyle="italic">
+              {sub}
+            </text>
+          </g>
+        ))}
 
         {/* Function dots */}
         {DOTS.map(({ fn, x, y }) => {
