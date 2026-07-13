@@ -1,5 +1,6 @@
 import React from "react";
 import SilhouetteMBTI from "@/components/archetype/SilhouetteMBTI";
+import EnneagramDiagram from "@/components/archetype/EnneagramDiagram";
 
 export default function Archetype() {
   return (
@@ -18,6 +19,8 @@ export default function Archetype() {
         </div>
 
         <SilhouetteMBTI />
+
+        <EnneagramDiagram />
 
         <div
           className="mt-8 rounded-2xl p-5 text-center"
