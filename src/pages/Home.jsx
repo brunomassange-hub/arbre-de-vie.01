@@ -83,12 +83,12 @@ export default function Home() {
                 onClick={() => setChakraDetail(c.light)}
                 className="text-right pr-2 flex justify-end items-center gap-1 cursor-pointer hover:bg-gray-100 rounded px-1 py-0.5 transition-colors"
               >
-                <span className="text-xs font-bold" style={{ color: c.dark ? "#fbbf24" : c.color }}>
+                <span className="text-[10px] font-bold leading-tight" style={{ color: c.dark ? "#fbbf24" : c.color }}>
                   {c.light}
                 </span>
-                <span className="text-xs text-gray-400">—</span>
+                <span className="text-[10px] text-gray-400">—</span>
                 <span
-                  className="text-xs font-semibold px-1 py-0.5 rounded"
+                  className="text-[10px] font-semibold px-1 py-0.5 rounded leading-tight"
                   style={{
                     color: c.dark ? "#fff" : c.color,
                     backgroundColor: c.dark ? c.color : "transparent",
