@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { createPageUrl } from "@/utils";
 import { useNavigate } from "react-router-dom";
 import ZoomableWrapper from "@/components/tree/ZoomableWrapper";
+import { CHAKRA_DESCRIPTIONS } from "@/lib/chakras";
 
 const CHAKRAS = [
   { light: "Spiritualité", shadow: "Solitude Paix", color: "#9333ea" },
@@ -56,6 +57,7 @@ const SEPHIROT_INFO = {
 
 export default function Home() {
   const [selected, setSelected] = useState(null);
+  const [chakraDetail, setChakraDetail] = useState(null);
   const navigate = useNavigate();
 
   const info = selected ? SEPHIROT_INFO[selected.id] : null;
@@ -76,7 +78,11 @@ export default function Home() {
           <p className="text-xs font-bold text-gray-500 mb-2 text-center">Chakras</p>
           <div className="flex flex-col gap-3 flex-1 justify-center">
             {CHAKRAS.map((c, i) => (
-              <div key={i} className="text-right pr-2 flex justify-end items-center gap-1">
+              <div
+                key={i}
+                onClick={() => setChakraDetail(c.light)}
+                className="text-right pr-2 flex justify-end items-center gap-1 cursor-pointer hover:bg-gray-100 rounded px-1 py-0.5 transition-colors"
+              >
                 <span className="text-xs font-bold" style={{ color: c.dark ? "#fbbf24" : c.color }}>
                   {c.light}
                 </span>
@@ -195,6 +201,27 @@ export default function Home() {
           </div>
         </div>
       </div>
+
+      {/* Chakra detail panel */}
+      {chakraDetail && (
+        <div
+          className="fixed inset-0 bg-black/50 z-40 flex items-end justify-center"
+          onClick={() => setChakraDetail(null)}
+        >
+          <div
+            className="bg-white rounded-t-2xl p-6 w-full max-w-lg shadow-2xl"
+            onClick={e => e.stopPropagation()}
+          >
+            <div className="flex justify-between items-start mb-3">
+              <h2 className="text-xl font-bold" style={{ color: CHAKRAS.find(c => c.light === chakraDetail)?.color }}>
+                {chakraDetail}
+              </h2>
+              <button onClick={() => setChakraDetail(null)} className="text-gray-400 text-2xl leading-none">×</button>
+            </div>
+            <p className="text-gray-600 text-sm">{CHAKRA_DESCRIPTIONS[chakraDetail]}</p>
+          </div>
+        </div>
+      )}
 
       {/* Detail panel */}
       {selected && info && (

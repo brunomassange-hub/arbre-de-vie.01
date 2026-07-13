@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { FUNCTION_DESCRIPTIONS } from "@/lib/mbti-data";
+import { CHAKRA_DESCRIPTIONS } from "@/lib/chakras";
 
 // MBTI cognitive function stacks (ego = Dominante, Auxiliaire, Tertiaire, Inférieure)
 const MBTI_FUNCTIONS = {
@@ -52,6 +53,7 @@ const CHAKRA_LABELS = [
 export default function SilhouetteMBTI() {
   const [mbtiType, setMbtiType] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [chakraDetail, setChakraDetail] = useState(null);
 
   useEffect(() => {
     base44.entities.CognitiveProfile.list()
@@ -113,8 +115,9 @@ export default function SilhouetteMBTI() {
 
         {/* Chakra labels — left side, aligned with function dots */}
         {CHAKRA_LABELS.map(({ y, name, sub, color }) => (
-          <g key={name}>
+          <g key={name} onClick={() => setChakraDetail(name)} style={{ cursor: "pointer" }}>
             <line x1="-5" y1={y} x2="20" y2={y} stroke={color} strokeWidth="0.5" strokeDasharray="1.5,1.5" opacity="0.5" />
+            <rect x="-88" y={y - 6} width="83" height="18" fill="transparent" />
             <text x="-8" y={y + 1.5} textAnchor="end" fontSize="7" fontWeight="bold" fill={color}>
               {name}
             </text>
@@ -154,6 +157,24 @@ export default function SilhouetteMBTI() {
           Silhouette vue de face — gauche/droite anatomiques du sujet
         </text>
       </svg>
+
+      {/* Chakra detail popover */}
+      {chakraDetail && (
+        <div className="mt-3 rounded-lg p-3 flex items-start gap-3" style={{ background: CHAKRA_LABELS.find(c => c.name === chakraDetail)?.color + "18", border: `1px solid ${CHAKRA_LABELS.find(c => c.name === chakraDetail)?.color}40` }}>
+          <div className="w-3 h-3 rounded-full flex-shrink-0 mt-0.5" style={{ background: CHAKRA_LABELS.find(c => c.name === chakraDetail)?.color }} />
+          <div className="flex-1">
+            <div className="flex items-center justify-between">
+              <span className="text-sm font-bold" style={{ color: CHAKRA_LABELS.find(c => c.name === chakraDetail)?.color }}>
+                {chakraDetail}
+              </span>
+              <button onClick={() => setChakraDetail(null)} className="text-gray-500 text-lg leading-none">×</button>
+            </div>
+            <p className="text-xs mt-1" style={{ color: "#9ba8bc" }}>
+              {CHAKRA_DESCRIPTIONS[chakraDetail]}
+            </p>
+          </div>
+        </div>
+      )}
 
       {/* Hierarchy legend */}
       {functions && (
