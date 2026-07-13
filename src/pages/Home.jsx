@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { createPageUrl } from "@/utils";
 import { useNavigate } from "react-router-dom";
+import ZoomableWrapper from "@/components/tree/ZoomableWrapper";
 
 const CHAKRAS = [
   { light: "Spiritualité", shadow: "Solitude Paix", color: "#9333ea" },
@@ -97,6 +98,7 @@ export default function Home() {
 
         {/* CENTER: Tree SVG */}
         <div className="flex-1 relative flex items-center justify-center">
+         <ZoomableWrapper>
           <svg viewBox="0 0 400 520" className="w-full h-full" style={{ maxHeight: 560 }}>
             {/* Background tree image - using a drawn SVG tree */}
             {/* Ground */}
@@ -178,6 +180,7 @@ export default function Home() {
               );
             })}
           </svg>
+         </ZoomableWrapper>
         </div>
 
         {/* RIGHT: Maslow */}
