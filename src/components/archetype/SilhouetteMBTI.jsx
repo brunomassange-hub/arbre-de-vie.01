@@ -25,16 +25,17 @@ const MBTI_FUNCTIONS = {
 const POSITION_LABELS = ["Dominante", "Auxiliaire", "Tertiaire", "Inférieure"];
 
 // Dot positions on the silhouette (viewBox 0 0 200 420)
-// Tête: Ni/Ti · Bras: Ne/Te · Torse: Fe/Fi · Bassin: Se/Si
+// Tête: Ni (sommet), Ti (cerveau droite sujet), Ne (oreille gauche sujet), Si (haut tête)
+// Gorge: Te · Torse: Fe/Fi · Bassin: Se
 const DOTS = [
-  { fn: "Ni", x: 100, y: 38 },   // Tête — centre
-  { fn: "Ti", x: 72, y: 38 },    // Tête — gauche
-  { fn: "Ne", x: 156, y: 118 },  // Bras droit
-  { fn: "Te", x: 44, y: 118 },   // Bras gauche
+  { fn: "Ni", x: 100, y: 17 },   // Sommet du crâne
+  { fn: "Ti", x: 84, y: 38 },    // Cerveau — côté droit du sujet (gauche écran), proche du centre
+  { fn: "Ne", x: 122, y: 40 },   // Oreille gauche du sujet (droite écran)
+  { fn: "Te", x: 100, y: 72 },   // Gorge
   { fn: "Fe", x: 100, y: 130 },  // Torse — centre
   { fn: "Fi", x: 75, y: 160 },   // Torse — gauche
   { fn: "Se", x: 100, y: 200 },  // Bassin — centre
-  { fn: "Si", x: 125, y: 200 },  // Bassin — droite
+  { fn: "Si", x: 115, y: 30 },   // Haut de la tête
 ];
 
 export default function SilhouetteMBTI() {
@@ -92,9 +93,6 @@ export default function SilhouetteMBTI() {
         </g>
 
         {/* Zone labels */}
-        <text x="100" y="76" textAnchor="middle" fontSize="6" fill="rgba(255,255,255,0.2)">
-          Tête
-        </text>
         <text x="100" y="148" textAnchor="middle" fontSize="6" fill="rgba(255,255,255,0.2)">
           Torse
         </text>
