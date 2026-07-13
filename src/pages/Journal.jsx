@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus, Trash2, BookOpen, Heart, Wind, Brain, TrendingUp } from "lucide-react";
+import { Plus, Trash2, BookOpen, Heart, Wind, Brain, TrendingUp, Sparkles, Users, Sun } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import GroundingSection from "@/components/journal/GroundingSection";
@@ -15,13 +15,70 @@ import ImprovementSection from "@/components/journal/ImprovementSection";
 
 const SERIF = "'Playfair Display', Georgia, serif";
 
-const TABS = [
-  { id: "journal", label: "Journal", icon: BookOpen },
+const THEMES = [
+  {
+    id: "trauma",
+    label: "Traumatisme",
+    fullLabel: "Soulager le traumatisme",
+    icon: Heart,
+    desc: "Guérir les blessures du passé et apaiser la charge émotionnelle des événements difficiles.",
+    context: "L'objectif thérapeutique est de soulager le traumatisme : aide la personne à guérir ses blessures passées, apaiser la charge émotionnelle et transformer la souffrance en résilience.",
+  },
+  {
+    id: "emotions",
+    label: "Émotions",
+    fullLabel: "Gérer les émotions, la pensée et l'image de soi",
+    icon: Brain,
+    desc: "Réguler les émotions, apaiser le dialogue intérieur et cultiver une image de soi bienveillante.",
+    context: "L'objectif thérapeutique est de gérer les émotions, la pensée et l'image de soi : aide la personne à réguler ses émotions, transformer son dialogue intérieur et cultiver une estime de soi saine.",
+  },
+  {
+    id: "conflits",
+    label: "Conflits",
+    fullLabel: "Résoudre les conflits psychiques",
+    icon: Sparkles,
+    desc: "Harmoniser les tensions internes et réconcilier les parts de soi en conflit.",
+    context: "L'objectif thérapeutique est de résoudre les conflits psychiques : aide la personne à identifier et harmoniser les tensions internes, réconcilier les parts d'elle-même en conflit.",
+  },
+  {
+    id: "relations",
+    label: "Relations",
+    fullLabel: "Appréhender les relations",
+    icon: Users,
+    desc: "Comprendre les dynamiques relationnelles et cultiver des liens sains et authentiques.",
+    context: "L'objectif thérapeutique est d'appréhender les relations : aide la personne à comprendre les dynamiques relationnelles, poser des limites saines et cultiver des liens authentiques.",
+  },
+  {
+    id: "comportement",
+    label: "Comportement",
+    fullLabel: "Changer de comportement",
+    icon: TrendingUp,
+    desc: "Transformer les schémas automatiques et installer de nouveaux comportements alignés.",
+    context: "L'objectif thérapeutique est de changer de comportement : aide la personne à identifier ses schémas automatiques, les transformer et installer de nouveaux comportements alignés avec ses valeurs.",
+  },
+  {
+    id: "sens",
+    label: "Sens de vie",
+    fullLabel: "Donner du sens à sa vie",
+    icon: Sun,
+    desc: "Explorer sa raison d'être et aligner sa vie avec ses valeurs profondes.",
+    context: "L'objectif thérapeutique est de donner du sens à sa vie : aide la personne à explorer sa raison d'être, aligner sa vie avec ses valeurs profondes et trouver une direction porteuse de sens.",
+  },
+];
+
+const TOOLS = [
   { id: "grounding", label: "Ancrage", icon: Heart },
-  { id: "hypnose", label: "Hypnose", icon: Brain },
   { id: "meditation", label: "Méditation", icon: Wind },
+  { id: "hypnose", label: "Hypnose", icon: Brain },
   { id: "amelioration", label: "Axes", icon: TrendingUp },
 ];
+
+const TOOL_INTROS = {
+  grounding: "💚 L'ancrage vous reconnecte à vos expériences positives pour retrouver stabilité et présence dans l'instant.",
+  meditation: "🌬️ Des méditations guidées pour apaiser le mental, relâcher le corps et harmoniser vos énergies.",
+  hypnose: "🌀 L'hypnose éricksonnienne accompagne la transformation intérieure, guidée par vos besoins profonds.",
+  amelioration: "📈 Une analyse personnalisée de vos données pour identifier vos axes de croissance.",
+};
 
 const BRANCHES = ["Corps", "Esprit", "Âme", "Social", "Professionnel", "Créativité", "Racines", "Tronc"];
 const ICONS = { Corps: "💪", Esprit: "🧠", "Âme": "✨", Social: "👥", Professionnel: "💼", "Créativité": "🎨", Racines: "🌱", Tronc: "🌲" };
@@ -133,6 +190,10 @@ function JournalEntries() {
 
 export default function Journal() {
   const [activeTab, setActiveTab] = useState("journal");
+  const [activeTheme, setActiveTheme] = useState("trauma");
+  const [activeTool, setActiveTool] = useState("grounding");
+
+  const selectedTheme = THEMES.find(t => t.id === activeTheme);
 
   return (
     <div className="min-h-screen px-4 py-8" style={{ background: "#faf6f0" }}>
@@ -140,13 +201,24 @@ export default function Journal() {
         <h1 className="text-3xl font-bold mb-1" style={{ fontFamily: SERIF, color: "#3e2723" }}>📖 Journal thérapeutique</h1>
         <p className="text-sm mb-5" style={{ color: "#8d6e63" }}>Outils d'introspection et de guérison personnalisés</p>
 
-        {/* Tabs */}
+        {/* Top tabs: Journal + 6 themes */}
         <div className="flex gap-1.5 mb-6 overflow-x-auto pb-1">
-          {TABS.map(tab => {
-            const Icon = tab.icon;
-            const active = activeTab === tab.id;
+          <button onClick={() => setActiveTab("journal")}
+            className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium transition whitespace-nowrap border"
+            style={{
+              background: activeTab === "journal" ? "#5d7a3a" : "transparent",
+              borderColor: activeTab === "journal" ? "#5d7a3a" : "#e0d6c8",
+              color: activeTab === "journal" ? "#fff" : "#8d6e63",
+              fontFamily: SERIF,
+            }}>
+            <BookOpen className="w-3.5 h-3.5" />
+            Journal
+          </button>
+          {THEMES.map(theme => {
+            const Icon = theme.icon;
+            const active = activeTab === "therapy" && activeTheme === theme.id;
             return (
-              <button key={tab.id} onClick={() => setActiveTab(tab.id)}
+              <button key={theme.id} onClick={() => { setActiveTab("therapy"); setActiveTheme(theme.id); }}
                 className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium transition whitespace-nowrap border"
                 style={{
                   background: active ? "#5d7a3a" : "transparent",
@@ -155,44 +227,54 @@ export default function Journal() {
                   fontFamily: SERIF,
                 }}>
                 <Icon className="w-3.5 h-3.5" />
-                {tab.label}
+                {theme.label}
               </button>
             );
           })}
         </div>
 
-        {/* Content */}
+        {/* Journal free writing */}
         {activeTab === "journal" && <JournalEntries />}
-        {activeTab === "grounding" && (
+
+        {/* Therapy themes with tools */}
+        {activeTab === "therapy" && selectedTheme && (
           <div>
+            <div className="mb-4 p-3 rounded-xl border" style={{ background: "#f5f0e8", borderColor: "#e0d6c8" }}>
+              <h2 className="text-base font-bold mb-0.5" style={{ color: "#3e2723", fontFamily: SERIF }}>
+                {selectedTheme.fullLabel}
+              </h2>
+              <p className="text-xs" style={{ color: "#8d6e63" }}>{selectedTheme.desc}</p>
+            </div>
+
+            {/* Tool sub-tabs */}
+            <div className="flex gap-1.5 mb-4 overflow-x-auto pb-1">
+              {TOOLS.map(tool => {
+                const Icon = tool.icon;
+                const active = activeTool === tool.id;
+                return (
+                  <button key={tool.id} onClick={() => setActiveTool(tool.id)}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition whitespace-nowrap border"
+                    style={{
+                      background: active ? "#7fae7e" : "transparent",
+                      borderColor: active ? "#7fae7e" : "#e0d6c8",
+                      color: active ? "#fff" : "#8d6e63",
+                      fontFamily: SERIF,
+                    }}>
+                    <Icon className="w-3.5 h-3.5" />
+                    {tool.label}
+                  </button>
+                );
+              })}
+            </div>
+
             <p className="text-sm mb-4" style={{ color: "#5d4037", fontFamily: SERIF }}>
-              💚 L'ancrage vous reconnecte à vos expériences positives pour retrouver stabilité et ancrage dans le présent.
+              {TOOL_INTROS[activeTool]}
             </p>
-            <GroundingSection />
-          </div>
-        )}
-        {activeTab === "hypnose" && (
-          <div>
-            <p className="text-sm mb-4" style={{ color: "#5d4037", fontFamily: SERIF }}>
-              🌀 L'hypnose éricksonnienne accompagne la guérison de vos blessures en transformant la souffrance, guidée par vos besoins profonds.
-            </p>
-            <HypnosisSection />
-          </div>
-        )}
-        {activeTab === "meditation" && (
-          <div>
-            <p className="text-sm mb-4" style={{ color: "#5d4037", fontFamily: SERIF }}>
-              🌬️ Des méditations guidées pour apaiser le mental, relâcher le corps et harmoniser vos énergies.
-            </p>
-            <MeditationSection />
-          </div>
-        )}
-        {activeTab === "amelioration" && (
-          <div>
-            <p className="text-sm mb-4" style={{ color: "#5d4037", fontFamily: SERIF }}>
-              📈 Une analyse personnalisée de vos données pour identifier vos axes de croissance.
-            </p>
-            <ImprovementSection />
+
+            {activeTool === "grounding" && <GroundingSection theme={selectedTheme.context} />}
+            {activeTool === "meditation" && <MeditationSection theme={selectedTheme.context} />}
+            {activeTool === "hypnose" && <HypnosisSection theme={selectedTheme.context} />}
+            {activeTool === "amelioration" && <ImprovementSection theme={selectedTheme.context} />}
           </div>
         )}
       </div>

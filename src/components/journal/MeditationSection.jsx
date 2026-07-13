@@ -14,7 +14,7 @@ const MEDITATION_TYPES = [
   { id: "forest", label: "🌲 Forêt intérieure", desc: "Se ressourcer dans la nature" },
 ];
 
-export default function MeditationSection() {
+export default function MeditationSection({ theme }) {
   const [selectedType, setSelectedType] = useState("scan");
   const [selectedChakra, setSelectedChakra] = useState(CHAKRAS[0].name);
   const [content, setContent] = useState(null);
@@ -30,7 +30,7 @@ export default function MeditationSection() {
         const ch = CHAKRAS.find(c => c.name === selectedChakra);
         chakraContext = `Centrée sur le chakra "${ch.name}" (couleur: ${ch.color}), lumière: ${ch.light}, ombre: ${ch.shadow}.`;
       }
-      const prompt = `Tu es un guide de méditation. Crée une méditation guidée de 10 minutes: ${typeLabel}. ${chakraContext}
+      const prompt = `Tu es un guide de méditation. ${theme || ""} Crée une méditation guidée de 10 minutes: ${typeLabel}. ${chakraContext}
 Ton apaisant, phrases courtes, pauses de respiration indiquées par "...". Réponds en français.`;
       const res = await base44.integrations.Core.InvokeLLM({
         prompt,

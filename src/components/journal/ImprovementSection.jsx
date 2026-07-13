@@ -7,7 +7,7 @@ import { Loader2, Sparkles, TrendingUp } from "lucide-react";
 
 const SERIF = "'Playfair Display', Georgia, serif";
 
-export default function ImprovementSection() {
+export default function ImprovementSection({ theme }) {
   const [data, setData] = useState(null);
   const [content, setContent] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -49,7 +49,7 @@ export default function ImprovementSection() {
       const cogSummary = data.cog ? `MBTI: ${data.cog.mbti_type || "?"}, Ennéagramme: ${data.cog.enneagram_type || "?"}` : "Non renseigné";
       const limitingBeliefs = data.limitBeliefs.map(b => `- ${b.branch}: "${b.belief}"`).join("\n") || "Aucune";
 
-      const prompt = `Tu es un coach thérapeutique. Analyse les données de cet utilisateur et propose 3 à 5 axes d'amélioration concrets.
+      const prompt = `Tu es un coach thérapeutique. ${theme || ""} Analyse les données de cet utilisateur et propose 3 à 5 axes d'amélioration concrets.
 
 ÉVÉNEMENTS DOULOUREUX:
 ${traumaSummary}

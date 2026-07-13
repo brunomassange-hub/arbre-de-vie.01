@@ -7,7 +7,7 @@ import { Loader2, Sparkles } from "lucide-react";
 
 const SERIF = "'Playfair Display', Georgia, serif";
 
-export default function GroundingSection() {
+export default function GroundingSection({ theme }) {
   const [events, setEvents] = useState([]);
   const [selectedId, setSelectedId] = useState("");
   const [content, setContent] = useState(null);
@@ -29,7 +29,7 @@ export default function GroundingSection() {
     setContent(null);
     try {
       const chakra = CHAKRAS.find(c => c.name === selected.chakra);
-      const prompt = `Tu es un thérapeute spécialisé en ancrage et grounding. Crée un exercice d'ancrage de 2-3 minutes basé sur ce souvenir positif:
+      const prompt = `Tu es un thérapeute spécialisé en ancrage et grounding. ${theme || ""} Crée un exercice d'ancrage de 2-3 minutes basé sur ce souvenir positif:
 Titre: ${selected.title}
 Description: ${selected.description || "—"}
 Émotion positive: ${selected.emotion} (chakra: ${selected.chakra})

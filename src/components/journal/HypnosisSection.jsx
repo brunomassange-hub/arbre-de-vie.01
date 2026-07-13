@@ -8,7 +8,7 @@ import { Loader2, Sparkles } from "lucide-react";
 
 const SERIF = "'Playfair Display', Georgia, serif";
 
-export default function HypnosisSection() {
+export default function HypnosisSection({ theme }) {
   const [events, setEvents] = useState([]);
   const [selectedId, setSelectedId] = useState("");
   const [content, setContent] = useState(null);
@@ -31,7 +31,7 @@ export default function HypnosisSection() {
     setLoading(true);
     setContent(null);
     try {
-      const prompt = `Tu es un hypnothérapeute éricksonnien bienveillant. Crée une séance d'hypnose de 5-7 minutes pour accompagner la guérison de cet événement:
+      const prompt = `Tu es un hypnothérapeute éricksonnien bienveillant. ${theme || ""} Crée une séance d'hypnose de 5-7 minutes pour accompagner la guérison de cet événement:
 Titre: ${selected.title}
 Description: ${selected.description || "—"}
 Type de blessure: ${selected.wound_type || "Non précisé"}
