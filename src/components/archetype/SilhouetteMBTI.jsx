@@ -32,7 +32,7 @@ const DOTS = [
   { fn: "Ti", x: 84, y: 38 },    // Cerveau — côté droit du sujet (gauche écran), proche du centre
   { fn: "Ne", x: 122, y: 40 },   // Oreille gauche du sujet (droite écran)
   { fn: "Te", x: 100, y: 72 },   // Gorge
-  { fn: "Fe", x: 100, y: 130 },  // Torse — centre
+  { fn: "Fe", x: 82, y: 130 },   // Torse — légèrement à gauche, niveau cœur
   { fn: "Fi", x: 44, y: 150 },   // Bras droit du sujet (gauche écran), entre Fe et Si
   { fn: "Se", x: 100, y: 200 },  // Bassin — centre
   { fn: "Si", x: 120, y: 175 },  // Ventre — côté gauche du sujet (droite écran), entre Fi et Se
