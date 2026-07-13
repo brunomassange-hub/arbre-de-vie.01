@@ -49,6 +49,7 @@ export default function Cognitive() {
   const [saved, setSaved] = useState(false);
   const [showMBTIQuiz, setShowMBTIQuiz] = useState(false);
   const [showEnneagramQuiz, setShowEnneagramQuiz] = useState(false);
+  const [fnDetail, setFnDetail] = useState(null);
 
   useEffect(() => {
     base44.entities.CognitiveProfile.list().then(data => {
@@ -143,7 +144,13 @@ export default function Cognitive() {
                 return (
                   <div key={fn} className="bg-white/10 rounded-xl p-3 border border-white/10">
                     <div className="flex items-center gap-2 mb-1">
-                      <span className="text-lg font-black" style={{ color: info.color }}>{fn}</span>
+                      <button
+                        onClick={() => setFnDetail(fn)}
+                        className="text-lg font-black cursor-pointer hover:underline"
+                        style={{ color: info.color }}
+                      >
+                        {fn}
+                      </button>
                       <span className="text-xs font-semibold" style={{ color: info.color + "cc" }}>{FUNCTION_SHORT[fn]}</span>
                       <span className="text-xs text-gray-500 ml-auto">{POSITION_LABELS[i]}</span>
                     </div>
@@ -169,7 +176,13 @@ export default function Cognitive() {
                 return (
                   <div key={fn} className="bg-white/5 rounded-xl p-3 border border-white/5 opacity-80">
                     <div className="flex items-center gap-2 mb-1">
-                      <span className="text-lg font-black" style={{ color: info.color + "99" }}>{fn}</span>
+                      <button
+                        onClick={() => setFnDetail(fn)}
+                        className="text-lg font-black cursor-pointer hover:underline"
+                        style={{ color: info.color + "99" }}
+                      >
+                        {fn}
+                      </button>
                       <span className="text-xs font-semibold" style={{ color: info.color + "aa" }}>{FUNCTION_SHORT[fn]}</span>
                       <span className="text-xs text-gray-600 ml-auto">{SHADOW_LABELS[i]}</span>
                     </div>
@@ -197,7 +210,13 @@ export default function Cognitive() {
                     <div className="h-2 rounded-full transition-all duration-700"
                       style={{ width: `${widths[i]}%`, backgroundColor: info.color }} />
                   </div>
-                  <span className="text-xs font-bold w-6" style={{ color: info.color }}>{fn}</span>
+                  <button
+                    onClick={() => setFnDetail(fn)}
+                    className="text-xs font-bold w-6 cursor-pointer hover:underline"
+                    style={{ color: info.color }}
+                  >
+                    {fn}
+                  </button>
                 </div>
               );
             })}
@@ -240,6 +259,33 @@ export default function Cognitive() {
           {saved ? "✓ Sauvegardé !" : saving ? "Sauvegarde..." : "Sauvegarder mon profil"}
         </Button>
       </div>
+
+      {/* Function detail modal */}
+      {fnDetail && (() => {
+        const info = FUNCTION_DESCRIPTIONS[fnDetail];
+        return (
+          <div
+            className="fixed inset-0 bg-black/60 z-50 flex items-end justify-center"
+            onClick={() => setFnDetail(null)}
+          >
+            <div
+              className="bg-[#0d1f2d] rounded-t-2xl p-6 w-full max-w-lg shadow-2xl border-t border-white/20"
+              onClick={e => e.stopPropagation()}
+            >
+              <div className="flex justify-between items-start mb-3">
+                <div className="flex items-baseline gap-2">
+                  <span className="text-2xl font-black" style={{ color: info.color }}>{fnDetail}</span>
+                  <span className="text-sm font-semibold" style={{ color: info.color + "cc" }}>{FUNCTION_SHORT[fnDetail]}</span>
+                </div>
+                <button onClick={() => setFnDetail(null)} className="text-gray-400 text-2xl leading-none">×</button>
+              </div>
+              <h3 className="text-white font-semibold mb-1">{info.label}</h3>
+              <p className="text-gray-400 text-sm mb-3">{info.desc}</p>
+              <p className="text-gray-500 text-xs leading-relaxed border-t border-white/10 pt-3">{info.fonctionnement}</p>
+            </div>
+          </div>
+        );
+      })()}
     </div>
   );
 }
