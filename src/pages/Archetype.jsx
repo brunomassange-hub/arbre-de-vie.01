@@ -1,5 +1,6 @@
 import React from "react";
 import { Sparkles, Crown, Eye, Shield, Compass, Flame, Moon, Sun } from "lucide-react";
+import SilhouetteMBTI from "@/components/archetype/SilhouetteMBTI";
 
 const ARCHETYPES = [
   {
@@ -67,6 +68,8 @@ export default function Archetype() {
             Explorez les modèles universels qui habitent votre psyché
           </p>
         </div>
+
+        <SilhouetteMBTI />
 
         <div className="grid grid-cols-2 gap-4">
           {ARCHETYPES.map((a) => {
