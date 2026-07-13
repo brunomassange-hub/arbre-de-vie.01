@@ -33,9 +33,9 @@ const DOTS = [
   { fn: "Ne", x: 122, y: 40 },   // Oreille gauche du sujet (droite écran)
   { fn: "Te", x: 100, y: 72 },   // Gorge
   { fn: "Fe", x: 100, y: 130 },  // Torse — centre
-  { fn: "Fi", x: 75, y: 160 },   // Torse — gauche
+  { fn: "Fi", x: 44, y: 118 },   // Bras droit du sujet (gauche écran)
   { fn: "Se", x: 100, y: 200 },  // Bassin — centre
-  { fn: "Si", x: 115, y: 30 },   // Haut de la tête
+  { fn: "Si", x: 120, y: 200 },  // Ventre — côté gauche du sujet (droite écran)
 ];
 
 export default function SilhouetteMBTI() {
