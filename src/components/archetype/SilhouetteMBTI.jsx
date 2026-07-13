@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { FUNCTION_DESCRIPTIONS } from "@/lib/mbti-data";
+import { FUNCTION_SHORT } from "@/lib/mbti-data";
 import { CHAKRA_DESCRIPTIONS } from "@/lib/chakras";
 
 // MBTI cognitive function stacks (ego = Dominante, Auxiliaire, Tertiaire, Inférieure)
@@ -54,6 +55,7 @@ export default function SilhouetteMBTI() {
   const [mbtiType, setMbtiType] = useState(null);
   const [loading, setLoading] = useState(true);
   const [chakraDetail, setChakraDetail] = useState(null);
+  const [fnDetail, setFnDetail] = useState(null);
 
   useEffect(() => {
     base44.entities.CognitiveProfile.list()
@@ -135,7 +137,7 @@ export default function SilhouetteMBTI() {
           const opacity = isActive ? 1 : 0.3;
 
           return (
-            <g key={fn} opacity={opacity}>
+            <g key={fn} opacity={opacity} onClick={() => setFnDetail(fn)} style={{ cursor: "pointer" }}>
               {isActive && <circle cx={x} cy={y} r="14" fill={color} opacity="0.18" />}
               <circle cx={x} cy={y} r="9" fill={color} stroke="#fff" strokeWidth="1.5" />
               <text
@@ -157,6 +159,34 @@ export default function SilhouetteMBTI() {
           Silhouette vue de face — gauche/droite anatomiques du sujet
         </text>
       </svg>
+
+      {/* Function detail popover */}
+      {fnDetail && (() => {
+        const info = FUNCTION_DESCRIPTIONS[fnDetail];
+        if (!info) return null;
+        return (
+          <div className="mt-3 rounded-lg p-3 flex items-start gap-3" style={{ background: info.color + "18", border: `1px solid ${info.color}40` }}>
+            <div className="w-3 h-3 rounded-full flex-shrink-0 mt-0.5" style={{ background: info.color }} />
+            <div className="flex-1">
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-bold" style={{ color: info.color }}>
+                  {fnDetail} — {info.label}
+                </span>
+                <button onClick={() => setFnDetail(null)} className="text-gray-500 text-lg leading-none">×</button>
+              </div>
+              <span className="text-[10px] font-semibold" style={{ color: info.color + "cc" }}>
+                {FUNCTION_SHORT[fnDetail]}
+              </span>
+              <p className="text-xs mt-1" style={{ color: "#9ba8bc" }}>
+                {info.desc}
+              </p>
+              <p className="text-[11px] mt-1.5 leading-relaxed" style={{ color: "#6b7b94" }}>
+                {info.fonctionnement}
+              </p>
+            </div>
+          </div>
+        );
+      })()}
 
       {/* Chakra detail popover */}
       {chakraDetail && (
