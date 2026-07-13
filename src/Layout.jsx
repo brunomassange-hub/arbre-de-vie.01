@@ -1,12 +1,13 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { Home, Sprout, Flower2, Brain, BookOpen } from "lucide-react";
+import { Home, Sprout, Flower2, Sparkles, Brain, BookOpen } from "lucide-react";
 
 const NAV = [
   { label: "Arbre", icon: Home, page: "Home" },
   { label: "Blessure", icon: Sprout, page: "Garden" },
   { label: "Force", icon: Flower2, page: "Growth" },
+  { label: "Archétype", icon: Sparkles, page: "Archetype" },
   { label: "Personnalité", icon: Brain, page: "Cognitive" },
   { label: "Journal", icon: BookOpen, page: "Journal" },
 ];
