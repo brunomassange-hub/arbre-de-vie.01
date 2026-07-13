@@ -341,7 +341,7 @@ export default function Growth() {
         <h1 className="text-3xl font-bold mb-1" style={{ fontFamily: "'Playfair Display', serif", color: "#3e2723" }}>✨ Forces</h1>
         <p className="text-sm mb-4" style={{ color: "#8d6e63" }}>Cliquez sur l'arbre ou les sections ci-dessous</p>
 
-        <FullTree mode="strengths" />
+        <FullTree mode="strengths" zoomable />
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
           <Section emoji="🌱" title="Les Racines" subtitle="Relations nourrissantes"

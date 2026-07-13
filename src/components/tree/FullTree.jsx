@@ -15,6 +15,7 @@ import {
 import CellShadedArt from "@/components/tree/styles/CellShadedArt";
 import LineArtArt from "@/components/tree/styles/LineArtArt";
 import IllustratedArt from "@/components/tree/styles/IllustratedArt";
+import ZoomableWrapper from "@/components/tree/ZoomableWrapper";
 
 const SERIF = "'Playfair Display', Georgia, serif";
 
@@ -59,7 +60,7 @@ const STYLES = [
   { id: "line", label: "Linéaire", art: LineArtArt },
 ];
 
-export default function FullTree({ mode }) {
+export default function FullTree({ mode, zoomable = false }) {
   const isWound = mode === "wounds";
   const polarityLock = isWound ? "wound" : "strength";
   const accent = isWound ? "#a1887f" : "#7fae7e";
@@ -171,6 +172,7 @@ export default function FullTree({ mode }) {
           ))}
         </div>
 
+        <ZoomableWrapper enabled={zoomable}>
         <div className="rounded-2xl overflow-hidden border border-[#e0d6c8] shadow-sm" style={{ background: "#faf6f0" }}>
           <svg viewBox="0 0 400 520" className="w-full" style={{ maxHeight: 540 }}>
             {/* Style-specific tree art */}
@@ -414,6 +416,7 @@ export default function FullTree({ mode }) {
             })}
           </svg>
         </div>
+        </ZoomableWrapper>
 
         {/* Hint chips */}
         <div className="flex flex-wrap gap-2.5 mt-5 justify-center">
