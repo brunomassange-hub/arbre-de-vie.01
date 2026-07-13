@@ -84,7 +84,7 @@ export default function Cognitive() {
           <ArrowLeft className="w-4 h-4 mr-1" /> Retour à l'arbre
         </Link>
 
-        <h1 className="text-3xl font-bold text-white mb-1">🧠 Fonctions Cognitives</h1>
+        <h1 className="text-3xl font-bold text-white mb-1">🧠 Personnalité</h1>
         <p className="text-gray-400 mb-6">Modèle jungien — Ego & Ombre</p>
 
         {/* Type selector */}
