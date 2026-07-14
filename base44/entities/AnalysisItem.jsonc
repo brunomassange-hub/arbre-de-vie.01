@@ -1,0 +1,66 @@
+{
+  "name": "AnalysisItem",
+  "type": "object",
+  "properties": {
+    "category": {
+      "type": "string",
+      "enum": [
+        "type_trauma",
+        "difficulte_relationnelle",
+        "probleme_comportemental",
+        "conflit_psychique",
+        "blessure_ame",
+        "croyance_limitante"
+      ],
+      "description": "Cat\u00e9gorie d'analyse"
+    },
+    "title": {
+      "type": "string",
+      "description": "Titre de la suggestion"
+    },
+    "description": {
+      "type": "string",
+      "description": "Description d\u00e9taill\u00e9e"
+    },
+    "source_data": {
+      "type": "string",
+      "description": "R\u00e9sum\u00e9 des donn\u00e9es sources"
+    },
+    "journal_theme": {
+      "type": "string",
+      "enum": [
+        "trauma",
+        "emotions",
+        "conflits",
+        "relations",
+        "comportement",
+        "sens"
+      ],
+      "description": "Th\u00e8me du Journal recommand\u00e9"
+    },
+    "journal_tool": {
+      "type": "string",
+      "enum": [
+        "grounding",
+        "meditation",
+        "hypnose",
+        "amelioration"
+      ],
+      "description": "Outil du Journal recommand\u00e9"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "validated",
+        "rejected"
+      ],
+      "default": "validated",
+      "description": "Statut de validation"
+    }
+  },
+  "required": [
+    "category",
+    "title",
+    "status"
+  ]
+}

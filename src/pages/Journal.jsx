@@ -193,6 +193,17 @@ export default function Journal() {
   const [activeTheme, setActiveTheme] = useState("trauma");
   const [activeTool, setActiveTool] = useState("grounding");
 
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const theme = params.get("theme");
+    const tool = params.get("tool");
+    if (theme || tool) {
+      setActiveTab("therapy");
+      if (theme) setActiveTheme(theme);
+      if (tool) setActiveTool(tool);
+    }
+  }, []);
+
   const selectedTheme = THEMES.find(t => t.id === activeTheme);
 
   return (

@@ -59,6 +59,7 @@ import Trunk from './pages/Trunk';
 import Garden from './pages/Garden';
 import Archetype from './pages/Archetype';
 import Growth from './pages/Growth';
+import Analysis from './pages/Analysis';
 import __Layout from './Layout.jsx';
 
 
@@ -75,6 +76,7 @@ export const PAGES = {
     "Archetype": Archetype,
     "Garden": Garden,
     "Growth": Growth,
+    "Analysis": Analysis,
 }
 
 export const pagesConfig = {
