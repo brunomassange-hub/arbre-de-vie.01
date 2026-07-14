@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { Plus, Trash2, ChevronDown, ChevronUp, Pencil, Save } from "lucide-react";
 import FullTree from "@/components/tree/FullTree";
+import LinkQualification, { REL_DIFFICULTY_LABELS, TRAUMA_TYPE_LABELS } from "@/components/garden/LinkQualification";
 import { CHAKRAS } from "@/lib/chakras";
 
 // ─── TRONC ───────────────────────────────────────────────
@@ -194,23 +195,26 @@ function TroncSection() {
 function RacinesSection() {
   const [links, setLinks] = useState([]);
   const [showForm, setShowForm] = useState(false);
-  const [form, setForm] = useState({ name: "", type: "Famille", description: "" });
+  const [form, setForm] = useState({ name: "", type: "Famille", description: "", relational_difficulties: [], psychic_conflicts: false, problematic_behaviors: false, trauma_types: [] });
   const [editingId, setEditingId] = useState(null);
   const [editForm, setEditForm] = useState(null);
+  const [showQualForm, setShowQualForm] = useState(false);
+  const [showQualEdit, setShowQualEdit] = useState(false);
 
   useEffect(() => { base44.entities.Link.list().then(setLinks); }, []);
 
   const handleCreate = async () => {
     if (!form.name.trim()) return;
     await base44.entities.Link.create(form);
-    setForm({ name: "", type: "Famille", description: "" });
+    setForm({ name: "", type: "Famille", description: "", relational_difficulties: [], psychic_conflicts: false, problematic_behaviors: false, trauma_types: [] });
     setShowForm(false);
+    setShowQualForm(false);
     base44.entities.Link.list().then(setLinks);
   };
 
   const handleUpdate = async () => {
     await base44.entities.Link.update(editingId, editForm);
-    setEditingId(null); setEditForm(null);
+    setEditingId(null); setEditForm(null); setShowQualEdit(false);
     base44.entities.Link.list().then(setLinks);
   };
 
@@ -239,9 +243,17 @@ function RacinesSection() {
           <Textarea value={form.description} onChange={e => setForm({ ...form, description: e.target.value })}
             placeholder="Ce qui était douloureux dans cette relation..." rows={2}
             className="bg-white/60 border-[#e0d6c8] text-[#3e2723] placeholder:text-[#8d6e63]/50 resize-none" />
+          <button onClick={() => setShowQualForm(!showQualForm)} className="text-xs text-[#8d6e63] hover:text-rose-700 transition">
+            {showQualForm ? "− Masquer la qualification" : "+ Qualifier cette relation (optionnel)"}
+          </button>
+          {showQualForm && (
+            <div className="bg-white/40 rounded-lg p-3 border border-[#e0d6c8]/60">
+              <LinkQualification value={form} onChange={(updates) => setForm({ ...form, ...updates })} />
+            </div>
+          )}
           <div className="flex gap-2">
             <Button onClick={handleCreate} size="sm" className="flex-1 bg-rose-800 hover:bg-rose-700">Ajouter</Button>
-            <Button onClick={() => setShowForm(false)} size="sm" variant="outline" className="border-[#e0d6c8] text-[#3e2723] hover:bg-white/60">Annuler</Button>
+            <Button onClick={() => { setShowForm(false); setShowQualForm(false); }} size="sm" variant="outline" className="border-[#e0d6c8] text-[#3e2723] hover:bg-white/60">Annuler</Button>
           </div>
         </div>
       )}
@@ -261,9 +273,17 @@ function RacinesSection() {
                 </div>
                 <Textarea value={editForm.description || ""} onChange={e => setEditForm({ ...editForm, description: e.target.value })}
                   placeholder="Description" rows={2} className="bg-white/60 border-[#e0d6c8] text-[#3e2723] text-sm resize-none" />
+                <button onClick={() => setShowQualEdit(!showQualEdit)} className="text-xs text-[#8d6e63] hover:text-rose-700 transition">
+                  {showQualEdit ? "− Masquer la qualification" : "+ Qualifier (optionnel)"}
+                </button>
+                {showQualEdit && (
+                  <div className="bg-white/40 rounded-lg p-3 border border-[#e0d6c8]/60">
+                    <LinkQualification value={editForm} onChange={(updates) => setEditForm({ ...editForm, ...updates })} />
+                  </div>
+                )}
                 <div className="flex gap-2">
                   <Button onClick={handleUpdate} size="sm" className="flex-1 bg-rose-800 hover:bg-rose-700 h-8"><Save className="w-3 h-3 mr-1" />Enregistrer</Button>
-                  <Button onClick={() => { setEditingId(null); setEditForm(null); }} size="sm" variant="outline" className="border-[#e0d6c8] text-[#3e2723] h-8">Annuler</Button>
+                  <Button onClick={() => { setEditingId(null); setEditForm(null); setShowQualEdit(false); }} size="sm" variant="outline" className="border-[#e0d6c8] text-[#3e2723] h-8">Annuler</Button>
                 </div>
               </div>
             ) : (
@@ -272,9 +292,33 @@ function RacinesSection() {
                 <div className="flex-1 min-w-0">
                   <span className="text-[#3e2723] text-sm font-semibold">{lk.name}</span>
                   {lk.description && <p className="text-[#8d6e63] text-xs mt-0.5">{lk.description}</p>}
+                  {(lk.relational_difficulties?.length > 0 || lk.psychic_conflicts || lk.problematic_behaviors || lk.trauma_types?.length > 0) && (
+                    <div className="flex flex-wrap gap-1 mt-1">
+                      {(lk.relational_difficulties || []).map(d => (
+                        <span key={d} className="text-[9px] px-1.5 py-0.5 rounded-full bg-rose-100 text-rose-700 border border-rose-200">
+                          {REL_DIFFICULTY_LABELS[d] || d}{d === "autre" && lk.relational_difficulties_other ? ` : ${lk.relational_difficulties_other}` : ""}
+                        </span>
+                      ))}
+                      {lk.psychic_conflicts && (
+                        <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-purple-100 text-purple-700 border border-purple-200">
+                          Conflits psychiques{lk.psychic_conflicts_detail ? ` : ${lk.psychic_conflicts_detail}` : ""}
+                        </span>
+                      )}
+                      {lk.problematic_behaviors && (
+                        <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-amber-100 text-amber-700 border border-amber-200">
+                          Comportements{lk.problematic_behaviors_detail ? ` : ${lk.problematic_behaviors_detail}` : ""}
+                        </span>
+                      )}
+                      {(lk.trauma_types || []).map(t => (
+                        <span key={t} className="text-[9px] px-1.5 py-0.5 rounded-full bg-red-100 text-red-700 border border-red-200">
+                          {TRAUMA_TYPE_LABELS[t] || t}{t === "autre" && lk.trauma_types_other ? ` : ${lk.trauma_types_other}` : ""}
+                        </span>
+                      ))}
+                    </div>
+                  )}
                 </div>
                 <div className="flex gap-1 flex-shrink-0">
-                  <button onClick={() => { setEditingId(lk.id); setEditForm({ ...lk }); }} className="text-[#a1887f] hover:text-rose-600 transition">
+                  <button onClick={() => { setEditingId(lk.id); setEditForm({ ...lk, relational_difficulties: lk.relational_difficulties || [], psychic_conflicts: lk.psychic_conflicts || false, problematic_behaviors: lk.problematic_behaviors || false, trauma_types: lk.trauma_types || [] }); setShowQualEdit(!!(lk.relational_difficulties?.length || lk.psychic_conflicts || lk.problematic_behaviors || lk.trauma_types?.length)); }} className="text-[#a1887f] hover:text-rose-600 transition">
                     <Pencil className="w-4 h-4" />
                   </button>
                   <button onClick={() => handleDelete(lk.id)} className="text-[#a1887f] hover:text-red-600 transition">
