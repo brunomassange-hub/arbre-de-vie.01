@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Plus, Trash2, ChevronDown, ChevronUp, Pencil, Save } from "lucide-react";
 import FullTree from "@/components/tree/FullTree";
 import LinkQualification, { REL_DIFFICULTY_LABELS, TRAUMA_TYPE_LABELS } from "@/components/garden/LinkQualification";
+import BeliefQualification, { THEME_TAG_LABELS } from "@/components/garden/BeliefQualification";
 import { CHAKRAS } from "@/lib/chakras";
 
 // ─── TRONC ───────────────────────────────────────────────
@@ -383,19 +384,28 @@ function BranchesSection() {
   const [beliefs, setBeliefs] = useState([]);
   const [openAxis, setOpenAxis] = useState(null);
   const [showFormFor, setShowFormFor] = useState(null);
-  const [form, setForm] = useState({ belief: "", age: "", origin: "", reframe: "" });
+  const [form, setForm] = useState({ belief: "", age: "", origin: "", reframe: "", theme_tag: null });
   const [editingId, setEditingId] = useState(null);
   const [editForm, setEditForm] = useState(null);
+  const [showQualForm, setShowQualForm] = useState(false);
+  const [showQualEdit, setShowQualEdit] = useState(false);
+  const [events, setEvents] = useState([]);
+  const [links, setLinks] = useState([]);
 
-  useEffect(() => { base44.entities.LimitingBelief.list().then(setBeliefs); }, []);
+  useEffect(() => {
+    base44.entities.LimitingBelief.list().then(setBeliefs);
+    base44.entities.TraumaticEvent.list().then(setEvents);
+    base44.entities.Link.list().then(setLinks);
+  }, []);
 
   const handleCreate = async (branch) => {
     if (!form.belief.trim()) return;
     const data = { ...form, branch };
     if (data.age) data.age = Number(data.age); else delete data.age;
     await base44.entities.LimitingBelief.create(data);
-    setForm({ belief: "", age: "", origin: "", reframe: "" });
+    setForm({ belief: "", age: "", origin: "", reframe: "", theme_tag: null });
     setShowFormFor(null);
+    setShowQualForm(false);
     base44.entities.LimitingBelief.list().then(setBeliefs);
   };
 
@@ -403,7 +413,7 @@ function BranchesSection() {
     const data = { ...editForm };
     if (data.age) data.age = Number(data.age); else delete data.age;
     await base44.entities.LimitingBelief.update(editingId, data);
-    setEditingId(null); setEditForm(null);
+    setEditingId(null); setEditForm(null); setShowQualEdit(false);
     base44.entities.LimitingBelief.list().then(setBeliefs);
   };
 
@@ -447,9 +457,17 @@ function BranchesSection() {
                           placeholder="Origine" className="bg-white/60 border-[#e0d6c8] text-[#3e2723] text-sm h-8" />
                         <Input value={editForm.reframe || ""} onChange={e => setEditForm({ ...editForm, reframe: e.target.value })}
                           placeholder="Reformulation positive" className="bg-white/60 border-[#e0d6c8] text-[#3e2723] text-sm h-8" />
+                        <button onClick={() => setShowQualEdit(!showQualEdit)} className="text-xs text-[#8d6e63] hover:text-green-700 transition">
+                          {showQualEdit ? "− Masquer" : "+ Qualifier (optionnel)"}
+                        </button>
+                        {showQualEdit && (
+                          <div className="bg-white/40 rounded-lg p-3 border border-[#e0d6c8]/60">
+                            <BeliefQualification value={editForm} onChange={(updates) => setEditForm({ ...editForm, ...updates })} events={events} links={links} />
+                          </div>
+                        )}
                         <div className="flex gap-2">
                           <Button onClick={handleUpdate} size="sm" className="flex-1 bg-green-800 hover:bg-green-700 h-8"><Save className="w-3 h-3 mr-1" />Enregistrer</Button>
-                          <Button onClick={() => { setEditingId(null); setEditForm(null); }} size="sm" variant="outline" className="border-[#e0d6c8] text-[#3e2723] h-8">Annuler</Button>
+                          <Button onClick={() => { setEditingId(null); setEditForm(null); setShowQualEdit(false); }} size="sm" variant="outline" className="border-[#e0d6c8] text-[#3e2723] h-8">Annuler</Button>
                         </div>
                       </div>
                     ) : (
@@ -459,9 +477,28 @@ function BranchesSection() {
                           {b.age != null && <p className="text-[#8d6e63] text-xs mt-0.5">Âge : {b.age} ans</p>}
                           {b.origin && <p className="text-[#8d6e63] text-xs mt-1">Origine : {b.origin}</p>}
                           {b.reframe && <p className="text-green-600 text-xs mt-1">✦ {b.reframe}</p>}
+                          {(b.theme_tag || b.source_event_id || b.source_link_id) && (
+                            <div className="flex flex-wrap gap-1 mt-1">
+                              {b.theme_tag && (
+                                <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-green-100 text-green-700 border border-green-200">
+                                  {THEME_TAG_LABELS[b.theme_tag] || b.theme_tag}
+                                </span>
+                              )}
+                              {b.source_event_id && events.find(e => e.id === b.source_event_id) && (
+                                <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-amber-100 text-amber-700 border border-amber-200">
+                                  📅 {events.find(e => e.id === b.source_event_id).title}
+                                </span>
+                              )}
+                              {b.source_link_id && links.find(l => l.id === b.source_link_id) && (
+                                <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-rose-100 text-rose-700 border border-rose-200">
+                                  🔗 {links.find(l => l.id === b.source_link_id).name}
+                                </span>
+                              )}
+                            </div>
+                          )}
                         </div>
                         <div className="flex gap-1 flex-shrink-0">
-                          <button onClick={() => { setEditingId(b.id); setEditForm({ ...b }); }} className="text-[#a1887f] hover:text-green-600 transition">
+                          <button onClick={() => { setEditingId(b.id); setEditForm({ ...b, theme_tag: b.theme_tag || null }); setShowQualEdit(!!(b.theme_tag || b.source_event_id || b.source_link_id)); }} className="text-[#a1887f] hover:text-green-600 transition">
                             <Pencil className="w-4 h-4" />
                           </button>
                           <button onClick={() => handleDelete(b.id)} className="text-[#a1887f] hover:text-red-600 transition">
@@ -483,9 +520,17 @@ function BranchesSection() {
                       placeholder="D'où vient-elle ? (optionnel)" className="bg-white/60 border-[#e0d6c8] text-[#3e2723] placeholder:text-[#8d6e63]/50 text-sm" />
                     <Input value={form.reframe} onChange={e => setForm({ ...form, reframe: e.target.value })}
                       placeholder="Reformulation positive (optionnel)" className="bg-white/60 border-[#e0d6c8] text-[#3e2723] placeholder:text-[#8d6e63]/50 text-sm" />
+                    <button onClick={() => setShowQualForm(!showQualForm)} className="text-xs text-[#8d6e63] hover:text-green-700 transition">
+                      {showQualForm ? "− Masquer" : "+ Qualifier (optionnel)"}
+                    </button>
+                    {showQualForm && (
+                      <div className="bg-white/40 rounded-lg p-3 border border-[#e0d6c8]/60">
+                        <BeliefQualification value={form} onChange={(updates) => setForm({ ...form, ...updates })} events={events} links={links} />
+                      </div>
+                    )}
                     <div className="flex gap-2">
                       <Button onClick={() => handleCreate(axis.name)} size="sm" className="flex-1 bg-green-800 hover:bg-green-700 text-xs">Ajouter</Button>
-                      <Button onClick={() => { setShowFormFor(null); setForm({ belief: "", age: "", origin: "", reframe: "" }); }}
+                      <Button onClick={() => { setShowFormFor(null); setForm({ belief: "", age: "", origin: "", reframe: "", theme_tag: null }); setShowQualForm(false); }}
                         size="sm" variant="outline" className="border-[#e0d6c8] text-[#3e2723] hover:bg-white/60 text-xs">Annuler</Button>
                     </div>
                   </div>

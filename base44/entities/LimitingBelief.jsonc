@@ -29,6 +29,26 @@
     "reframe": {
       "type": "string",
       "description": "Comment la reformuler positivement ?"
+    },
+    "theme_tag": {
+      "type": "string",
+      "enum": [
+        "valeur_personnelle",
+        "securite",
+        "amour",
+        "controle",
+        "confiance",
+        "autre"
+      ],
+      "description": "Th\u00e8me de la croyance"
+    },
+    "source_event_id": {
+      "type": "string",
+      "description": "ID de l'\u00e9v\u00e9nement traumatique qui a g\u00e9n\u00e9r\u00e9 cette croyance"
+    },
+    "source_link_id": {
+      "type": "string",
+      "description": "ID de la relation qui a g\u00e9n\u00e9r\u00e9 cette croyance"
     }
   },
   "required": [
