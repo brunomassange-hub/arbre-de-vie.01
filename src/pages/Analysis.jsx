@@ -2,24 +2,31 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import { Loader2, ArrowRight, Sparkles } from "lucide-react";
-import { generateSuggestions, CATEGORIES, JOURNAL_TOOLS } from "@/lib/analysisEngine";
+import { generateSuggestions, CATEGORIES, JOURNAL_TOOLS, aggregateData } from "@/lib/analysisEngine";
 import SuggestionCard from "@/components/analysis/SuggestionCard";
+import AggregateView from "@/components/analysis/AggregateView";
+import BigFivePerspective from "@/components/analysis/BigFivePerspective";
+import BeliefSynthesis from "@/components/analysis/BeliefSynthesis";
 
 export default function Analysis() {
   const [loading, setLoading] = useState(true);
   const [suggestions, setSuggestions] = useState([]);
   const [validated, setValidated] = useState([]);
+  const [rawData, setRawData] = useState({ events: [], links: [], beliefs: [], bigFive: null });
 
   useEffect(() => { loadData(); }, []);
 
   const loadData = async () => {
     setLoading(true);
-    const [events, links, beliefs, existing] = await Promise.all([
+    const [events, links, beliefs, existing, bigFiveList] = await Promise.all([
       base44.entities.TraumaticEvent.list(),
       base44.entities.Link.list(),
       base44.entities.LimitingBelief.list(),
       base44.entities.AnalysisItem.list(),
+      base44.entities.BigFiveProfile.list(),
     ]);
+    const bigFive = bigFiveList[0] || null;
+    setRawData({ events, links, beliefs, bigFive });
     const keys = new Set(existing.map(e => `${e.category}|${e.title}`));
     setValidated(existing.filter(e => e.status === "validated"));
     const all = generateSuggestions({ traumaticEvents: events, links, limitingBeliefs: beliefs });
@@ -60,6 +67,9 @@ export default function Analysis() {
     items: suggestions.filter(s => s.category === key),
   })).filter(g => g.items.length > 0);
 
+  const aggregated = aggregateData({ traumaticEvents: rawData.events, links: rawData.links });
+  const hasAnyData = rawData.events.length > 0 || rawData.links.length > 0 || rawData.beliefs.length > 0 || rawData.bigFive;
+
   return (
     <div className="min-h-screen px-4 py-8" style={{ background: "#0a1628" }}>
       <div className="max-w-xl mx-auto">
@@ -71,6 +81,10 @@ export default function Analysis() {
             Détection automatique de patterns à partir de vos données
           </p>
         </div>
+
+        <AggregateView traumaticEvents={rawData.events} links={rawData.links} />
+        <BigFivePerspective bigFive={rawData.bigFive} traumaticEvents={rawData.events} links={rawData.links} aggregated={aggregated} />
+        <BeliefSynthesis limitingBeliefs={rawData.beliefs} />
 
         {suggestions.length > 0 && (
           <div className="mb-8">
@@ -130,7 +144,7 @@ export default function Analysis() {
           </div>
         )}
 
-        {suggestions.length === 0 && validated.length === 0 && (
+        {!hasAnyData && suggestions.length === 0 && validated.length === 0 && (
           <div className="text-center py-16">
             <Sparkles className="w-10 h-10 text-gray-600 mx-auto mb-3" />
             <p className="text-sm" style={{ color: "#6b7b94" }}>Aucune suggestion disponible pour le moment.</p>
