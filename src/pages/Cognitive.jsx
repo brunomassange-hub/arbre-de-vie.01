@@ -11,6 +11,8 @@ import MBTIQuiz from "@/components/cognitive/MBTIQuiz";
 import EnneagramQuiz from "@/components/cognitive/EnneagramQuiz";
 import MBTITypeInfo from "@/components/cognitive/MBTITypeInfo";
 import MBTIImprovements from "@/components/cognitive/MBTIImprovements";
+import AttachmentSection from "@/components/cognitive/AttachmentSection";
+import AttachmentQuiz from "@/components/cognitive/AttachmentQuiz";
 import { FUNCTION_DESCRIPTIONS } from "@/lib/mbti-data";
 import { FUNCTION_SHORT } from "@/lib/mbti-data";
 import { HelpCircle } from "lucide-react";
@@ -45,10 +47,12 @@ export default function Cognitive() {
   const [selectedType, setSelectedType] = useState("INTP");
   const [notes, setNotes] = useState("");
   const [enneagramType, setEnneagramType] = useState(null);
+  const [attachmentStyle, setAttachmentStyle] = useState(null);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [showMBTIQuiz, setShowMBTIQuiz] = useState(false);
   const [showEnneagramQuiz, setShowEnneagramQuiz] = useState(false);
+  const [showAttachmentQuiz, setShowAttachmentQuiz] = useState(false);
   const [fnDetail, setFnDetail] = useState(null);
 
   useEffect(() => {
@@ -58,6 +62,7 @@ export default function Cognitive() {
         setSelectedType(data[0].mbti_type || "INTP");
         setNotes(data[0].notes || "");
         setEnneagramType(data[0].enneagram_type || null);
+        setAttachmentStyle(data[0].attachment_style || null);
       }
     });
   }, []);
@@ -66,7 +71,7 @@ export default function Cognitive() {
 
   const handleSave = async () => {
     setSaving(true);
-    const data = { mbti_type: selectedType, enneagram_type: enneagramType, notes };
+    const data = { mbti_type: selectedType, enneagram_type: enneagramType, attachment_style: attachmentStyle, notes };
     if (profile) {
       await base44.entities.CognitiveProfile.update(profile.id, data);
     } else {
@@ -244,6 +249,26 @@ export default function Cognitive() {
 
         {/* Personalized improvement axes based on Enneagram type */}
         {enneagramType && <EnneagramImprovements selectedType={enneagramType} />}
+
+        {/* Attachment style */}
+        <div className="bg-white/10 backdrop-blur rounded-2xl p-5 mb-5 border border-white/20">
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-white font-semibold">💝 Style d'attachement</h2>
+            <button onClick={() => setShowAttachmentQuiz(!showAttachmentQuiz)}
+              className={`flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg border transition ${showAttachmentQuiz ? "bg-pink-600 text-white border-pink-400" : "bg-white/10 text-pink-300 border-white/20 hover:bg-white/20"}`}>
+              <HelpCircle className="w-3.5 h-3.5" />
+              {showAttachmentQuiz ? "Fermer le test" : "Faire le test"}
+            </button>
+          </div>
+          {showAttachmentQuiz ? (
+            <AttachmentQuiz
+              onComplete={(style) => { setAttachmentStyle(style); setShowAttachmentQuiz(false); }}
+              onClose={() => setShowAttachmentQuiz(false)}
+            />
+          ) : (
+            <AttachmentSection style={attachmentStyle} />
+          )}
+        </div>
 
         {/* Notes */}
         <div className="bg-white/10 backdrop-blur rounded-2xl p-5 mb-5 border border-white/20">

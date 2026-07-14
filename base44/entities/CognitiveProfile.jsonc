@@ -12,6 +12,16 @@
       "maximum": 9,
       "description": "Type Enn\u00e9agramme (1-9)"
     },
+    "attachment_style": {
+      "type": "string",
+      "enum": [
+        "secure",
+        "anxious",
+        "avoidant",
+        "fearful"
+      ],
+      "description": "Style d'attachement (s\u00e9cure, anxieux, \u00e9vitant, craintif)"
+    },
     "notes": {
       "type": "string",
       "description": "Notes personnelles sur son profil cognitif"
