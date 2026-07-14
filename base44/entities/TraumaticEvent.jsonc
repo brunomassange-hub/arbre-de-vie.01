@@ -50,6 +50,63 @@
         "Stabilit\u00e9"
       ],
       "description": "Chakra associ\u00e9 (d\u00e9riv\u00e9 de l'\u00e9motion)"
+    },
+    "relational_difficulties": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "peur_engagement",
+          "isolement",
+          "agressivite",
+          "difficulte_confiance",
+          "dependance_affective",
+          "evitement",
+          "autre"
+        ]
+      },
+      "description": "Difficult\u00e9s relationnelles engendr\u00e9es"
+    },
+    "relational_difficulties_other": {
+      "type": "string",
+      "description": "Pr\u00e9cision pour 'autre' difficult\u00e9 relationnelle"
+    },
+    "psychic_conflicts": {
+      "type": "boolean",
+      "description": "A engendr\u00e9 des conflits psychiques"
+    },
+    "psychic_conflicts_detail": {
+      "type": "string",
+      "description": "Pr\u00e9cision des conflits psychiques"
+    },
+    "problematic_behaviors": {
+      "type": "boolean",
+      "description": "A engendr\u00e9 des comportements probl\u00e9matiques"
+    },
+    "problematic_behaviors_detail": {
+      "type": "string",
+      "description": "Pr\u00e9cision des comportements probl\u00e9matiques"
+    },
+    "trauma_types": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "agression",
+          "viol",
+          "vol",
+          "traumatisme_precoce",
+          "separation",
+          "negligence",
+          "violence",
+          "autre"
+        ]
+      },
+      "description": "Types de traumatisme"
+    },
+    "trauma_types_other": {
+      "type": "string",
+      "description": "Pr\u00e9cision pour 'autre' type de trauma"
     }
   },
   "required": [

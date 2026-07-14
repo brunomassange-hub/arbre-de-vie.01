@@ -62,9 +62,11 @@ function Section({ emoji, title, subtitle, accentClass, children }) {
 function TroncSection() {
   const [events, setEvents] = useState([]);
   const [showForm, setShowForm] = useState(false);
-  const [form, setForm] = useState({ age: "", title: "", description: "", emotion: "Peur", wound_type: "" });
+  const [form, setForm] = useState({ age: "", title: "", description: "", emotion: "Peur", wound_type: "", relational_difficulties: [], psychic_conflicts: false, problematic_behaviors: false, trauma_types: [] });
   const [editingId, setEditingId] = useState(null);
   const [editForm, setEditForm] = useState(null);
+  const [showQualForm, setShowQualForm] = useState(false);
+  const [showQualEdit, setShowQualEdit] = useState(false);
 
   useEffect(() => {
     base44.entities.TraumaticEvent.list().then(d => setEvents([...d].sort((a, b) => a.age - b.age)));
@@ -74,15 +76,16 @@ function TroncSection() {
     if (!form.title.trim() || !form.age) return;
     const chakra = CHAKRAS.find(c => c.shadow === form.emotion)?.name || "Connexion";
     await base44.entities.TraumaticEvent.create({ ...form, age: Number(form.age), chakra });
-    setForm({ age: "", title: "", description: "", emotion: "Peur", wound_type: "" });
+    setForm({ age: "", title: "", description: "", emotion: "Peur", wound_type: "", relational_difficulties: [], psychic_conflicts: false, problematic_behaviors: false, trauma_types: [] });
     setShowForm(false);
+    setShowQualForm(false);
     base44.entities.TraumaticEvent.list().then(d => setEvents([...d].sort((a, b) => a.age - b.age)));
   };
 
   const handleUpdate = async () => {
     const chakra = CHAKRAS.find(c => c.shadow === editForm.emotion)?.name || "Connexion";
     await base44.entities.TraumaticEvent.update(editingId, { ...editForm, age: Number(editForm.age), chakra });
-    setEditingId(null); setEditForm(null);
+    setEditingId(null); setEditForm(null); setShowQualEdit(false);
     base44.entities.TraumaticEvent.list().then(d => setEvents([...d].sort((a, b) => a.age - b.age)));
   };
 
@@ -122,9 +125,17 @@ function TroncSection() {
           <Textarea value={form.description} onChange={e => setForm({ ...form, description: e.target.value })}
             placeholder="Description (optionnel)" rows={2}
             className="bg-white/60 border-[#e0d6c8] text-[#3e2723] placeholder:text-[#8d6e63]/50 resize-none" />
+          <button onClick={() => setShowQualForm(!showQualForm)} className="text-xs text-[#8d6e63] hover:text-amber-700 transition">
+            {showQualForm ? "− Masquer la qualification" : "+ Qualifier cet événement (optionnel)"}
+          </button>
+          {showQualForm && (
+            <div className="bg-white/40 rounded-lg p-3 border border-[#e0d6c8]/60">
+              <LinkQualification value={form} onChange={(updates) => setForm({ ...form, ...updates })} />
+            </div>
+          )}
           <div className="flex gap-2">
             <Button onClick={handleCreate} size="sm" className="flex-1 bg-amber-700 hover:bg-amber-600">Ajouter</Button>
-            <Button onClick={() => setShowForm(false)} size="sm" variant="outline" className="border-[#e0d6c8] text-[#3e2723] hover:bg-white/60">Annuler</Button>
+            <Button onClick={() => { setShowForm(false); setShowQualForm(false); }} size="sm" variant="outline" className="border-[#e0d6c8] text-[#3e2723] hover:bg-white/60">Annuler</Button>
           </div>
         </div>
       )}
@@ -156,9 +167,17 @@ function TroncSection() {
                       placeholder="Titre" className="bg-white/60 border-[#e0d6c8] text-[#3e2723] text-sm h-8" />
                     <Textarea value={editForm.description || ""} onChange={e => setEditForm({ ...editForm, description: e.target.value })}
                       placeholder="Description" rows={2} className="bg-white/60 border-[#e0d6c8] text-[#3e2723] text-sm resize-none" />
+                    <button onClick={() => setShowQualEdit(!showQualEdit)} className="text-xs text-[#8d6e63] hover:text-amber-700 transition">
+                      {showQualEdit ? "− Masquer la qualification" : "+ Qualifier (optionnel)"}
+                    </button>
+                    {showQualEdit && (
+                      <div className="bg-white/40 rounded-lg p-3 border border-[#e0d6c8]/60">
+                        <LinkQualification value={editForm} onChange={(updates) => setEditForm({ ...editForm, ...updates })} />
+                      </div>
+                    )}
                     <div className="flex gap-2">
                       <Button onClick={handleUpdate} size="sm" className="flex-1 bg-amber-700 hover:bg-amber-600 h-8"><Save className="w-3 h-3 mr-1" />Enregistrer</Button>
-                      <Button onClick={() => { setEditingId(null); setEditForm(null); }} size="sm" variant="outline" className="border-[#e0d6c8] text-[#3e2723] h-8">Annuler</Button>
+                      <Button onClick={() => { setEditingId(null); setEditForm(null); setShowQualEdit(false); }} size="sm" variant="outline" className="border-[#e0d6c8] text-[#3e2723] h-8">Annuler</Button>
                     </div>
                   </div>
                 ) : (
@@ -170,9 +189,33 @@ function TroncSection() {
                         {ev.wound_type && <Badge className="bg-red-900/20 text-red-700 border border-red-900/30 text-xs">{ev.wound_type}</Badge>}
                       </div>
                       {ev.description && <p className="text-[#8d6e63] text-xs mt-1">{ev.description}</p>}
+                      {(ev.relational_difficulties?.length > 0 || ev.psychic_conflicts || ev.problematic_behaviors || ev.trauma_types?.length > 0) && (
+                        <div className="flex flex-wrap gap-1 mt-1">
+                          {(ev.relational_difficulties || []).map(d => (
+                            <span key={d} className="text-[9px] px-1.5 py-0.5 rounded-full bg-rose-100 text-rose-700 border border-rose-200">
+                              {REL_DIFFICULTY_LABELS[d] || d}{d === "autre" && ev.relational_difficulties_other ? ` : ${ev.relational_difficulties_other}` : ""}
+                            </span>
+                          ))}
+                          {ev.psychic_conflicts && (
+                            <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-purple-100 text-purple-700 border border-purple-200">
+                              Conflits psychiques{ev.psychic_conflicts_detail ? ` : ${ev.psychic_conflicts_detail}` : ""}
+                            </span>
+                          )}
+                          {ev.problematic_behaviors && (
+                            <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-amber-100 text-amber-700 border border-amber-200">
+                              Comportements{ev.problematic_behaviors_detail ? ` : ${ev.problematic_behaviors_detail}` : ""}
+                            </span>
+                          )}
+                          {(ev.trauma_types || []).map(t => (
+                            <span key={t} className="text-[9px] px-1.5 py-0.5 rounded-full bg-red-100 text-red-700 border border-red-200">
+                              {TRAUMA_TYPE_LABELS[t] || t}{t === "autre" && ev.trauma_types_other ? ` : ${ev.trauma_types_other}` : ""}
+                            </span>
+                          ))}
+                        </div>
+                      )}
                     </div>
                     <div className="flex gap-1 flex-shrink-0">
-                      <button onClick={() => { setEditingId(ev.id); setEditForm({ ...ev }); }} className="text-[#a1887f] hover:text-amber-600 transition">
+                      <button onClick={() => { setEditingId(ev.id); setEditForm({ ...ev, relational_difficulties: ev.relational_difficulties || [], psychic_conflicts: ev.psychic_conflicts || false, problematic_behaviors: ev.problematic_behaviors || false, trauma_types: ev.trauma_types || [] }); setShowQualEdit(!!(ev.relational_difficulties?.length || ev.psychic_conflicts || ev.problematic_behaviors || ev.trauma_types?.length)); }} className="text-[#a1887f] hover:text-amber-600 transition">
                         <Pencil className="w-4 h-4" />
                       </button>
                       <button onClick={() => handleDelete(ev.id)} className="text-[#a1887f] hover:text-red-600 transition">
