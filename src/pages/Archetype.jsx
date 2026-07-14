@@ -1,6 +1,7 @@
 import React from "react";
 import SilhouetteMBTI from "@/components/archetype/SilhouetteMBTI";
 import EnneagramDiagram from "@/components/archetype/EnneagramDiagram";
+import AttachmentGrid from "@/components/archetype/AttachmentGrid";
 
 export default function Archetype() {
   return (
@@ -21,6 +22,8 @@ export default function Archetype() {
         <SilhouetteMBTI />
 
         <EnneagramDiagram />
+
+        <AttachmentGrid />
 
         <div
           className="mt-8 rounded-2xl p-5 text-center"
