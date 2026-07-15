@@ -8,26 +8,36 @@ import AggregateView from "@/components/analysis/AggregateView";
 import BigFivePerspective from "@/components/analysis/BigFivePerspective";
 import BeliefSynthesis from "@/components/analysis/BeliefSynthesis";
 import SourceElementList from "@/components/analysis/SourceElementList";
+import PersonalizedReport from "@/components/analysis/PersonalizedReport";
 
 export default function Analysis() {
   const [loading, setLoading] = useState(true);
   const [suggestions, setSuggestions] = useState([]);
   const [validated, setValidated] = useState([]);
   const [rawData, setRawData] = useState({ events: [], links: [], beliefs: [], bigFive: null });
+  const [cognitiveProfile, setCognitiveProfile] = useState(null);
+  const [positiveLinks, setPositiveLinks] = useState([]);
+  const [positiveBeliefs, setPositiveBeliefs] = useState([]);
 
   useEffect(() => { loadData(); }, []);
 
   const loadData = async () => {
     setLoading(true);
-    const [events, links, beliefs, existing, bigFiveList] = await Promise.all([
+    const [events, links, beliefs, existing, bigFiveList, cogList, posLinks, posBeliefs] = await Promise.all([
       base44.entities.TraumaticEvent.list(),
       base44.entities.Link.list(),
       base44.entities.LimitingBelief.list(),
       base44.entities.AnalysisItem.list(),
       base44.entities.BigFiveProfile.list(),
+      base44.entities.CognitiveProfile.list(),
+      base44.entities.PositiveLink.list(),
+      base44.entities.PositiveBelief.list(),
     ]);
     const bigFive = bigFiveList[0] || null;
     setRawData({ events, links, beliefs, bigFive });
+    setCognitiveProfile(cogList[0] || null);
+    setPositiveLinks(posLinks);
+    setPositiveBeliefs(posBeliefs);
     const keys = new Set(existing.map(e => `${e.category}|${e.title}`));
     setValidated(existing.filter(e => e.status === "validated"));
     const all = generateSuggestions({ traumaticEvents: events, links, limitingBeliefs: beliefs });
@@ -97,6 +107,16 @@ export default function Analysis() {
         <AggregateView traumaticEvents={rawData.events} links={rawData.links} limitingBeliefs={rawData.beliefs} />
         <BigFivePerspective bigFive={rawData.bigFive} traumaticEvents={rawData.events} links={rawData.links} aggregated={aggregated} />
         <BeliefSynthesis limitingBeliefs={rawData.beliefs} />
+
+        <PersonalizedReport
+          events={rawData.events}
+          links={rawData.links}
+          beliefs={rawData.beliefs}
+          bigFive={rawData.bigFive}
+          cognitiveProfile={cognitiveProfile}
+          positiveLinks={positiveLinks}
+          positiveBeliefs={positiveBeliefs}
+        />
 
         <SourceElementList
           events={rawData.events}
