@@ -5,17 +5,35 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus, Trash2, BookOpen, Heart, Wind, Brain, TrendingUp, Sparkles, Users, Sun } from "lucide-react";
+import { Plus, Trash2, BookOpen, Heart, Wind, Brain, TrendingUp, Sparkles, Users, Sun, HandHeart, HeartCrack } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import GroundingSection from "@/components/journal/GroundingSection";
 import HypnosisSection from "@/components/journal/HypnosisSection";
 import MeditationSection from "@/components/journal/MeditationSection";
 import ImprovementSection from "@/components/journal/ImprovementSection";
+import BesoinSection from "@/components/journal/BesoinSection";
+import WoundSection from "@/components/journal/WoundSection";
 
 const SERIF = "'Playfair Display', Georgia, serif";
 
 const THEMES = [
+  {
+    id: "emotions",
+    label: "Émotion",
+    fullLabel: "Gérer les émotions, la pensée et l'image de soi",
+    icon: Brain,
+    desc: "Réguler les émotions, apaiser le dialogue intérieur et cultiver une image de soi bienveillante.",
+    context: "L'objectif thérapeutique est de gérer les émotions, la pensée et l'image de soi : aide la personne à réguler ses émotions, transformer son dialogue intérieur et cultiver une estime de soi saine.",
+  },
+  {
+    id: "wound",
+    label: "Blessure de l'âme",
+    fullLabel: "Guérir les blessures de l'âme",
+    icon: HeartCrack,
+    desc: "Reconnaître et transformer les cinq blessures fondamentales : rejet, abandon, trahison, humiliation, injustice.",
+    context: "L'objectif thérapeutique est de guérir les blessures de l'âme : aide la personne à reconnaître ses blessures fondamentales (rejet, abandon, trahison, humiliation, injustice), comprendre leur message et les transformer en forces.",
+  },
   {
     id: "trauma",
     label: "Traumatisme",
@@ -25,16 +43,8 @@ const THEMES = [
     context: "L'objectif thérapeutique est de soulager le traumatisme : aide la personne à guérir ses blessures passées, apaiser la charge émotionnelle et transformer la souffrance en résilience.",
   },
   {
-    id: "emotions",
-    label: "Émotions",
-    fullLabel: "Gérer les émotions, la pensée et l'image de soi",
-    icon: Brain,
-    desc: "Réguler les émotions, apaiser le dialogue intérieur et cultiver une image de soi bienveillante.",
-    context: "L'objectif thérapeutique est de gérer les émotions, la pensée et l'image de soi : aide la personne à réguler ses émotions, transformer son dialogue intérieur et cultiver une estime de soi saine.",
-  },
-  {
     id: "conflits",
-    label: "Conflits",
+    label: "Conflit psychique",
     fullLabel: "Résoudre les conflits psychiques",
     icon: Sparkles,
     desc: "Harmoniser les tensions internes et réconcilier les parts de soi en conflit.",
@@ -42,7 +52,7 @@ const THEMES = [
   },
   {
     id: "relations",
-    label: "Relations",
+    label: "Relation",
     fullLabel: "Appréhender les relations",
     icon: Users,
     desc: "Comprendre les dynamiques relationnelles et cultiver des liens sains et authentiques.",
@@ -58,7 +68,7 @@ const THEMES = [
   },
   {
     id: "sens",
-    label: "Sens de vie",
+    label: "Sens de la vie",
     fullLabel: "Donner du sens à sa vie",
     icon: Sun,
     desc: "Explorer sa raison d'être et aligner sa vie avec ses valeurs profondes.",
@@ -71,6 +81,8 @@ const TOOLS = [
   { id: "meditation", label: "Méditation", icon: Wind },
   { id: "hypnose", label: "Hypnose", icon: Brain },
   { id: "amelioration", label: "Axes", icon: TrendingUp },
+  { id: "besoin", label: "Besoin", icon: HandHeart },
+  { id: "wound", label: "Blessure de l'âme", icon: HeartCrack },
 ];
 
 const TOOL_INTROS = {
@@ -78,6 +90,8 @@ const TOOL_INTROS = {
   meditation: "🌬️ Des méditations guidées pour apaiser le mental, relâcher le corps et harmoniser vos énergies.",
   hypnose: "🌀 L'hypnose éricksonnienne accompagne la transformation intérieure, guidée par vos besoins profonds.",
   amelioration: "📈 Une analyse personnalisée de vos données pour identifier vos axes de croissance.",
+  besoin: "💎 Explorez les besoins non satisfaits derrière vos émotions pour les reconnaître et commencer à y répondre.",
+  wound: "🩹 Reconnaissance et guérison des cinq blessures de l'âme : rejet, abandon, trahison, humiliation, injustice.",
 };
 
 const BRANCHES = ["Corps", "Esprit", "Âme", "Social", "Professionnel", "Créativité", "Racines", "Tronc"];
@@ -286,6 +300,8 @@ export default function Journal() {
             {activeTool === "meditation" && <MeditationSection theme={selectedTheme.context} />}
             {activeTool === "hypnose" && <HypnosisSection theme={selectedTheme.context} />}
             {activeTool === "amelioration" && <ImprovementSection theme={selectedTheme.context} />}
+            {activeTool === "besoin" && <BesoinSection theme={selectedTheme.context} />}
+            {activeTool === "wound" && <WoundSection theme={selectedTheme.context} />}
           </div>
         )}
       </div>
