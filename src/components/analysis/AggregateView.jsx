@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
 import { aggregateData, JOURNAL_TOOLS, LIST_JOURNAL_RECOMMENDATIONS } from "@/lib/analysisEngine";
 import { CLINICAL_LISTS } from "@/lib/clinicalCategories";
+import VideoDisplay from "@/components/video/VideoDisplay";
 
 const LIST_COLORS = {
   trauma: { bg: "rgba(239,68,68,0.05)", border: "rgba(239,68,68,0.15)", text: "#ef4444" },
@@ -47,6 +48,7 @@ export default function AggregateView({ traumaticEvents, links, limitingBeliefs 
                   </div>
                 ))}
               </div>
+              <VideoDisplay tags={items.map(i => i.key)} dark />
             </div>
           );
         })}

@@ -14,6 +14,7 @@ import MeditationSection from "@/components/journal/MeditationSection";
 import ImprovementSection from "@/components/journal/ImprovementSection";
 import BesoinSection from "@/components/journal/BesoinSection";
 import WoundSection from "@/components/journal/WoundSection";
+import ThemeVideoDisplay from "@/components/video/ThemeVideoDisplay";
 
 const SERIF = "'Playfair Display', Georgia, serif";
 
@@ -290,6 +291,10 @@ export default function Journal() {
                   </button>
                 );
               })}
+            </div>
+
+            <div className="mb-4">
+              <ThemeVideoDisplay themeId={activeTheme} />
             </div>
 
             <p className="text-sm mb-4" style={{ color: "#5d4037", fontFamily: SERIF }}>

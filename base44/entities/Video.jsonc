@@ -1,0 +1,25 @@
+{
+  "name": "Video",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string",
+      "description": "Titre de la vid\u00e9o"
+    },
+    "url": {
+      "type": "string",
+      "description": "Lien externe (YouTube/Vimeo) ou URL du fichier upload\u00e9"
+    },
+    "category_tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Cat\u00e9gories associ\u00e9es (format listId:itemId, emotion:EmotionName, ou wound_type:WoundName)"
+    }
+  },
+  "required": [
+    "title",
+    "url"
+  ]
+}

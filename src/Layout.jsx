@@ -1,7 +1,8 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { Home, Sprout, Flower2, ScanSearch, Sparkles, Brain, BookOpen } from "lucide-react";
+import { useAuth } from "@/lib/AuthContext";
+import { Home, Sprout, Flower2, ScanSearch, Sparkles, Brain, BookOpen, Video } from "lucide-react";
 
 const NAV = [
   { label: "Arbre", icon: Home, page: "Home" },
@@ -14,6 +15,8 @@ const NAV = [
 ];
 
 export default function Layout({ children, currentPageName }) {
+  const { user } = useAuth();
+  const navItems = user?.role === "admin" ? [...NAV, { label: "Vidéos", icon: Video, page: "VideoManager" }] : NAV;
   return (
     <div className="min-h-screen bg-[#0a1628] flex flex-col">
       <style>{`
@@ -33,7 +36,7 @@ export default function Layout({ children, currentPageName }) {
       {/* Bottom navigation */}
       <nav className="fixed bottom-0 left-0 right-0 bg-[#0d1f0d]/95 backdrop-blur border-t border-green-900/40 z-50">
         <div className="flex max-w-lg mx-auto overflow-x-auto">
-          {NAV.map(({ label, icon: Icon, page }) => {
+          {navItems.map(({ label, icon: Icon, page }) => {
             const active = currentPageName === page;
             return (
               <Link

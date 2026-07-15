@@ -1,5 +1,13 @@
 import React from "react";
 import ClinicalCategorizationEditor from "./ClinicalCategorizationEditor";
+import VideoDisplay from "@/components/video/VideoDisplay";
+
+function buildEventTags(ev) {
+  const tags = [...(ev.clinical_tags || [])];
+  if (ev.emotion) tags.push(`emotion:${ev.emotion}`);
+  if (ev.wound_type) tags.push(`wound_type:${ev.wound_type}`);
+  return tags;
+}
 
 export default function SourceElementList({ events = [], links = [], beliefs = [], onTagsChange }) {
   if (events.length === 0 && links.length === 0 && beliefs.length === 0) return null;
@@ -23,6 +31,7 @@ export default function SourceElementList({ events = [], links = [], beliefs = [
                   value={lk.clinical_tags || []}
                   onChange={(tags) => onTagsChange("link", lk.id, tags)}
                 />
+                <VideoDisplay tags={lk.clinical_tags || []} dark />
               </div>
             ))}
           </div>
@@ -46,6 +55,7 @@ export default function SourceElementList({ events = [], links = [], beliefs = [
                   value={ev.clinical_tags || []}
                   onChange={(tags) => onTagsChange("event", ev.id, tags)}
                 />
+                <VideoDisplay tags={buildEventTags(ev)} dark />
               </div>
             ))}
           </div>
@@ -67,6 +77,7 @@ export default function SourceElementList({ events = [], links = [], beliefs = [
                   value={b.clinical_tags || []}
                   onChange={(tags) => onTagsChange("belief", b.id, tags)}
                 />
+                <VideoDisplay tags={b.clinical_tags || []} dark />
               </div>
             ))}
           </div>

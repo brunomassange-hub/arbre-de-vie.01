@@ -60,6 +60,7 @@ import Garden from './pages/Garden';
 import Archetype from './pages/Archetype';
 import Growth from './pages/Growth';
 import Analysis from './pages/Analysis';
+import VideoManager from './pages/VideoManager';
 import __Layout from './Layout.jsx';
 
 
@@ -77,6 +78,7 @@ export const PAGES = {
     "Garden": Garden,
     "Growth": Growth,
     "Analysis": Analysis,
+    "VideoManager": VideoManager,
 }
 
 export const pagesConfig = {
