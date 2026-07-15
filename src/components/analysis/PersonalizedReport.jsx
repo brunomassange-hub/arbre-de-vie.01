@@ -117,6 +117,9 @@ Les forces sur lesquelles l'utilisateur peut s'appuyer: traits Big Five positifs
 ## Pistes de développement concrètes
 Suggestions pratiques et actionnables, en lien avec les outils thérapeutiques disponibles: Ancrage (grounding), Hypnose, Méditation, Axes d'amélioration. Précise quand un outil est particulièrement pertinent au regard d'une difficulté identifiée.
 
+## Sens de la vie
+En te basant EXCLUSIVEMENT sur les croyances limitantes de l'utilisateur et leurs thèmes (branches: Physique, Social, Intellectuel, Émotionnel, Artistique, Spirituel), explore ce qui pourrait donner du sens à sa vie. Identifie les valeurs qui transparaissent à travers ses croyances (ce qu'il craint révèle ce qu'il valorise), et propose des pistes pour aligner sa vie avec un sens porteur. Formule avec bienveillance et sans jugement.
+
 Règles:
 - Sois précis et référence les vraies données de l'utilisateur (cite des événements, relations ou croyances spécifiques).
 - Sois chaleureux, respectueux, non jugeant.
