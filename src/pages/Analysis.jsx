@@ -125,13 +125,25 @@ export default function Analysis() {
           onTagsChange={handleTagsChange}
         />
 
-        {validated.length > 0 && (
+        {validated.filter(item => {
+          const isExcluded = (item.title || "").toLowerCase().includes("pattern relationnel") ||
+            (item.title || "").toLowerCase().includes("injustice");
+          return !isExcluded;
+        }).length > 0 && (
           <div className="mb-8">
             <h2 className="text-sm font-bold mb-3" style={{ color: "#e8d5c4" }}>
-              ✅ Validé ({validated.length})
+              ✅ Validé ({validated.filter(item => {
+                const isExcluded = (item.title || "").toLowerCase().includes("pattern relationnel") ||
+                  (item.title || "").toLowerCase().includes("injustice");
+                return !isExcluded;
+              }).length})
             </h2>
             <div className="space-y-2">
-              {validated.map(item => {
+              {validated.filter(item => {
+                const isExcluded = (item.title || "").toLowerCase().includes("pattern relationnel") ||
+                  (item.title || "").toLowerCase().includes("injustice");
+                return !isExcluded;
+              }).map(item => {
                 const cat = CATEGORIES[item.category];
                 const tool = JOURNAL_TOOLS[item.journal_tool];
                 return (
