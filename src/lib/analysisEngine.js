@@ -1,4 +1,4 @@
-import { CLINICAL_LISTS, getTagLabel, getTagDescription } from "@/lib/clinicalCategories";
+import { CLINICAL_LISTS, getTagLabel, getTagDescription, getListLabel } from "@/lib/clinicalCategories";
 
 export const CATEGORIES = {
   type_trauma: { label: "Type de trauma", icon: "🔥", color: "#ef4444" },
@@ -14,6 +14,15 @@ export const JOURNAL_TOOLS = {
   meditation: { label: "Méditation", icon: "🌬️" },
   hypnose: { label: "Hypnose", icon: "🌀" },
   amelioration: { label: "Axes", icon: "📈" },
+};
+
+export const LIST_JOURNAL_RECOMMENDATIONS = {
+  trauma: { theme: "trauma", tool: "grounding" },
+  rel: { theme: "relations", tool: "amelioration" },
+  conflict: { theme: "conflits", tool: "meditation" },
+  behavior: { theme: "comportement", tool: "amelioration" },
+  wound: { theme: "trauma", tool: "hypnose" },
+  need: { theme: "emotions", tool: "amelioration" },
 };
 
 const WOUND_DESC = {
@@ -185,7 +194,20 @@ function hasTag(aggregated, listId, itemId) {
   return (aggregated?.byList?.[listId] || []).some(item => item.key === itemId);
 }
 
-// ─── Big Five cross-reference ────────────────────────────
+function tagCount(aggregated, listId, itemId) {
+  const items = aggregated?.byList?.[listId] || [];
+  return items.find(i => i.key === itemId)?.count || 0;
+}
+
+function getAllTopTags(aggregated) {
+  const all = [];
+  Object.entries(aggregated?.byList || {}).forEach(([listId, items]) => {
+    items.forEach(item => all.push({ ...item, listId }));
+  });
+  return all.sort((a, b) => b.count - a.count);
+}
+
+// ─── Big Five cross-reference (dynamic) ──────────────────
 export function crossReferenceBigFive({ bigFive, traumaticEvents = [], links = [], aggregated }) {
   const insights = [];
   if (!bigFive) return insights;
@@ -196,76 +218,165 @@ export function crossReferenceBigFive({ bigFive, traumaticEvents = [], links = [
   const a = bigFive.agreabilite ?? 0;
   const c = bigFive.conscience ?? 0;
 
-  const abandonCount = traumaticEvents.filter(ev => ev.wound_type === "Abandon").length;
-  const rejetCount = traumaticEvents.filter(ev => ev.wound_type === "Rejet").length;
-  const trahisonCount = traumaticEvents.filter(ev => ev.wound_type === "Trahison").length;
+  const abandonWoundCount = traumaticEvents.filter(ev => ev.wound_type === "Abandon").length;
+  const rejetWoundCount = traumaticEvents.filter(ev => ev.wound_type === "Rejet").length;
+  const trahisonWoundCount = traumaticEvents.filter(ev => ev.wound_type === "Trahison").length;
 
-  const hasIsolement = hasTag(aggregated, "rel", "isolement_social");
-  const hasDependance = hasTag(aggregated, "rel", "dependance_affective");
-  const hasEvitement = hasTag(aggregated, "rel", "evitement_intimite") || hasTag(aggregated, "behavior", "evitement_chronique");
-  const hasDiffConfiance = hasTag(aggregated, "rel", "difficulte_confiance");
+  const peurAbandonCount = tagCount(aggregated, "rel", "peur_abandon");
+  const negligenceCount = tagCount(aggregated, "trauma", "negligence_emotionnelle");
+  const isolementCount = tagCount(aggregated, "rel", "isolement_social");
+  const dependanceCount = tagCount(aggregated, "rel", "dependance_affective");
+  const evitementCount = tagCount(aggregated, "rel", "evitement_intimite") + tagCount(aggregated, "behavior", "evitement_chronique");
+  const diffConfianceCount = tagCount(aggregated, "rel", "difficulte_confiance");
+  const videCount = tagCount(aggregated, "conflict", "vide_existentiel");
+  const perfectionnismeCount = tagCount(aggregated, "behavior", "perfectionnisme_paralysant") + tagCount(aggregated, "conflict", "perfectionnisme_interieur");
   const hasPsychicConflicts = (aggregated?.byList?.conflict || []).length > 0;
 
-  if (n >= 60 && abandonCount > 0) {
+  // Nervosité + peur de l'abandon (clinical tag)
+  if (n >= 55 && peurAbandonCount > 0) {
     insights.push({
-      title: "Hypervigilance relationnelle",
-      description: `Un score élevé en Nervosité (${n}/100) combiné à ${abandonCount} traumatisme(s) d'abandon suggère une hypervigilance dans vos relations : vous anticipez la séparation ou le rejet, ce qui peut vous amener à vous accrocher ou, au contraire, à fuir avant d'être abandonné.`,
+      title: "Hypervigilance d'attachement",
+      description: `Votre Nervosité (${n}/100) combinée à ${peurAbandonCount} occurrence(s) de « peur de l'abandon » suggère une hypervigilance d'attachement : vous êtes en alerte constante face aux signaux de retrait ou de distance de l'autre, ce qui peut vous amener à vous accrocher ou à anticiper la séparation.`,
       journal_theme: "relations", journal_tool: "grounding",
     });
   }
-  if (n >= 60 && rejetCount > 0) {
+
+  // Nervosité + négligence émotionnelle
+  if (n >= 55 && negligenceCount > 0) {
+    insights.push({
+      title: "Blessure d'attachement précoce",
+      description: `Votre Nervosité (${n}/100) associée à ${negligenceCount} expérience(s) de négligence émotionnelle suggère une blessure d'attachement : le manque de réconfort et d'attention affective dans votre histoire a pu créer un besoin insatiable de validation et de présence.`,
+      journal_theme: "trauma", journal_tool: "hypnose",
+    });
+  }
+
+  // Nervosité + peur de l'abandon + négligence émotionnelle → pattern d'attachement insécure
+  if (n >= 55 && peurAbandonCount > 0 && negligenceCount > 0) {
+    insights.push({
+      title: "Pattern d'attachement insécure",
+      description: `La combinaison d'une Nervosité élevée (${n}/100), de la peur de l'abandon et de négligence émotionnelle dessine un pattern d'attachement insécure : vos relations sont probablement marquées par une alternance entre le besoin de proximité et la peur de l'engagement, avec une sensibilité exacerbée aux signes de rejet.`,
+      journal_theme: "relations", journal_tool: "hypnose",
+    });
+  }
+
+  // Nervosité + wound_type Abandon (from entity)
+  if (n >= 60 && abandonWoundCount > 0) {
+    insights.push({
+      title: "Hypervigilance relationnelle",
+      description: `Un score élevé en Nervosité (${n}/100) combiné à ${abandonWoundCount} traumatisme(s) d'abandon suggère une hypervigilance dans vos relations : vous anticipez la séparation ou le rejet, ce qui peut vous amener à vous accrocher ou, au contraire, à fuir avant d'être abandonné.`,
+      journal_theme: "relations", journal_tool: "grounding",
+    });
+  }
+
+  // Nervosité + wound_type Rejet
+  if (n >= 60 && rejetWoundCount > 0) {
     insights.push({
       title: "Peur du jugement social",
-      description: `La combinaison d'une Nervosité élevée (${n}/100) et de ${rejetCount} blessure(s) de rejet indique une sensibilité accrue au regard des autres. Vous pouvez tendre à vous effacer ou, inversement, à surcompenser pour éviter le rejet.`,
+      description: `La combinaison d'une Nervosité élevée (${n}/100) et de ${rejetWoundCount} blessure(s) de rejet indique une sensibilité accrue au regard des autres. Vous pouvez tendre à vous effacer ou, inversement, à surcompenser pour éviter le rejet.`,
       journal_theme: "emotions", journal_tool: "meditation",
     });
   }
-  if (n >= 60 && trahisonCount > 0) {
+
+  // Nervosité + wound_type Trahison
+  if (n >= 60 && trahisonWoundCount > 0) {
     insights.push({
       title: "Difficulté de confiance",
-      description: `Votre Nervosité (${n}/100) associée à ${trahisonCount} expérience(s) de trahison crée une méfiance de fond. Vous pouvez avoir du mal à vous engager pleinement, par peur d'être à nouveau trahi.`,
+      description: `Votre Nervosité (${n}/100) associée à ${trahisonWoundCount} expérience(s) de trahison crée une méfiance de fond. Vous pouvez avoir du mal à vous engager pleinement, par peur d'être à nouveau trahi.`,
       journal_theme: "relations", journal_tool: "hypnose",
     });
   }
-  if (e <= 40 && hasIsolement) {
+
+  // Nervosité + vide existentiel → angoisse existentielle
+  if (n >= 55 && videCount > 0) {
+    insights.push({
+      title: "Angoisse existentielle",
+      description: `Votre Nervosité (${n}/100) associée à ${videCount} occurrence(s) de sentiment de vide existentiel suggère une angoisse de fond : le manque de sens perçu alimente votre tension interne, et votre hypervigilance empêche de relâcher le contrôle pour explorer ce vide.`,
+      journal_theme: "sens", journal_tool: "meditation",
+    });
+  }
+
+  // Extraversion basse + isolement social
+  if (e <= 40 && isolementCount > 0) {
     insights.push({
       title: "Retrait social",
-      description: `Une Extraversion basse (${e}/100) couplée à des difficultés d'isolement suggère un pattern de retrait. Vous vous protégez en vous isolant, mais cela peut renforcer le sentiment de solitude.`,
+      description: `Une Extraversion basse (${e}/100) couplée à ${isolementCount} difficulté(s) d'isolement social suggère un pattern de retrait. Vous vous protégez en vous isolant, mais cela peut renforcer le sentiment de solitude.`,
       journal_theme: "relations", journal_tool: "grounding",
     });
   }
-  if (a >= 65 && hasDependance) {
+
+  // Agréabilité élevée + dépendance affective
+  if (a >= 65 && dependanceCount > 0) {
     insights.push({
       title: "Tendance au sacrifice de soi",
-      description: `Une Agréabilité élevée (${a}/100) combinée à une dépendance affective indique que vous priorisez souvent les besoins des autres au détriment des vôtres. Cette recherche d'harmonie peut masquer une peur du conflit ou de l'abandon.`,
+      description: `Une Agréabilité élevée (${a}/100) combinée à ${dependanceCount} occurrence(s) de dépendance affective indique que vous priorisez souvent les besoins des autres au détriment des vôtres. Cette recherche d'harmonie peut masquer une peur du conflit ou de l'abandon.`,
       journal_theme: "conflits", journal_tool: "amelioration",
     });
   }
-  if (o <= 40 && hasEvitement) {
+
+  // Agréabilité élevée + difficulté à poser des limites
+  if (a >= 65 && hasTag(aggregated, "rel", "difficulte_limites")) {
+    insights.push({
+      title: "Effacement de soi",
+      description: `Votre Agréabilité (${a}/100) associée à une difficulté à poser des limites suggère un pattern d'effacement : vous avez du mal à dire non et à protéger votre espace, ce qui vous expose à l'épuisement et au ressentiment.`,
+      journal_theme: "conflits", journal_tool: "amelioration",
+    });
+  }
+
+  // Ouverture basse + évitement
+  if (o <= 40 && evitementCount > 0) {
     insights.push({
       title: "Rigidité face à l'inconnu",
-      description: `Une Ouverture basse (${o}/100) associée à des comportements d'évitement suggère une préférence pour le connu et le contrôlable. Vous évitez les situations nouvelles pour réduire l'anxiété, ce qui peut limiter votre croissance.`,
+      description: `Une Ouverture basse (${o}/100) associée à ${evitementCount} comportement(s) d'évitement suggère une préférence pour le connu et le contrôlable. Vous évitez les situations nouvelles pour réduire l'anxiété, ce qui peut limiter votre croissance.`,
       journal_theme: "comportement", journal_tool: "amelioration",
     });
   }
-  if (c >= 70 && hasPsychicConflicts) {
+
+  // Conscience élevée + conflits psychiques ou perfectionnisme
+  if (c >= 70 && (hasPsychicConflicts || perfectionnismeCount > 0)) {
+    const detail = perfectionnismeCount > 0 ? `${perfectionnismeCount} occurrence(s) de perfectionnisme` : "des conflits psychiques identifiés";
     insights.push({
       title: "Surcontrôle interne",
-      description: `Une Conscience élevée (${c}/100) combinée à des conflits psychiques identifiés suggère une tendance au surcontrôle. Vous tentez de tout maîtriser intérieurement, ce qui génère des tensions entre vos différentes parts.`,
+      description: `Une Conscience élevée (${c}/100) combinée à ${detail} suggère une tendance au surcontrôle. Vous tentez de tout maîtriser intérieurement, ce qui génère des tensions entre vos différentes parts et une difficulté à lâcher prise.`,
       journal_theme: "conflits", journal_tool: "meditation",
     });
   }
-  if (n >= 60 && hasDiffConfiance && trahisonCount === 0) {
+
+  // Nervosité + difficulté de confiance (sans trahison)
+  if (n >= 60 && diffConfianceCount > 0 && trahisonWoundCount === 0) {
     insights.push({
       title: "Méfiance relationnelle de fond",
-      description: `Votre Nervosité (${n}/100) associée à des difficultés de confiance (sans trahison identifiée) suggère une méfiance qui ne repose pas sur un événement précis. Cette anticipation du danger relationnel peut saboter vos liens.`,
+      description: `Votre Nervosité (${n}/100) associée à ${diffConfianceCount} difficulté(s) de confiance (sans trahison identifiée) suggère une méfiance qui ne repose pas sur un événement précis. Cette anticipation du danger relationnel peut saboter vos liens.`,
       journal_theme: "relations", journal_tool: "hypnose",
     });
   }
-  if (n >= 65 && insights.length === 0) {
+
+  // Dynamic fallback: generate insight from actual data even without hardcoded pattern
+  if (insights.length === 0) {
+    const allTags = getAllTopTags(aggregated);
+    if (allTags.length > 0) {
+      const topTag = allTags[0];
+      const traitDesc = n >= 60 ? `une Nervosité élevée (${n}/100)`
+        : e <= 40 ? `une Extraversion basse (${e}/100)`
+        : o <= 40 ? `une Ouverture basse (${o}/100)`
+        : a >= 65 ? `une Agréabilité élevée (${a}/100)`
+        : c >= 70 ? `une Conscience élevée (${c}/100)`
+        : null;
+
+      if (traitDesc) {
+        insights.push({
+          title: "Croisement personnalité / expériences",
+          description: `${traitDesc} combinée à la récurrence de « ${topTag.label} » (${topTag.count} occurrence(s)) suggère que ce thème occupe une place importante dans votre fonctionnement psychologique. Votre tempérament amplifie la résonance de cette expérience dans votre vie intérieure.`,
+          journal_theme: "emotions", journal_tool: "meditation",
+        });
+      }
+    }
+  }
+
+  // Anxiété de fond (no specific data but high nervosity)
+  if (insights.length === 0 && n >= 65) {
     insights.push({
       title: "Anxiété de fond",
-      description: `Votre score élevé en Nervosité (${n}/100) indique une tendance à l'anxiété généralisée. Sans traumatisme spécifique identifié, cette tension peut être liée à votre tempérament. Des pratiques d'ancrage peuvent aider à la réguler.`,
+      description: `Votre score élevé en Nervosité (${n}/100) indique une tendance à l'anxiété généralisée. Sans thème spécifique identifié dans vos données, cette tension peut être liée à votre tempérament. Des pratiques d'ancrage peuvent aider à la réguler.`,
       journal_theme: "emotions", journal_tool: "grounding",
     });
   }
@@ -273,63 +384,66 @@ export function crossReferenceBigFive({ bigFive, traumaticEvents = [], links = [
   return insights;
 }
 
-// ─── Belief synthesis by unmet needs ──────────────────────
+// ─── Belief synthesis by all clinical tags ───────────────
 export function synthesizeBeliefs({ limitingBeliefs = [] }) {
-  const byNeed = {};
+  if (limitingBeliefs.length === 0) {
+    return { byTheme: [], total: 0, interpretation: "Aucune croyance limitante enregistrée pour l'instant." };
+  }
+
+  const tagCount = {};
   limitingBeliefs.forEach(b => {
-    const needTags = (b.clinical_tags || []).filter(t => t.startsWith("need:"));
-    if (needTags.length === 0) {
-      (byNeed["sans_need"] ||= []).push(b);
-    } else {
-      needTags.forEach(tag => {
-        const itemId = tag.split(":")[1];
-        (byNeed[itemId] ||= []).push(b);
-      });
-    }
+    (b.clinical_tags || []).forEach(tag => {
+      tagCount[tag] = (tagCount[tag] || 0) + 1;
+    });
   });
 
-  const needList = CLINICAL_LISTS.find(l => l.id === "need");
-  const themes = Object.entries(byNeed).map(([key, beliefs]) => ({
-    key,
-    label: key === "sans_need" ? "Sans besoin identifié" : (needList?.items.find(i => i.id === key)?.label || key),
-    count: beliefs.length,
-    beliefs,
-  })).sort((a, b) => b.count - a.count);
+  const themes = Object.entries(tagCount)
+    .map(([tag, count]) => {
+      const [listId, itemId] = tag.split(":");
+      const list = CLINICAL_LISTS.find(l => l.id === listId);
+      const item = list?.items.find(i => i.id === itemId);
+      return {
+        key: tag,
+        listId,
+        label: item?.label || itemId,
+        count,
+        beliefs: limitingBeliefs.filter(b => (b.clinical_tags || []).includes(tag)),
+      };
+    })
+    .sort((a, b) => b.count - a.count);
 
   return {
     byTheme: themes,
     total: limitingBeliefs.length,
-    interpretation: generateLifeInterpretation(themes),
+    interpretation: generateBeliefInterpretation(themes, limitingBeliefs),
   };
 }
 
-function generateLifeInterpretation(themes) {
-  if (themes.length === 0) return "Aucune croyance limitante enregistrée pour l'instant.";
-
-  const dominant = themes[0];
-  if (dominant.key === "sans_need") {
-    return "Vos croyances limitantes ne sont pas encore rattachées à des besoins fondamentaux. Qualifiez-les pour générer une interprétation de sens.";
+function generateBeliefInterpretation(tags, beliefs) {
+  if (tags.length === 0) {
+    return `Vous avez enregistré ${beliefs.length} croyance(s) limitante(s) sans thématique clinique associée. Qualifiez vos croyances avec les catégories cliniques pour générer une synthèse de sens.`;
   }
 
-  const tied = themes.filter(t => t.count === dominant.count && t.key !== "sans_need");
+  const top = tags[0];
+  const listId = top.listId;
 
   const interpretations = {
-    securite: "Votre paysage intérieur est structuré autour de la recherche de sécurité : vous cherchez à vous protéger des menaces perçues, ce qui peut limiter votre capacité à vous engager dans l'inconnu.",
-    appartenance: "Le besoin d'appartenance structure votre existence : vos croyances révèlent une quête de validation du groupe qui peut entraver votre autonomie émotionnelle.",
-    reconnaissance: "Le besoin de reconnaissance est au centre de votre rapport au monde : vous cherchez constamment à prouver votre valeur, ce qui peut générer une dépendance au regard des autres.",
-    autonomie: "L'autonomie est votre enjeu central : vous êtes tiraillé·e entre le désir d'indépendance et la peur de la solitude.",
-    etre_vu_entendu: "Le besoin d'être vu et entendu est au cœur de vos questionnements : vous interrogez constamment votre légitimité à exister pleinement.",
-    justice: "Le besoin de justice structure votre vision du monde : vous êtes particulièrement sensible aux iniquités, ce qui peut générer de la rigidité face à l'autorité.",
-    stabilite: "Le besoin de stabilité est au centre de votre existence : vous cherchez à sécuriser votre environnement pour réduire l'anxiété de l'imprévu.",
-    controle: "Le contrôle est au centre de votre rapport au monde : vous cherchez à maîtriser votre environnement pour éviter l'imprévu, ce qui peut générer de la rigidité.",
-    affection: "Le besoin d'affection structure votre existence : vos croyances révèlent une quête de chaleur humaine qui peut entraver votre autonomie émotionnelle.",
-    valorisation: "Le besoin de valorisation est au cœur de vos questionnements : vous doutez de votre propre valeur et cherchez constamment des preuves extérieures de votre mérite.",
+    need: `vos croyances révèlent un besoin non comblé dominant — « ${top.label} » (${top.count} occurrence(s)) — qui structure votre quête de sens. Vous cherchez activement à combler ce que vous percevez comme manquant, et cette recherche oriente vos choix et votre vision du monde.`,
+    wound: `la blessure de l'âme « ${top.label} » (${top.count} occurrence(s)) traverse vos croyances, révélant une peur centrale qui filtre votre rapport au monde. Votre sens de la vie semble se construire autour de la gestion de cette blessure.`,
+    conflict: `le conflit psychique « ${top.label} » (${top.count} occurrence(s)) domine vos croyances, indiquant une tension interne récurrente. Votre vision du monde se construit dans la négociation entre des forces contradictoires qui cohabitent en vous.`,
+    behavior: `le comportement « ${top.label} » (${top.count} occurrence(s)) apparaît comme un pattern d'adaptation récurrent. Vous avez développé des stratégies de protection qui, si elles vous aidaient à survivre, sont devenues des limites à votre épanouissement.`,
+    rel: `la difficulté relationnelle « ${top.label} » (${top.count} occurrence(s)) structure vos croyances, révélant un schéma relationnel qui filtre votre vision des autres. Votre sens de la vie se joue dans la qualité de vos liens et la peur de les perdre.`,
+    trauma: `le traumatisme « ${top.label} » (${top.count} occurrence(s)) infiltre vos croyances, suggérant qu'un événement non résolu continue de façonner votre interprétation du présent. Votre vision du monde est colorée par cette expérience fondatrice.`,
   };
 
-  if (tied.length > 1) {
-    const labels = tied.map(t => t.label).join(", ");
-    return `Plusieurs besoins se partagent votre paysage intérieur (${labels}). ${interpretations[dominant.key] || ""}`;
+  let text = `À travers vos ${beliefs.length} croyance(s) limitante(s), ${interpretations[listId] || `le thème « ${top.label} » (${top.count} occurrence(s)) occupe une place centrale dans votre vision du monde.`}`;
+
+  if (tags[1]) {
+    const second = tags[1];
+    text += ` Ce pattern se combine avec « ${second.label} » (${second.count} occurrence(s)), renforçant la complexité de votre paysage intérieur.`;
   }
 
-  return interpretations[dominant.key] || "Vos croyances limitantes révèlent des besoins profonds à explorer.";
+  text += " Transformer ces croyances fondatrices est un levier puissant pour redéfinir le sens que vous donnez à votre existence.";
+
+  return text;
 }

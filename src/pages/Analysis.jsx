@@ -67,7 +67,7 @@ export default function Analysis() {
     items: suggestions.filter(s => s.category === key),
   })).filter(g => g.items.length > 0);
 
-  const aggregated = aggregateData({ traumaticEvents: rawData.events, links: rawData.links });
+  const aggregated = aggregateData({ traumaticEvents: rawData.events, links: rawData.links, limitingBeliefs: rawData.beliefs });
   const hasAnyData = rawData.events.length > 0 || rawData.links.length > 0 || rawData.beliefs.length > 0 || rawData.bigFive;
 
   return (
