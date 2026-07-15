@@ -105,30 +105,6 @@ export default function Analysis() {
           onTagsChange={handleTagsChange}
         />
 
-        {suggestions.length > 0 && (
-          <div className="mb-8">
-            <h2 className="text-sm font-bold mb-3" style={{ color: "#e8d5c4" }}>
-              Suggestions à valider ({suggestions.length})
-            </h2>
-            <div className="space-y-4">
-              {grouped.map(group => (
-                <div key={group.key}>
-                  <div className="flex items-center gap-1.5 mb-2">
-                    <span>{group.icon}</span>
-                    <span className="text-xs font-bold" style={{ color: group.color }}>{group.label}</span>
-                    <span className="text-xs text-gray-600">({group.items.length})</span>
-                  </div>
-                  <div className="space-y-2 ml-4">
-                    {group.items.map(s => (
-                      <SuggestionCard key={s.id} suggestion={s} onValidate={handleValidate} onReject={handleReject} />
-                    ))}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
         {validated.length > 0 && (
           <div className="mb-8">
             <h2 className="text-sm font-bold mb-3" style={{ color: "#e8d5c4" }}>
