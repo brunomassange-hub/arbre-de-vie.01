@@ -30,17 +30,12 @@
       "type": "string",
       "description": "Comment la reformuler positivement ?"
     },
-    "theme_tag": {
-      "type": "string",
-      "enum": [
-        "valeur_personnelle",
-        "securite",
-        "amour",
-        "controle",
-        "confiance",
-        "autre"
-      ],
-      "description": "Th\u00e8me de la croyance"
+    "clinical_tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Cat\u00e9gories cliniques s\u00e9lectionn\u00e9es (format listId:itemId)"
     },
     "source_event_id": {
       "type": "string",

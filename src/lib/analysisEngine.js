@@ -1,3 +1,5 @@
+import { CLINICAL_LISTS, getTagLabel, getTagDescription } from "@/lib/clinicalCategories";
+
 export const CATEGORIES = {
   type_trauma: { label: "Type de trauma", icon: "🔥", color: "#ef4444" },
   difficulte_relationnelle: { label: "Difficulté relationnelle", icon: "🔗", color: "#f59e0b" },
@@ -46,7 +48,6 @@ export function generateSuggestions({ traumaticEvents = [], links = [], limiting
   let idc = 0;
   const nid = () => `sug-${++idc}`;
 
-  // 1. Type de trauma
   const woundCount = {};
   traumaticEvents.forEach(e => { if (e.wound_type) woundCount[e.wound_type] = (woundCount[e.wound_type] || 0) + 1; });
   Object.entries(woundCount).forEach(([wound, count]) => {
@@ -62,7 +63,6 @@ export function generateSuggestions({ traumaticEvents = [], links = [], limiting
     });
   });
 
-  // 2. Difficultés relationnelles
   if (links.length > 0) {
     const typeCount = {};
     links.forEach(l => { if (l.type) typeCount[l.type] = (typeCount[l.type] || 0) + 1; });
@@ -91,7 +91,6 @@ export function generateSuggestions({ traumaticEvents = [], links = [], limiting
     suggestions.push(...relSugs);
   }
 
-  // 3. Problèmes comportementaux
   const emoCount = {};
   traumaticEvents.forEach(e => { if (e.emotion) emoCount[e.emotion] = (emoCount[e.emotion] || 0) + 1; });
   Object.entries(emoCount).forEach(([emotion, count]) => {
@@ -106,7 +105,6 @@ export function generateSuggestions({ traumaticEvents = [], links = [], limiting
     });
   });
 
-  // 4. Conflits psychiques
   if (limitingBeliefs.length > 0) {
     const byBranch = {};
     limitingBeliefs.forEach(b => { (byBranch[b.branch] ||= []).push(b); });
@@ -130,7 +128,6 @@ export function generateSuggestions({ traumaticEvents = [], links = [], limiting
     });
   }
 
-  // 5. Blessure de l'âme
   Object.entries(woundCount).forEach(([wound, count]) => {
     suggestions.push({
       id: nid(), category: "blessure_ame",
@@ -141,7 +138,6 @@ export function generateSuggestions({ traumaticEvents = [], links = [], limiting
     });
   });
 
-  // 6. Croyances limitantes regroupées
   if (limitingBeliefs.length > 0) {
     const groups = {};
     limitingBeliefs.forEach(b => { (groups[b.branch || "Autre"] ||= []).push(b); });
@@ -159,58 +155,34 @@ export function generateSuggestions({ traumaticEvents = [], links = [], limiting
   return suggestions;
 }
 
-// ─── Label maps for qualification fields ─────────────────
-export const TRAUMA_TYPE_LABELS = {
-  agression: "Agression",
-  viol: "Viol",
-  vol: "Vol",
-  traumatisme_precoce: "Traumatisme précoce",
-  separation: "Séparation",
-  negligence: "Négligence",
-  violence: "Violence",
-  autre: "Autre",
-};
-
-export const REL_DIFFICULTY_LABELS = {
-  peur_engagement: "Peur de l'engagement",
-  isolement: "Isolement",
-  agressivite: "Agressivité",
-  difficulte_confiance: "Difficulté de confiance",
-  dependance_affective: "Dépendance affective",
-  evitement: "Évitement",
-  autre: "Autre",
-};
-
-export const THEME_TAG_LABELS = {
-  valeur_personnelle: "Valeur personnelle",
-  securite: "Sécurité",
-  amour: "Amour",
-  controle: "Contrôle",
-  confiance: "Confiance",
-  autre: "Autre",
-};
-
-// ─── Aggregated data view ────────────────────────────────
-export function aggregateData({ traumaticEvents = [], links = [] }) {
-  const traumaTypeCount = {};
-  const relDifficultyCount = {};
-  let psychicConflictsCount = 0;
-  let problematicBehaviorsCount = 0;
-
-  const allItems = [...traumaticEvents, ...links];
+// ─── Aggregated data from clinical_tags ──────────────────
+export function aggregateData({ traumaticEvents = [], links = [], limitingBeliefs = [] }) {
+  const tagCount = {};
+  const allItems = [...traumaticEvents, ...links, ...limitingBeliefs];
   allItems.forEach(item => {
-    (item.trauma_types || []).forEach(t => { traumaTypeCount[t] = (traumaTypeCount[t] || 0) + 1; });
-    (item.relational_difficulties || []).forEach(d => { relDifficultyCount[d] = (relDifficultyCount[d] || 0) + 1; });
-    if (item.psychic_conflicts) psychicConflictsCount++;
-    if (item.problematic_behaviors) problematicBehaviorsCount++;
+    (item.clinical_tags || []).forEach(tag => {
+      tagCount[tag] = (tagCount[tag] || 0) + 1;
+    });
   });
 
-  return {
-    traumaTypes: Object.entries(traumaTypeCount).map(([key, count]) => ({ key, label: TRAUMA_TYPE_LABELS[key] || key, count })).sort((a, b) => b.count - a.count),
-    relDifficulties: Object.entries(relDifficultyCount).map(([key, count]) => ({ key, label: REL_DIFFICULTY_LABELS[key] || key, count })).sort((a, b) => b.count - a.count),
-    psychicConflicts: psychicConflictsCount,
-    problematicBehaviors: problematicBehaviorsCount,
-  };
+  const byList = {};
+  CLINICAL_LISTS.forEach(list => {
+    const items = Object.entries(tagCount)
+      .filter(([tag]) => tag.startsWith(`${list.id}:`))
+      .map(([tag, count]) => {
+        const itemId = tag.split(":")[1];
+        const item = list.items.find(i => i.id === itemId);
+        return { key: itemId, label: item?.label || itemId, count };
+      })
+      .sort((a, b) => b.count - a.count);
+    if (items.length > 0) byList[list.id] = items;
+  });
+
+  return { byList, total: Object.values(tagCount).reduce((a, b) => a + b, 0) };
+}
+
+function hasTag(aggregated, listId, itemId) {
+  return (aggregated?.byList?.[listId] || []).some(item => item.key === itemId);
 }
 
 // ─── Big Five cross-reference ────────────────────────────
@@ -227,11 +199,12 @@ export function crossReferenceBigFive({ bigFive, traumaticEvents = [], links = [
   const abandonCount = traumaticEvents.filter(ev => ev.wound_type === "Abandon").length;
   const rejetCount = traumaticEvents.filter(ev => ev.wound_type === "Rejet").length;
   const trahisonCount = traumaticEvents.filter(ev => ev.wound_type === "Trahison").length;
-  const relDiffs = aggregated?.relDifficulties || [];
-  const hasIsolement = relDiffs.some(d => d.key === "isolement");
-  const hasDependance = relDiffs.some(d => d.key === "dependance_affective");
-  const hasEvitement = relDiffs.some(d => d.key === "evitement");
-  const hasDiffConfiance = relDiffs.some(d => d.key === "difficulte_confiance");
+
+  const hasIsolement = hasTag(aggregated, "rel", "isolement_social");
+  const hasDependance = hasTag(aggregated, "rel", "dependance_affective");
+  const hasEvitement = hasTag(aggregated, "rel", "evitement_intimite") || hasTag(aggregated, "behavior", "evitement_chronique");
+  const hasDiffConfiance = hasTag(aggregated, "rel", "difficulte_confiance");
+  const hasPsychicConflicts = (aggregated?.byList?.conflict || []).length > 0;
 
   if (n >= 60 && abandonCount > 0) {
     insights.push({
@@ -275,10 +248,10 @@ export function crossReferenceBigFive({ bigFive, traumaticEvents = [], links = [
       journal_theme: "comportement", journal_tool: "amelioration",
     });
   }
-  if (c >= 70 && aggregated?.psychicConflicts > 0) {
+  if (c >= 70 && hasPsychicConflicts) {
     insights.push({
       title: "Surcontrôle interne",
-      description: `Une Conscience élevée (${c}/100) combinée à ${aggregated.psychicConflicts} conflit(s) psychique(s) suggère une tendance au surcontrôle. Vous tentez de tout maîtriser intérieurement, ce qui génère des tensions entre vos différentes parts.`,
+      description: `Une Conscience élevée (${c}/100) combinée à des conflits psychiques identifiés suggère une tendance au surcontrôle. Vous tentez de tout maîtriser intérieurement, ce qui génère des tensions entre vos différentes parts.`,
       journal_theme: "conflits", journal_tool: "meditation",
     });
   }
@@ -300,17 +273,25 @@ export function crossReferenceBigFive({ bigFive, traumaticEvents = [], links = [
   return insights;
 }
 
-// ─── Belief synthesis by theme ───────────────────────────
+// ─── Belief synthesis by unmet needs ──────────────────────
 export function synthesizeBeliefs({ limitingBeliefs = [] }) {
-  const byTheme = {};
+  const byNeed = {};
   limitingBeliefs.forEach(b => {
-    const tag = b.theme_tag || "sans_theme";
-    (byTheme[tag] ||= []).push(b);
+    const needTags = (b.clinical_tags || []).filter(t => t.startsWith("need:"));
+    if (needTags.length === 0) {
+      (byNeed["sans_need"] ||= []).push(b);
+    } else {
+      needTags.forEach(tag => {
+        const itemId = tag.split(":")[1];
+        (byNeed[itemId] ||= []).push(b);
+      });
+    }
   });
 
-  const themes = Object.entries(byTheme).map(([key, beliefs]) => ({
+  const needList = CLINICAL_LISTS.find(l => l.id === "need");
+  const themes = Object.entries(byNeed).map(([key, beliefs]) => ({
     key,
-    label: THEME_TAG_LABELS[key] || "Sans thème",
+    label: key === "sans_need" ? "Sans besoin identifié" : (needList?.items.find(i => i.id === key)?.label || key),
     count: beliefs.length,
     beliefs,
   })).sort((a, b) => b.count - a.count);
@@ -326,22 +307,29 @@ function generateLifeInterpretation(themes) {
   if (themes.length === 0) return "Aucune croyance limitante enregistrée pour l'instant.";
 
   const dominant = themes[0];
-  const tied = themes.filter(t => t.count === dominant.count);
+  if (dominant.key === "sans_need") {
+    return "Vos croyances limitantes ne sont pas encore rattachées à des besoins fondamentaux. Qualifiez-les pour générer une interprétation de sens.";
+  }
+
+  const tied = themes.filter(t => t.count === dominant.count && t.key !== "sans_need");
 
   const interpretations = {
     securite: "Votre paysage intérieur est structuré autour de la recherche de sécurité : vous cherchez à vous protéger des menaces perçues, ce qui peut limiter votre capacité à vous engager dans l'inconnu.",
-    amour: "Le besoin d'amour et de connexion structure votre existence : vos croyances révèlent une quête de validation qui peut entraver votre autonomie émotionnelle.",
+    appartenance: "Le besoin d'appartenance structure votre existence : vos croyances révèlent une quête de validation du groupe qui peut entraver votre autonomie émotionnelle.",
+    reconnaissance: "Le besoin de reconnaissance est au centre de votre rapport au monde : vous cherchez constamment à prouver votre valeur, ce qui peut générer une dépendance au regard des autres.",
+    autonomie: "L'autonomie est votre enjeu central : vous êtes tiraillé·e entre le désir d'indépendance et la peur de la solitude.",
+    etre_vu_entendu: "Le besoin d'être vu et entendu est au cœur de vos questionnements : vous interrogez constamment votre légitimité à exister pleinement.",
+    justice: "Le besoin de justice structure votre vision du monde : vous êtes particulièrement sensible aux iniquités, ce qui peut générer de la rigidité face à l'autorité.",
+    stabilite: "Le besoin de stabilité est au centre de votre existence : vous cherchez à sécuriser votre environnement pour réduire l'anxiété de l'imprévu.",
     controle: "Le contrôle est au centre de votre rapport au monde : vous cherchez à maîtriser votre environnement pour éviter l'imprévu, ce qui peut générer de la rigidité.",
-    confiance: "La confiance — en vous et en les autres — est votre enjeu central : vos croyances révèlent une fragilité dans votre capacité à vous fier, entravant votre ouverture.",
-    valeur_personnelle: "Votre valeur personnelle est au cœur de vos questionnements : vous interrogez constamment votre légitimité et votre droit d'exister pleinement.",
-    autre: "Vos croyances limitantes touchent à des dimensions variées de votre existence.",
-    sans_theme: "Vos croyances limitantes ne sont pas encore thématiquement catégorisées.",
+    affection: "Le besoin d'affection structure votre existence : vos croyances révèlent une quête de chaleur humaine qui peut entraver votre autonomie émotionnelle.",
+    valorisation: "Le besoin de valorisation est au cœur de vos questionnements : vous doutez de votre propre valeur et cherchez constamment des preuves extérieures de votre mérite.",
   };
 
   if (tied.length > 1) {
     const labels = tied.map(t => t.label).join(", ");
-    return `Plusieurs thèmes se partagent votre paysage intérieur (${labels}). ${interpretations[dominant.key] || ""}`;
+    return `Plusieurs besoins se partagent votre paysage intérieur (${labels}). ${interpretations[dominant.key] || ""}`;
   }
 
-  return interpretations[dominant.key] || interpretations.autre;
+  return interpretations[dominant.key] || "Vos croyances limitantes révèlent des besoins profonds à explorer.";
 }

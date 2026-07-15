@@ -7,8 +7,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { Plus, Trash2, ChevronDown, ChevronUp, Pencil, Save } from "lucide-react";
 import FullTree from "@/components/tree/FullTree";
-import LinkQualification, { REL_DIFFICULTY_LABELS, TRAUMA_TYPE_LABELS } from "@/components/garden/LinkQualification";
-import BeliefQualification, { THEME_TAG_LABELS } from "@/components/garden/BeliefQualification";
+import LinkQualification from "@/components/garden/LinkQualification";
+import BeliefQualification from "@/components/garden/BeliefQualification";
+import ClinicalTagBadges from "@/components/clinical/ClinicalTagBadges";
 import { CHAKRAS } from "@/lib/chakras";
 
 // ─── TRONC ───────────────────────────────────────────────
@@ -63,7 +64,7 @@ function Section({ emoji, title, subtitle, accentClass, children }) {
 function TroncSection() {
   const [events, setEvents] = useState([]);
   const [showForm, setShowForm] = useState(false);
-  const [form, setForm] = useState({ age: "", title: "", description: "", emotion: "Peur", wound_type: "", relational_difficulties: [], psychic_conflicts: false, problematic_behaviors: false, trauma_types: [] });
+  const [form, setForm] = useState({ age: "", title: "", description: "", emotion: "Peur", wound_type: "", clinical_tags: [] });
   const [editingId, setEditingId] = useState(null);
   const [editForm, setEditForm] = useState(null);
   const [showQualForm, setShowQualForm] = useState(false);
@@ -77,7 +78,7 @@ function TroncSection() {
     if (!form.title.trim() || !form.age) return;
     const chakra = CHAKRAS.find(c => c.shadow === form.emotion)?.name || "Connexion";
     await base44.entities.TraumaticEvent.create({ ...form, age: Number(form.age), chakra });
-    setForm({ age: "", title: "", description: "", emotion: "Peur", wound_type: "", relational_difficulties: [], psychic_conflicts: false, problematic_behaviors: false, trauma_types: [] });
+    setForm({ age: "", title: "", description: "", emotion: "Peur", wound_type: "", clinical_tags: [] });
     setShowForm(false);
     setShowQualForm(false);
     base44.entities.TraumaticEvent.list().then(d => setEvents([...d].sort((a, b) => a.age - b.age)));
@@ -190,33 +191,14 @@ function TroncSection() {
                         {ev.wound_type && <Badge className="bg-red-900/20 text-red-700 border border-red-900/30 text-xs">{ev.wound_type}</Badge>}
                       </div>
                       {ev.description && <p className="text-[#8d6e63] text-xs mt-1">{ev.description}</p>}
-                      {(ev.relational_difficulties?.length > 0 || ev.psychic_conflicts || ev.problematic_behaviors || ev.trauma_types?.length > 0) && (
-                        <div className="flex flex-wrap gap-1 mt-1">
-                          {(ev.relational_difficulties || []).map(d => (
-                            <span key={d} className="text-[9px] px-1.5 py-0.5 rounded-full bg-rose-100 text-rose-700 border border-rose-200">
-                              {REL_DIFFICULTY_LABELS[d] || d}{d === "autre" && ev.relational_difficulties_other ? ` : ${ev.relational_difficulties_other}` : ""}
-                            </span>
-                          ))}
-                          {ev.psychic_conflicts && (
-                            <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-purple-100 text-purple-700 border border-purple-200">
-                              Conflits psychiques{ev.psychic_conflicts_detail ? ` : ${ev.psychic_conflicts_detail}` : ""}
-                            </span>
-                          )}
-                          {ev.problematic_behaviors && (
-                            <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-amber-100 text-amber-700 border border-amber-200">
-                              Comportements{ev.problematic_behaviors_detail ? ` : ${ev.problematic_behaviors_detail}` : ""}
-                            </span>
-                          )}
-                          {(ev.trauma_types || []).map(t => (
-                            <span key={t} className="text-[9px] px-1.5 py-0.5 rounded-full bg-red-100 text-red-700 border border-red-200">
-                              {TRAUMA_TYPE_LABELS[t] || t}{t === "autre" && ev.trauma_types_other ? ` : ${ev.trauma_types_other}` : ""}
-                            </span>
-                          ))}
+                      {ev.clinical_tags?.length > 0 && (
+                        <div className="mt-1">
+                          <ClinicalTagBadges tags={ev.clinical_tags} />
                         </div>
                       )}
                     </div>
                     <div className="flex gap-1 flex-shrink-0">
-                      <button onClick={() => { setEditingId(ev.id); setEditForm({ ...ev, relational_difficulties: ev.relational_difficulties || [], psychic_conflicts: ev.psychic_conflicts || false, problematic_behaviors: ev.problematic_behaviors || false, trauma_types: ev.trauma_types || [] }); setShowQualEdit(!!(ev.relational_difficulties?.length || ev.psychic_conflicts || ev.problematic_behaviors || ev.trauma_types?.length)); }} className="text-[#a1887f] hover:text-amber-600 transition">
+                      <button onClick={() => { setEditingId(ev.id); setEditForm({ ...ev, clinical_tags: ev.clinical_tags || [] }); setShowQualEdit(!!ev.clinical_tags?.length); }} className="text-[#a1887f] hover:text-amber-600 transition">
                         <Pencil className="w-4 h-4" />
                       </button>
                       <button onClick={() => handleDelete(ev.id)} className="text-[#a1887f] hover:text-red-600 transition">
@@ -239,7 +221,7 @@ function TroncSection() {
 function RacinesSection() {
   const [links, setLinks] = useState([]);
   const [showForm, setShowForm] = useState(false);
-  const [form, setForm] = useState({ name: "", type: "Famille", description: "", relational_difficulties: [], psychic_conflicts: false, problematic_behaviors: false, trauma_types: [] });
+  const [form, setForm] = useState({ name: "", type: "Famille", description: "", clinical_tags: [] });
   const [editingId, setEditingId] = useState(null);
   const [editForm, setEditForm] = useState(null);
   const [showQualForm, setShowQualForm] = useState(false);
@@ -250,7 +232,7 @@ function RacinesSection() {
   const handleCreate = async () => {
     if (!form.name.trim()) return;
     await base44.entities.Link.create(form);
-    setForm({ name: "", type: "Famille", description: "", relational_difficulties: [], psychic_conflicts: false, problematic_behaviors: false, trauma_types: [] });
+    setForm({ name: "", type: "Famille", description: "", clinical_tags: [] });
     setShowForm(false);
     setShowQualForm(false);
     base44.entities.Link.list().then(setLinks);
@@ -336,33 +318,14 @@ function RacinesSection() {
                 <div className="flex-1 min-w-0">
                   <span className="text-[#3e2723] text-sm font-semibold">{lk.name}</span>
                   {lk.description && <p className="text-[#8d6e63] text-xs mt-0.5">{lk.description}</p>}
-                  {(lk.relational_difficulties?.length > 0 || lk.psychic_conflicts || lk.problematic_behaviors || lk.trauma_types?.length > 0) && (
-                    <div className="flex flex-wrap gap-1 mt-1">
-                      {(lk.relational_difficulties || []).map(d => (
-                        <span key={d} className="text-[9px] px-1.5 py-0.5 rounded-full bg-rose-100 text-rose-700 border border-rose-200">
-                          {REL_DIFFICULTY_LABELS[d] || d}{d === "autre" && lk.relational_difficulties_other ? ` : ${lk.relational_difficulties_other}` : ""}
-                        </span>
-                      ))}
-                      {lk.psychic_conflicts && (
-                        <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-purple-100 text-purple-700 border border-purple-200">
-                          Conflits psychiques{lk.psychic_conflicts_detail ? ` : ${lk.psychic_conflicts_detail}` : ""}
-                        </span>
-                      )}
-                      {lk.problematic_behaviors && (
-                        <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-amber-100 text-amber-700 border border-amber-200">
-                          Comportements{lk.problematic_behaviors_detail ? ` : ${lk.problematic_behaviors_detail}` : ""}
-                        </span>
-                      )}
-                      {(lk.trauma_types || []).map(t => (
-                        <span key={t} className="text-[9px] px-1.5 py-0.5 rounded-full bg-red-100 text-red-700 border border-red-200">
-                          {TRAUMA_TYPE_LABELS[t] || t}{t === "autre" && lk.trauma_types_other ? ` : ${lk.trauma_types_other}` : ""}
-                        </span>
-                      ))}
+                  {lk.clinical_tags?.length > 0 && (
+                    <div className="mt-1">
+                      <ClinicalTagBadges tags={lk.clinical_tags} />
                     </div>
                   )}
                 </div>
                 <div className="flex gap-1 flex-shrink-0">
-                  <button onClick={() => { setEditingId(lk.id); setEditForm({ ...lk, relational_difficulties: lk.relational_difficulties || [], psychic_conflicts: lk.psychic_conflicts || false, problematic_behaviors: lk.problematic_behaviors || false, trauma_types: lk.trauma_types || [] }); setShowQualEdit(!!(lk.relational_difficulties?.length || lk.psychic_conflicts || lk.problematic_behaviors || lk.trauma_types?.length)); }} className="text-[#a1887f] hover:text-rose-600 transition">
+                  <button onClick={() => { setEditingId(lk.id); setEditForm({ ...lk, clinical_tags: lk.clinical_tags || [] }); setShowQualEdit(!!lk.clinical_tags?.length); }} className="text-[#a1887f] hover:text-rose-600 transition">
                     <Pencil className="w-4 h-4" />
                   </button>
                   <button onClick={() => handleDelete(lk.id)} className="text-[#a1887f] hover:text-red-600 transition">
@@ -384,7 +347,7 @@ function BranchesSection() {
   const [beliefs, setBeliefs] = useState([]);
   const [openAxis, setOpenAxis] = useState(null);
   const [showFormFor, setShowFormFor] = useState(null);
-  const [form, setForm] = useState({ belief: "", age: "", origin: "", reframe: "", theme_tag: null });
+  const [form, setForm] = useState({ belief: "", age: "", origin: "", reframe: "", clinical_tags: [] });
   const [editingId, setEditingId] = useState(null);
   const [editForm, setEditForm] = useState(null);
   const [showQualForm, setShowQualForm] = useState(false);
@@ -403,7 +366,7 @@ function BranchesSection() {
     const data = { ...form, branch };
     if (data.age) data.age = Number(data.age); else delete data.age;
     await base44.entities.LimitingBelief.create(data);
-    setForm({ belief: "", age: "", origin: "", reframe: "", theme_tag: null });
+    setForm({ belief: "", age: "", origin: "", reframe: "", clinical_tags: [] });
     setShowFormFor(null);
     setShowQualForm(false);
     base44.entities.LimitingBelief.list().then(setBeliefs);
@@ -477,13 +440,9 @@ function BranchesSection() {
                           {b.age != null && <p className="text-[#8d6e63] text-xs mt-0.5">Âge : {b.age} ans</p>}
                           {b.origin && <p className="text-[#8d6e63] text-xs mt-1">Origine : {b.origin}</p>}
                           {b.reframe && <p className="text-green-600 text-xs mt-1">✦ {b.reframe}</p>}
-                          {(b.theme_tag || b.source_event_id || b.source_link_id) && (
+                          {(b.clinical_tags?.length || b.source_event_id || b.source_link_id) && (
                             <div className="flex flex-wrap gap-1 mt-1">
-                              {b.theme_tag && (
-                                <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-green-100 text-green-700 border border-green-200">
-                                  {THEME_TAG_LABELS[b.theme_tag] || b.theme_tag}
-                                </span>
-                              )}
+                              {b.clinical_tags?.length > 0 && <ClinicalTagBadges tags={b.clinical_tags} />}
                               {b.source_event_id && events.find(e => e.id === b.source_event_id) && (
                                 <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-amber-100 text-amber-700 border border-amber-200">
                                   📅 {events.find(e => e.id === b.source_event_id).title}
@@ -498,7 +457,7 @@ function BranchesSection() {
                           )}
                         </div>
                         <div className="flex gap-1 flex-shrink-0">
-                          <button onClick={() => { setEditingId(b.id); setEditForm({ ...b, theme_tag: b.theme_tag || null }); setShowQualEdit(!!(b.theme_tag || b.source_event_id || b.source_link_id)); }} className="text-[#a1887f] hover:text-green-600 transition">
+                          <button onClick={() => { setEditingId(b.id); setEditForm({ ...b, clinical_tags: b.clinical_tags || [] }); setShowQualEdit(!!(b.clinical_tags?.length || b.source_event_id || b.source_link_id)); }} className="text-[#a1887f] hover:text-green-600 transition">
                             <Pencil className="w-4 h-4" />
                           </button>
                           <button onClick={() => handleDelete(b.id)} className="text-[#a1887f] hover:text-red-600 transition">
@@ -530,7 +489,7 @@ function BranchesSection() {
                     )}
                     <div className="flex gap-2">
                       <Button onClick={() => handleCreate(axis.name)} size="sm" className="flex-1 bg-green-800 hover:bg-green-700 text-xs">Ajouter</Button>
-                      <Button onClick={() => { setShowFormFor(null); setForm({ belief: "", age: "", origin: "", reframe: "", theme_tag: null }); setShowQualForm(false); }}
+                      <Button onClick={() => { setShowFormFor(null); setForm({ belief: "", age: "", origin: "", reframe: "", clinical_tags: [] }); setShowQualForm(false); }}
                         size="sm" variant="outline" className="border-[#e0d6c8] text-[#3e2723] hover:bg-white/60 text-xs">Annuler</Button>
                     </div>
                   </div>

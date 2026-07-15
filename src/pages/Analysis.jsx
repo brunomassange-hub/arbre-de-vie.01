@@ -82,7 +82,7 @@ export default function Analysis() {
           </p>
         </div>
 
-        <AggregateView traumaticEvents={rawData.events} links={rawData.links} />
+        <AggregateView traumaticEvents={rawData.events} links={rawData.links} limitingBeliefs={rawData.beliefs} />
         <BigFivePerspective bigFive={rawData.bigFive} traumaticEvents={rawData.events} links={rawData.links} aggregated={aggregated} />
         <BeliefSynthesis limitingBeliefs={rawData.beliefs} />
 
