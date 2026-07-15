@@ -7,6 +7,7 @@ import SuggestionCard from "@/components/analysis/SuggestionCard";
 import AggregateView from "@/components/analysis/AggregateView";
 import BigFivePerspective from "@/components/analysis/BigFivePerspective";
 import BeliefSynthesis from "@/components/analysis/BeliefSynthesis";
+import SourceElementList from "@/components/analysis/SourceElementList";
 
 export default function Analysis() {
   const [loading, setLoading] = useState(true);
@@ -54,6 +55,17 @@ export default function Analysis() {
     setSuggestions(suggestions.filter(s => s.id !== suggestion.id));
   };
 
+  const handleTagsChange = async (entityType, entityId, newTags) => {
+    const entityMap = { event: "TraumaticEvent", link: "Link", belief: "LimitingBelief" };
+    const entityName = entityMap[entityType];
+    if (!entityName) return;
+    await base44.entities[entityName].update(entityId, { clinical_tags: newTags });
+    setRawData(prev => {
+      const key = entityType === "event" ? "events" : entityType === "link" ? "links" : "beliefs";
+      return { ...prev, [key]: prev[key].map(item => item.id === entityId ? { ...item, clinical_tags: newTags } : item) };
+    });
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center" style={{ background: "#0a1628" }}>
@@ -85,6 +97,13 @@ export default function Analysis() {
         <AggregateView traumaticEvents={rawData.events} links={rawData.links} limitingBeliefs={rawData.beliefs} />
         <BigFivePerspective bigFive={rawData.bigFive} traumaticEvents={rawData.events} links={rawData.links} aggregated={aggregated} />
         <BeliefSynthesis limitingBeliefs={rawData.beliefs} />
+
+        <SourceElementList
+          events={rawData.events}
+          links={rawData.links}
+          beliefs={rawData.beliefs}
+          onTagsChange={handleTagsChange}
+        />
 
         {suggestions.length > 0 && (
           <div className="mb-8">
