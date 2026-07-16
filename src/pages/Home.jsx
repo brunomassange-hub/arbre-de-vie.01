@@ -22,6 +22,14 @@ const MASLOW = [
   { name: "Physiologique", color: "#ef4444" },
 ];
 
+const MASLOW_DESCRIPTIONS = {
+  "Physiologique": "Les besoins physiologiques constituent la base de la pyramide : nourriture, eau, sommeil, abri, respiration. Ce sont les besoins de survie essentiels sans lesquels aucun autre besoin ne peut être pleinement satisfait.",
+  "Sécurité": "Le besoin de sécurité englobe la sécurité physique, financière, de santé, ainsi que la stabilité et la prévisibilité de l'environnement. Il s'agit de se sentir protégé et en confiance face au monde.",
+  "Appartenance": "Le besoin d'appartenance correspond à la nécessité de relations sociales, d'amour, d'amitié et d'intégration dans un groupe. L'être humain est un être social qui a besoin de se sentir connecté aux autres.",
+  "Estime": "Le besoin d'estime comprend l'estime de soi (confiance, compétence, réalisation) et l'estime des autres (reconnaissance, respect, statut). Il s'agit de se sentir valorisé et compétent.",
+  "Accomplissement": "L'accomplissement de soi est le sommet de la pyramide de Maslow. Il correspond au besoin de réaliser son plein potentiel, de développer ses talents, de grandir personnellement et de donner un sens à sa vie.",
+};
+
 const SEPHIROTS = [
   // Top
   { id: "foi", name: "Foi", x: 50, y: 6, color: "#9333ea", textColor: "#9333ea" },
@@ -58,6 +66,7 @@ const SEPHIROT_INFO = {
 export default function Home() {
   const [selected, setSelected] = useState(null);
   const [chakraDetail, setChakraDetail] = useState(null);
+  const [maslowDetail, setMaslowDetail] = useState(null);
   const navigate = useNavigate();
 
   const info = selected ? SEPHIROT_INFO[selected.id] : null;
@@ -194,8 +203,12 @@ export default function Home() {
           <p className="text-xs font-bold text-gray-500 mb-2 text-center">Besoins</p>
           <div className="flex flex-col gap-6 flex-1 justify-center">
             {MASLOW.map((m, i) => (
-              <div key={i} className="text-left pl-2 border-b border-gray-300 pb-1">
-                <span className="text-xs font-semibold" style={{ color: "#374151" }}>{m.name}</span>
+              <div
+                key={i}
+                onClick={() => setMaslowDetail(m.name)}
+                className="text-left pl-2 border-b border-gray-300 pb-1 cursor-pointer hover:bg-gray-100 rounded px-1 py-0.5 transition-colors"
+              >
+                <span className="text-xs font-semibold" style={{ color: m.color }}>{m.name}</span>
               </div>
             ))}
           </div>
@@ -205,11 +218,11 @@ export default function Home() {
       {/* Chakra detail panel */}
       {chakraDetail && (
         <div
-          className="fixed inset-0 bg-black/50 z-40 flex items-end justify-center"
+          className="fixed inset-0 bg-black/50 z-40 flex items-center justify-center px-4"
           onClick={() => setChakraDetail(null)}
         >
           <div
-            className="bg-white rounded-t-2xl p-6 w-full max-w-lg shadow-2xl"
+            className="bg-white rounded-2xl p-6 w-full max-w-lg shadow-2xl max-h-[80vh] overflow-y-auto"
             onClick={e => e.stopPropagation()}
           >
             <div className="flex justify-between items-start mb-3">
@@ -219,6 +232,27 @@ export default function Home() {
               <button onClick={() => setChakraDetail(null)} className="text-gray-400 text-2xl leading-none">×</button>
             </div>
             <p className="text-gray-600 text-sm">{CHAKRA_DESCRIPTIONS[chakraDetail]}</p>
+          </div>
+        </div>
+      )}
+
+      {/* Maslow detail panel */}
+      {maslowDetail && (
+        <div
+          className="fixed inset-0 bg-black/50 z-40 flex items-center justify-center px-4"
+          onClick={() => setMaslowDetail(null)}
+        >
+          <div
+            className="bg-white rounded-2xl p-6 w-full max-w-lg shadow-2xl max-h-[80vh] overflow-y-auto"
+            onClick={e => e.stopPropagation()}
+          >
+            <div className="flex justify-between items-start mb-3">
+              <h2 className="text-xl font-bold" style={{ color: MASLOW.find(m => m.name === maslowDetail)?.color }}>
+                {maslowDetail}
+              </h2>
+              <button onClick={() => setMaslowDetail(null)} className="text-gray-400 text-2xl leading-none">×</button>
+            </div>
+            <p className="text-gray-600 text-sm">{MASLOW_DESCRIPTIONS[maslowDetail]}</p>
           </div>
         </div>
       )}
