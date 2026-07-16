@@ -1,8 +1,8 @@
-import React from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { Link, Navigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { useAuth } from "@/lib/AuthContext";
-import { Home, Sprout, Flower2, ScanSearch, Sparkles, Brain, BookOpen, Video, Users, HelpCircle } from "lucide-react";
+import { Home, Sprout, Flower2, ScanSearch, Sparkles, Brain, BookOpen, Video, Users, HelpCircle, ChevronLeft, ChevronRight } from "lucide-react";
 
 const NAV = [
   { label: "Arbre", icon: Home, page: "Home" },
@@ -16,6 +16,40 @@ const NAV = [
 
 export default function Layout({ children, currentPageName }) {
   const { user } = useAuth();
+  const scrollRef = useRef(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(false);
+
+  const checkScroll = () => {
+    const el = scrollRef.current;
+    if (!el) return;
+    setCanScrollLeft(el.scrollLeft > 4);
+    setCanScrollRight(el.scrollLeft + el.clientWidth < el.scrollWidth - 4);
+  };
+
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    checkScroll();
+
+    const onWheel = (e) => {
+      if (e.deltaY !== 0) {
+        e.preventDefault();
+        el.scrollLeft += e.deltaY;
+      }
+    };
+
+    window.addEventListener("resize", checkScroll);
+    el.addEventListener("wheel", onWheel, { passive: false });
+    return () => {
+      window.removeEventListener("resize", checkScroll);
+      el.removeEventListener("wheel", onWheel);
+    };
+  }, [user?.role]);
+
+  const scrollBy = (dir) => {
+    scrollRef.current?.scrollBy({ left: dir * 120, behavior: "smooth" });
+  };
 
   if (user && user.onboarding_completed === false) {
     return <Navigate to="/Onboarding" replace />;
@@ -46,22 +80,44 @@ export default function Layout({ children, currentPageName }) {
 
       {/* Bottom navigation */}
       <nav className="fixed bottom-0 left-0 right-0 bg-[#0d1f0d]/95 backdrop-blur border-t border-green-900/40 z-50">
-        <div className="flex max-w-lg mx-auto overflow-x-auto">
-          {navItems.map(({ label, icon: Icon, page }) => {
-            const active = currentPageName === page;
-            return (
-              <Link
-                key={page}
-                to={createPageUrl(page)}
-                className={`flex flex-col items-center py-3 px-3 flex-shrink-0 transition-all ${
-                  active ? "text-green-400" : "text-gray-500 hover:text-gray-300"
-                }`}
-              >
-                <Icon className={`w-5 h-5 mb-1 ${active ? "drop-shadow-[0_0_6px_rgba(74,222,128,0.8)]" : ""}`} />
-                <span className="text-xs font-medium">{label}</span>
-              </Link>
-            );
-          })}
+        <div className="relative max-w-lg mx-auto">
+          {canScrollLeft && (
+            <button
+              onClick={() => scrollBy(-1)}
+              className="absolute left-0 top-1/2 -translate-y-1/2 z-10 w-7 h-7 rounded-full flex items-center justify-center bg-[#0d1f0d]/95 border border-green-900/40 text-green-400 hover:bg-green-900/40 transition"
+            >
+              <ChevronLeft className="w-4 h-4" />
+            </button>
+          )}
+          <div
+            ref={scrollRef}
+            onScroll={checkScroll}
+            className="flex overflow-x-auto"
+          >
+            {navItems.map(({ label, icon: Icon, page }) => {
+              const active = currentPageName === page;
+              return (
+                <Link
+                  key={page}
+                  to={createPageUrl(page)}
+                  className={`flex flex-col items-center py-3 px-3 flex-shrink-0 transition-all ${
+                    active ? "text-green-400" : "text-gray-500 hover:text-gray-300"
+                  }`}
+                >
+                  <Icon className={`w-5 h-5 mb-1 ${active ? "drop-shadow-[0_0_6px_rgba(74,222,128,0.8)]" : ""}`} />
+                  <span className="text-xs font-medium">{label}</span>
+                </Link>
+              );
+            })}
+          </div>
+          {canScrollRight && (
+            <button
+              onClick={() => scrollBy(1)}
+              className="absolute right-0 top-1/2 -translate-y-1/2 z-10 w-7 h-7 rounded-full flex items-center justify-center bg-[#0d1f0d]/95 border border-green-900/40 text-green-400 hover:bg-green-900/40 transition"
+            >
+              <ChevronRight className="w-4 h-4" />
+            </button>
+          )}
         </div>
       </nav>
     </div>
