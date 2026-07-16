@@ -5,7 +5,7 @@ import { Loader2, ArrowRight, Sparkles } from "lucide-react";
 import { generateSuggestions, CATEGORIES, JOURNAL_TOOLS, aggregateData } from "@/lib/analysisEngine";
 import SuggestionCard from "@/components/analysis/SuggestionCard";
 import AggregateView from "@/components/analysis/AggregateView";
-import BigFivePerspective from "@/components/analysis/BigFivePerspective";
+import PersonalityPerspective from "@/components/analysis/PersonalityPerspective";
 import BeliefSynthesis from "@/components/analysis/BeliefSynthesis";
 import SourceElementList from "@/components/analysis/SourceElementList";
 import PersonalizedReport from "@/components/analysis/PersonalizedReport";
@@ -105,7 +105,7 @@ export default function Analysis() {
         </div>
 
         <AggregateView traumaticEvents={rawData.events} links={rawData.links} limitingBeliefs={rawData.beliefs} />
-        <BigFivePerspective bigFive={rawData.bigFive} traumaticEvents={rawData.events} links={rawData.links} aggregated={aggregated} />
+        <PersonalityPerspective bigFive={rawData.bigFive} cognitiveProfile={cognitiveProfile} events={rawData.events} links={rawData.links} beliefs={rawData.beliefs} />
         <BeliefSynthesis limitingBeliefs={rawData.beliefs} />
 
         <PersonalizedReport

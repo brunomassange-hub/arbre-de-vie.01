@@ -30,6 +30,19 @@
     "bilan_fingerprint": {
       "type": "string",
       "description": "Empreinte des donn\u00e9es au moment de la g\u00e9n\u00e9ration du bilan"
+    },
+    "perspective_report": {
+      "type": "string",
+      "description": "Texte de la perspective de personnalit\u00e9 crois\u00e9e g\u00e9n\u00e9r\u00e9e par IA"
+    },
+    "perspective_date": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Date de derni\u00e8re g\u00e9n\u00e9ration de la perspective"
+    },
+    "perspective_fingerprint": {
+      "type": "string",
+      "description": "Empreinte des donn\u00e9es au moment de la g\u00e9n\u00e9ration de la perspective"
     }
   },
   "required": [
