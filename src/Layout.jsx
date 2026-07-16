@@ -2,7 +2,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { useAuth } from "@/lib/AuthContext";
-import { Home, Sprout, Flower2, ScanSearch, Sparkles, Brain, BookOpen, Video } from "lucide-react";
+import { Home, Sprout, Flower2, ScanSearch, Sparkles, Brain, BookOpen, Video, Users } from "lucide-react";
 
 const NAV = [
   { label: "Arbre", icon: Home, page: "Home" },
@@ -16,7 +16,7 @@ const NAV = [
 
 export default function Layout({ children, currentPageName }) {
   const { user } = useAuth();
-  const navItems = user?.role === "admin" ? [...NAV, { label: "Vidéos", icon: Video, page: "VideoManager" }] : NAV;
+  const navItems = user?.role === "admin" ? [...NAV, { label: "Vidéos", icon: Video, page: "VideoManager" }, { label: "Users", icon: Users, page: "UserManagement" }] : NAV;
   return (
     <div className="min-h-screen bg-[#0a1628] flex flex-col">
       <style>{`

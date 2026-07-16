@@ -61,6 +61,7 @@ import Archetype from './pages/Archetype';
 import Growth from './pages/Growth';
 import Analysis from './pages/Analysis';
 import VideoManager from './pages/VideoManager';
+import UserManagement from './pages/UserManagement';
 import __Layout from './Layout.jsx';
 
 
@@ -79,6 +80,7 @@ export const PAGES = {
     "Growth": Growth,
     "Analysis": Analysis,
     "VideoManager": VideoManager,
+    "UserManagement": UserManagement,
 }
 
 export const pagesConfig = {

@@ -92,6 +92,12 @@ export const AuthProvider = ({ children }) => {
       // Now check if the user is authenticated
       setIsLoadingAuth(true);
       const currentUser = await base44.auth.me();
+      if (currentUser.banned) {
+        setIsLoadingAuth(false);
+        setAuthError({ type: 'auth_required', message: 'Ce compte a été désactivé par un administrateur' });
+        base44.auth.logout();
+        return;
+      }
       setUser(currentUser);
       setIsAuthenticated(true);
       setIsLoadingAuth(false);
