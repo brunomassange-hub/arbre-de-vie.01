@@ -44,7 +44,7 @@ const MBTI_TYPES = Object.keys(MBTI_FUNCTIONS);
 
 export default function Cognitive() {
   const [profile, setProfile] = useState(null);
-  const [selectedType, setSelectedType] = useState("INTP");
+  const [selectedType, setSelectedType] = useState(null);
   const [notes, setNotes] = useState("");
   const [enneagramType, setEnneagramType] = useState(null);
   const [attachmentStyle, setAttachmentStyle] = useState(null);
@@ -61,7 +61,7 @@ export default function Cognitive() {
     base44.entities.CognitiveProfile.list().then(data => {
       if (data[0]) {
         setProfile(data[0]);
-        setSelectedType(data[0].mbti_type || "INTP");
+        setSelectedType(data[0].mbti_type || null);
         setNotes(data[0].notes || "");
         setEnneagramType(data[0].enneagram_type || null);
         setAttachmentStyle(data[0].attachment_style || null);
@@ -71,7 +71,7 @@ export default function Cognitive() {
     });
   }, []);
 
-  const functions = MBTI_FUNCTIONS[selectedType] || MBTI_FUNCTIONS["INTP"];
+  const functions = selectedType ? MBTI_FUNCTIONS[selectedType] : null;
 
   const handleSave = async () => {
     setSaving(true);
@@ -135,7 +135,13 @@ export default function Cognitive() {
             </button>
           </div>
           {!showMBTIQuiz && (
-            <div className="grid grid-cols-4 gap-2">
+            <>
+              {!selectedType && (
+                <p className="text-indigo-300/70 text-xs mb-3 text-center">
+                  Choisissez votre type ci-dessous ou faites le test pour le déterminer automatiquement.
+                </p>
+              )}
+              <div className="grid grid-cols-4 gap-2">
               {MBTI_TYPES.map(type => (
                 <button
                   key={type}
@@ -149,7 +155,8 @@ export default function Cognitive() {
                   {type}
                 </button>
               ))}
-            </div>
+              </div>
+            </>
           )}
           {showMBTIQuiz && (
             <MBTIQuiz
@@ -165,6 +172,8 @@ export default function Cognitive() {
         {/* Personalized improvement axes based on MBTI type */}
         <MBTIImprovements selectedType={selectedType} />
 
+        {selectedType && functions ? (
+        <>
         {/* Ego / Ombre split */}
         <div className="grid grid-cols-2 gap-4 mb-5">
           {/* EGO */}
@@ -258,6 +267,12 @@ export default function Cognitive() {
             })}
           </div>
         </div>
+        </>
+        ) : (
+          <div className="bg-white/5 rounded-2xl p-6 mb-5 border border-white/10 text-center">
+            <p className="text-gray-400 text-sm">Complétez le test MBTI ou choisissez votre type pour explorer vos fonctions cognitives (Ego & Ombre).</p>
+          </div>
+        )}
 
         <div className="bg-white/10 backdrop-blur rounded-2xl p-5 mb-5 border border-white/20">
           <div className="flex items-center justify-between mb-3">
