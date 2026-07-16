@@ -31,7 +31,7 @@
         "\ud83d\ude0c Serein",
         "\ud83d\ude10 Neutre",
         "\ud83d\ude14 Difficile",
-        "\ud83d\ude24 Tendu"
+        "\ud83d\ude23 Tendu"
       ],
       "description": "Humeur du moment"
     },
@@ -43,5 +43,17 @@
   "required": [
     "branch",
     "content"
-  ]
+  ],
+  "rls": {
+    "create": true,
+    "read": {
+      "created_by_id": "{{user.id}}"
+    },
+    "update": {
+      "created_by_id": "{{user.id}}"
+    },
+    "delete": {
+      "created_by_id": "{{user.id}}"
+    }
+  }
 }

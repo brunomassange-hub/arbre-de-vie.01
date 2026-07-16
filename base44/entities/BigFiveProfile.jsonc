@@ -51,5 +51,17 @@
       "description": "Liste de qualit\u00e9s personnelles associ\u00e9es \u00e0 un trait Big Five"
     }
   },
-  "required": []
+  "required": [],
+  "rls": {
+    "create": true,
+    "read": {
+      "created_by_id": "{{user.id}}"
+    },
+    "update": {
+      "created_by_id": "{{user.id}}"
+    },
+    "delete": {
+      "created_by_id": "{{user.id}}"
+    }
+  }
 }
