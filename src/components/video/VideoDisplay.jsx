@@ -5,7 +5,7 @@ import { getEmbedInfo, getVideoTagLabel } from "@/lib/videoCategories";
 
 const SERIF = "'Playfair Display', Georgia, serif";
 
-export default function VideoDisplay({ tags = [], dark = false }) {
+export default function VideoDisplay({ tags = [], dark = false, fallbackToAll = false }) {
   const [videos, setVideos] = useState(null);
   const [activeVideoId, setActiveVideoId] = useState(null);
 
@@ -15,11 +15,18 @@ export default function VideoDisplay({ tags = [], dark = false }) {
 
   if (!videos) return null;
 
-  const matching = videos.filter(v =>
-    v.category_tags?.some(tag => tags.includes(tag))
-  );
+  const matching = videos
+    .map(v => ({
+      video: v,
+      matchCount: (v.category_tags || []).filter(tag => tags.includes(tag)).length,
+    }))
+    .filter(item => item.matchCount > 0)
+    .sort((a, b) => b.matchCount - a.matchCount)
+    .map(item => item.video);
 
-  if (matching.length === 0) return null;
+  const display = matching.length > 0 ? matching : (fallbackToAll ? videos : []);
+
+  if (display.length === 0) return null;
 
   const cardBg = dark ? "rgba(255,255,255,0.03)" : "#f5f0e8";
   const cardBorder = dark ? "rgba(255,255,255,0.08)" : "#e0d6c8";
@@ -29,7 +36,7 @@ export default function VideoDisplay({ tags = [], dark = false }) {
 
   return (
     <div className="space-y-2">
-      {matching.map(video => {
+      {display.map(video => {
         const embed = getEmbedInfo(video.url);
         const isActive = activeVideoId === video.id;
         return (
