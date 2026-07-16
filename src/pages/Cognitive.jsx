@@ -48,6 +48,8 @@ export default function Cognitive() {
   const [notes, setNotes] = useState("");
   const [enneagramType, setEnneagramType] = useState(null);
   const [attachmentStyle, setAttachmentStyle] = useState(null);
+  const [attachmentAnxiety, setAttachmentAnxiety] = useState(null);
+  const [attachmentAvoidance, setAttachmentAvoidance] = useState(null);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [showMBTIQuiz, setShowMBTIQuiz] = useState(false);
@@ -63,6 +65,8 @@ export default function Cognitive() {
         setNotes(data[0].notes || "");
         setEnneagramType(data[0].enneagram_type || null);
         setAttachmentStyle(data[0].attachment_style || null);
+        setAttachmentAnxiety(data[0].attachment_anxiety ?? null);
+        setAttachmentAvoidance(data[0].attachment_avoidance ?? null);
       }
     });
   }, []);
@@ -71,7 +75,7 @@ export default function Cognitive() {
 
   const handleSave = async () => {
     setSaving(true);
-    const data = { mbti_type: selectedType, enneagram_type: enneagramType, attachment_style: attachmentStyle, notes };
+    const data = { mbti_type: selectedType, enneagram_type: enneagramType, attachment_style: attachmentStyle, attachment_anxiety: attachmentAnxiety, attachment_avoidance: attachmentAvoidance, notes };
     if (profile) {
       await base44.entities.CognitiveProfile.update(profile.id, data);
     } else {
@@ -95,12 +99,19 @@ export default function Cognitive() {
 
   const selectMBTIType = (type) => {
     setSelectedType(type);
-    persistProfile({ mbti_type: type, enneagram_type: enneagramType, attachment_style: attachmentStyle, notes });
+    persistProfile({ mbti_type: type, enneagram_type: enneagramType, attachment_style: attachmentStyle, attachment_anxiety: attachmentAnxiety, attachment_avoidance: attachmentAvoidance, notes });
   };
 
   const selectEnneagramType = (typeN) => {
     setEnneagramType(typeN);
-    persistProfile({ mbti_type: selectedType, enneagram_type: typeN, attachment_style: attachmentStyle, notes });
+    persistProfile({ mbti_type: selectedType, enneagram_type: typeN, attachment_style: attachmentStyle, attachment_anxiety: attachmentAnxiety, attachment_avoidance: attachmentAvoidance, notes });
+  };
+
+  const selectAttachmentResult = ({ style, anxiety, avoidance }) => {
+    setAttachmentStyle(style);
+    setAttachmentAnxiety(anxiety);
+    setAttachmentAvoidance(avoidance);
+    persistProfile({ mbti_type: selectedType, enneagram_type: enneagramType, attachment_style: style, attachment_anxiety: anxiety, attachment_avoidance: avoidance, notes });
   };
 
   return (
@@ -282,7 +293,7 @@ export default function Cognitive() {
           </div>
           {showAttachmentQuiz ? (
             <AttachmentQuiz
-              onComplete={(style) => { setAttachmentStyle(style); setShowAttachmentQuiz(false); }}
+              onComplete={(result) => { selectAttachmentResult(result); setShowAttachmentQuiz(false); }}
               onClose={() => setShowAttachmentQuiz(false)}
             />
           ) : (

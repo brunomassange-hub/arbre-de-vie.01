@@ -68,7 +68,7 @@ export default function AttachmentQuiz({ onComplete, onClose }) {
             variant="outline" className="flex-1 bg-white/10 border-white/20 text-white hover:bg-white/20">
             <RotateCcw className="w-4 h-4 mr-1" /> Recommencer
           </Button>
-          <Button onClick={() => onComplete(style)}
+          <Button onClick={() => onComplete({ style, anxiety: anxietyMean, avoidance: avoidanceMean })}
             className="flex-1 text-white"
             style={{ backgroundColor: info.color }}>
             <ChevronRight className="w-4 h-4 mr-1" /> Choisir ce style

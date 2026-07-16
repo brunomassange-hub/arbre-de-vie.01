@@ -106,7 +106,11 @@ export default function PersonalizedReport({
       sections.push("--- PROFIL COGNITIF ---");
       if (cognitiveProfile.mbti_type) sections.push(`Type MBTI: ${cognitiveProfile.mbti_type}`);
       if (cognitiveProfile.enneagram_type) sections.push(`Type Ennéagramme: ${cognitiveProfile.enneagram_type}`);
-      if (cognitiveProfile.attachment_style) sections.push(`Style d'attachement: ${cognitiveProfile.attachment_style}`);
+      if (cognitiveProfile.attachment_style) {
+        sections.push(`Style d'attachement: ${cognitiveProfile.attachment_style}`);
+        if (cognitiveProfile.attachment_anxiety != null) sections.push(`  Score d'anxiété d'attachement: ${cognitiveProfile.attachment_anxiety.toFixed(1)}/5`);
+        if (cognitiveProfile.attachment_avoidance != null) sections.push(`  Score d'évitement d'attachement: ${cognitiveProfile.attachment_avoidance.toFixed(1)}/5`);
+      }
       if (cognitiveProfile.notes) sections.push(`Notes: ${cognitiveProfile.notes}`);
       sections.push("");
     }
