@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Loader2, RefreshCw, FileText } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { Loader2, RefreshCw, FileText, AlertCircle } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import { base44 } from "@/api/base44Client";
 import { getTagLabel } from "@/lib/clinicalCategories";
@@ -14,10 +14,36 @@ export default function PersonalizedReport({
   positiveBeliefs = [],
 }) {
   const [report, setReport] = useState(null);
+  const [reportDate, setReportDate] = useState(null);
+  const [savedFingerprint, setSavedFingerprint] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
   const hasData = events.length > 0 || links.length > 0 || beliefs.length > 0 || bigFive || cognitiveProfile;
+
+  const computeFingerprint = () => {
+    const items = [...events, ...links, ...beliefs, ...positiveLinks, ...positiveBeliefs];
+    if (bigFive) items.push(bigFive);
+    if (cognitiveProfile) items.push(cognitiveProfile);
+    const maxDate = items.reduce((max, item) => {
+      const d = item.updated_date || item.created_date || "";
+      return d > max ? d : max;
+    }, "");
+    return `${items.length}|${maxDate}|${bigFive ? "bf1" : "bf0"}|${cognitiveProfile ? "cp1" : "cp0"}`;
+  };
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const me = await base44.auth.me();
+        if (me?.bilan_report) {
+          setReport(me.bilan_report);
+          setReportDate(me.bilan_date || null);
+          setSavedFingerprint(me.bilan_fingerprint || null);
+        }
+      } catch { /* ignore */ }
+    })();
+  }, []);
 
   const buildPrompt = () => {
     const sections = [];
@@ -138,7 +164,17 @@ Règles:
         prompt: buildPrompt(),
         model: "claude_sonnet_4_6",
       });
-      setReport(typeof result === "string" ? result : JSON.stringify(result));
+      const text = typeof result === "string" ? result : JSON.stringify(result);
+      const now = new Date().toISOString();
+      const fp = computeFingerprint();
+      setReport(text);
+      setReportDate(now);
+      setSavedFingerprint(fp);
+      await base44.auth.updateMe({
+        bilan_report: text,
+        bilan_date: now,
+        bilan_fingerprint: fp,
+      });
     } catch (e) {
       setError(e.message || "Erreur lors de la génération");
     } finally {
@@ -147,6 +183,15 @@ Règles:
   };
 
   if (!hasData) return null;
+
+  const newDataAvailable = report && savedFingerprint !== computeFingerprint();
+
+  const formatDate = (iso) => {
+    try {
+      const d = new Date(iso);
+      return d.toLocaleDateString("fr-FR", { day: "2-digit", month: "2-digit", year: "numeric" });
+    } catch { return ""; }
+  };
 
   return (
     <div className="mb-8">
@@ -165,6 +210,13 @@ Règles:
         </button>
       </div>
 
+      {newDataAvailable && (
+        <div className="flex items-center gap-1.5 mb-2 text-[10px]" style={{ color: "#e0a868" }}>
+          <AlertCircle className="w-3 h-3" />
+          De nouvelles données sont disponibles — pensez à actualiser votre bilan
+        </div>
+      )}
+
       <div className="rounded-xl border p-3 mb-2 text-[10px] italic" style={{ background: "rgba(139,157,195,0.05)", borderColor: "rgba(139,157,195,0.15)", color: "#6b7b94" }}>
         ⚠️ Ce bilan est un outil de réflexion personnelle généré par IA à partir de vos données. Il ne remplace pas un accompagnement professionnel et ne constitue pas un diagnostic médical ou psychologique.
       </div>
@@ -177,6 +229,11 @@ Règles:
 
       {report && (
         <div className="rounded-xl border p-4" style={{ background: "rgba(139,157,195,0.05)", borderColor: "rgba(139,157,195,0.15)" }}>
+          {reportDate && (
+            <p className="text-[10px] mb-3" style={{ color: "#6b7b94" }}>
+              Bilan généré le {formatDate(reportDate)}
+            </p>
+          )}
           <div className="prose prose-sm prose-invert max-w-none text-sm" style={{ color: "#c4d0e0" }}>
             <ReactMarkdown>{report}</ReactMarkdown>
           </div>
