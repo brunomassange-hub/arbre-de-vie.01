@@ -83,6 +83,26 @@ export default function Cognitive() {
     setTimeout(() => setSaved(false), 2000);
   };
 
+  // Auto-persist a partial profile update (used for MBTI/Enneagram selections)
+  const persistProfile = async (data) => {
+    if (profile) {
+      await base44.entities.CognitiveProfile.update(profile.id, data);
+    } else {
+      const created = await base44.entities.CognitiveProfile.create(data);
+      setProfile(created);
+    }
+  };
+
+  const selectMBTIType = (type) => {
+    setSelectedType(type);
+    persistProfile({ mbti_type: type, enneagram_type: enneagramType, attachment_style: attachmentStyle, notes });
+  };
+
+  const selectEnneagramType = (typeN) => {
+    setEnneagramType(typeN);
+    persistProfile({ mbti_type: selectedType, enneagram_type: typeN, attachment_style: attachmentStyle, notes });
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#0a1628] to-[#0a2818] px-4 py-8">
       <div className="max-w-xl mx-auto">
@@ -108,7 +128,7 @@ export default function Cognitive() {
               {MBTI_TYPES.map(type => (
                 <button
                   key={type}
-                  onClick={() => setSelectedType(type)}
+                  onClick={() => selectMBTIType(type)}
                   className={`py-2 rounded-lg text-sm font-bold transition-all ${
                     selectedType === type
                       ? "bg-indigo-600 text-white shadow-lg shadow-indigo-900/50"
@@ -122,7 +142,7 @@ export default function Cognitive() {
           )}
           {showMBTIQuiz && (
             <MBTIQuiz
-              onComplete={(type) => { setSelectedType(type); setShowMBTIQuiz(false); }}
+              onComplete={(type) => { selectMBTIType(type); setShowMBTIQuiz(false); }}
               onClose={() => setShowMBTIQuiz(false)}
             />
           )}
@@ -239,11 +259,11 @@ export default function Cognitive() {
           </div>
           {showEnneagramQuiz ? (
             <EnneagramQuiz
-              onComplete={(typeN) => { setEnneagramType(typeN); setShowEnneagramQuiz(false); }}
+              onComplete={(typeN) => { selectEnneagramType(typeN); setShowEnneagramQuiz(false); }}
               onClose={() => setShowEnneagramQuiz(false)}
             />
           ) : (
-            <EnneagramSection selected={enneagramType} onSelect={setEnneagramType} />
+            <EnneagramSection selected={enneagramType} onSelect={selectEnneagramType} />
           )}
         </div>
 
