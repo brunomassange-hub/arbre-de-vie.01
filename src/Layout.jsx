@@ -1,8 +1,8 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { useAuth } from "@/lib/AuthContext";
-import { Home, Sprout, Flower2, ScanSearch, Sparkles, Brain, BookOpen, Video, Users } from "lucide-react";
+import { Home, Sprout, Flower2, ScanSearch, Sparkles, Brain, BookOpen, Video, Users, HelpCircle } from "lucide-react";
 
 const NAV = [
   { label: "Arbre", icon: Home, page: "Home" },
@@ -16,6 +16,11 @@ const NAV = [
 
 export default function Layout({ children, currentPageName }) {
   const { user } = useAuth();
+
+  if (user && user.onboarding_completed === false) {
+    return <Navigate to="/Onboarding" replace />;
+  }
+
   const navItems = user?.role === "admin" ? [...NAV, { label: "Vidéos", icon: Video, page: "VideoManager" }, { label: "Users", icon: Users, page: "UserManagement" }] : NAV;
   return (
     <div className="min-h-screen bg-[#0a1628] flex flex-col">
@@ -28,6 +33,12 @@ export default function Layout({ children, currentPageName }) {
         nav .overflow-x-auto::-webkit-scrollbar { display: none; }
         nav .overflow-x-auto { scrollbar-width: none; -ms-overflow-style: none; }
       `}</style>
+
+      {/* Help button — revisit onboarding */}
+      <Link to="/Onboarding" className="fixed top-4 right-4 z-40 w-9 h-9 rounded-full flex items-center justify-center transition hover:scale-110"
+        style={{ background: "rgba(255,255,255,0.06)", backdropFilter: "blur(4px)", border: "1px solid rgba(255,255,255,0.08)" }}>
+        <HelpCircle className="w-4 h-4 text-gray-400" />
+      </Link>
 
       <main className="flex-1 pb-20">
         {children}
