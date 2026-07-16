@@ -1,16 +1,17 @@
 import React, { useState, useEffect } from "react";
+import { Navigate } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import { useAuth } from "@/lib/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Loader2, Plus, Trash2, Upload, Link2, Video as VideoIcon } from "lucide-react";
+import { Loader2, Plus, Trash2, Upload, Link2 } from "lucide-react";
 import VideoCategorySelector from "@/components/video/VideoCategorySelector";
 import { getVideoTagLabel } from "@/lib/videoCategories";
 
 const SERIF = "'Playfair Display', Georgia, serif";
 
 export default function VideoManager() {
-  const { user } = useAuth();
+  const { user, isLoadingAuth } = useAuth();
   const [videos, setVideos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -60,15 +61,16 @@ export default function VideoManager() {
     setVideos(videos.filter(v => v.id !== id));
   };
 
-  if (!user || user.role !== "admin") {
+  if (isLoadingAuth) {
     return (
-      <div className="min-h-screen flex items-center justify-center" style={{ background: "#faf6f0" }}>
-        <div className="text-center">
-          <VideoIcon className="w-10 h-10 mx-auto mb-3" style={{ color: "#a1887f" }} />
-          <p className="text-sm" style={{ color: "#5d4037", fontFamily: SERIF }}>Accès réservé aux administrateurs.</p>
-        </div>
+      <div className="min-h-screen flex items-center justify-center" style={{ background: "#0a1628" }}>
+        <Loader2 className="w-6 h-6 animate-spin text-green-400" />
       </div>
     );
+  }
+
+  if (!user || user.role !== "admin") {
+    return <Navigate to="/" replace />;
   }
 
   return (
