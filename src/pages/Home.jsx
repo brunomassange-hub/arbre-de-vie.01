@@ -34,8 +34,8 @@ const SEPHIROTS = [
   // Top
   { id: "foi", name: "Foi", x: 50, y: 6, color: "#9333ea", textColor: "#9333ea" },
   // Second row
-  { id: "comprehension", name: "Compréhension", x: 28, y: 18, color: "#06b6d4", textColor: "#06b6d4" },
-  { id: "sagesse", name: "Sagesse", x: 72, y: 18, color: "#06b6d4", textColor: "#06b6d4" },
+  { id: "comprehension", name: "Compréhension", x: 28, y: 18, color: "#6366f1", textColor: "#6366f1" },
+  { id: "sagesse", name: "Sagesse", x: 72, y: 18, color: "#6366f1", textColor: "#6366f1" },
   // Third row
   { id: "desir", name: "Désir", x: 30, y: 33, color: "#06b6d4", textColor: "#06b6d4" },
   { id: "amour", name: "Amour", x: 70, y: 33, color: "#06b6d4", textColor: "#06b6d4" },
