@@ -229,7 +229,7 @@ export default function Journal() {
         <p className="text-sm mb-5" style={{ color: "#8d6e63" }}>Outils d'introspection et de guérison personnalisés</p>
 
         {/* Top tabs: Journal + 6 themes */}
-        <div className="flex gap-1.5 mb-6 overflow-x-auto pb-1">
+        <ScrollableTabBar className="mb-6">
           <button onClick={() => setActiveTab("journal")}
             className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium transition whitespace-nowrap border"
             style={{
@@ -258,7 +258,7 @@ export default function Journal() {
               </button>
             );
           })}
-        </div>
+        </ScrollableTabBar>
 
         {/* Journal free writing */}
         {activeTab === "journal" && <JournalEntries />}
