@@ -116,7 +116,7 @@ function BigFiveSection() {
       <div className="flex gap-4 flex-col sm:flex-row items-start">
         {/* Radar */}
         <div className="flex-shrink-0 mx-auto rounded-xl p-2" style={{ background: "linear-gradient(135deg, #ffffff 0%, #f5f0e8 100%)", boxShadow: "inset 0 1px 4px rgba(141,110,99,0.15)" }}>
-          <svg width="280" height="280" viewBox="0 0 280 280">
+          <svg width="280" height="280" viewBox="0 0 280 280" style={{ overflow: "visible" }}>
             {/* Colored sectors — each axis filled in its own color */}
             {BIG5.map((d, i) => {
               const next = (i + 1) % n;
@@ -162,6 +162,31 @@ function BigFiveSection() {
                 <text key={`lbl-${i}`} x={lx} y={ly} textAnchor="middle" dominantBaseline="middle"
                   fontSize="10" fontWeight="700" fill={BIG5[i].color}>{BIG5[i].label}</text>
               );
+            })}
+            {/* Qualités renseignées, affichées autour de chaque axe */}
+            {points.map((p, i) => {
+              const traitQualites = qualites.filter(q => q.trait === BIG5[i].key);
+              if (!traitQualites.length) return null;
+              const dx = p.ax - cx, dy = p.ay - cy;
+              let anchor = "middle";
+              if (dx > 30) anchor = "start";
+              else if (dx < -30) anchor = "end";
+              const half = (traitQualites.length - 1) / 2;
+              return traitQualites.map((q, qi) => {
+                const along = 1.30;
+                const perp = (qi - half) * 11;
+                const px = -dy / r;
+                const py = dx / r;
+                const qx = cx + dx * along + px * perp;
+                const qy = cy + dy * along + py * perp;
+                return (
+                  <text key={`ql-${i}-${qi}`} x={qx} y={qy} textAnchor={anchor}
+                    dominantBaseline="middle" fontSize="8.5" fontWeight="600"
+                    fill={BIG5[i].color} stroke="#fff" strokeWidth="2.5" paintOrder="stroke">
+                    {q.text}
+                  </text>
+                );
+              });
             })}
           </svg>
         </div>
