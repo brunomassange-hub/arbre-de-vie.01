@@ -376,21 +376,42 @@ export default function FullTree({ mode, zoomable = false }) {
                     const lr = 22;
                     const lx = end.x + lr * Math.cos(angle) + (bd.side === "left" ? -4 : 4);
                     const ly = end.y + lr * Math.sin(angle);
-                    const txt = a.name.length > 10 ? a.name.slice(0, 10) + "…" : a.name;
+                    // Wrap activity name into multiple lines instead of truncating
+                    const wrapText = (str, maxChars) => {
+                      const words = str.split(/\s+/);
+                      const lines = [];
+                      let line = "";
+                      for (const w of words) {
+                        if (line && (line + " " + w).length > maxChars) {
+                          lines.push(line);
+                          line = w;
+                        } else {
+                          line = line ? line + " " + w : w;
+                        }
+                      }
+                      if (line) lines.push(line);
+                      return lines.slice(0, 3);
+                    };
+                    const lines = wrapText(a.name, 10);
                     // Label goes outward from center
                     const labelDx = Math.cos(angle);
                     const labelDy = Math.sin(angle);
                     const labelX = lx + labelDx * 11;
-                    const labelY = ly + labelDy * 4 + 1;
+                    const labelY = ly + labelDy * 4 + 1 - (lines.length - 1) * 4;
+                    const anchor = labelDx < -0.3 ? "end" : labelDx > 0.3 ? "start" : "middle";
                     return (
                       <g key={a.id} style={{ cursor: "pointer" }}
                         onClick={(e) => { e.stopPropagation(); setDetail({ type: "activity", data: a, color }); }}>
                         <ellipse cx={lx} cy={ly} rx={8} ry={5} fill={color} opacity={0.75}
                           transform={`rotate(${(angle * 180 / Math.PI)} ${lx} ${ly})`} />
                         <text x={labelX} y={labelY} dominantBaseline="middle"
-                          textAnchor={labelDx < -0.3 ? "end" : labelDx > 0.3 ? "start" : "middle"}
+                          textAnchor={anchor}
                           fontSize="6.5" fill={color} fontWeight="600" pointerEvents="none"
-                          style={{ paintOrder: "stroke", stroke: "#faf6f0", strokeWidth: 2.5, fontFamily: SERIF }}>{txt}</text>
+                          style={{ paintOrder: "stroke", stroke: "#faf6f0", strokeWidth: 2.5, fontFamily: SERIF }}>
+                          {lines.map((ln, li) => (
+                            <tspan key={li} x={labelX} dy={li === 0 ? 0 : 8}>{ln}</tspan>
+                          ))}
+                        </text>
                       </g>
                     );
                   })}
