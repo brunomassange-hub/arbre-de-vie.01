@@ -8,6 +8,8 @@ import { ArrowLeft, Save } from "lucide-react";
 import EnneagramSection from "@/components/cognitive/EnneagramSection";
 import EnneagramImprovements from "@/components/cognitive/EnneagramImprovements";
 import MBTIQuiz from "@/components/cognitive/MBTIQuiz";
+import MBTITypeInfo from "@/components/cognitive/MBTITypeInfo";
+import MBTIImprovements from "@/components/cognitive/MBTIImprovements";
 import EnneagramQuiz from "@/components/cognitive/EnneagramQuiz";
 import AttachmentSection from "@/components/cognitive/AttachmentSection";
 import AttachmentQuiz from "@/components/cognitive/AttachmentQuiz";
@@ -184,6 +186,18 @@ export default function Cognitive() {
             })}
           </div>
         </div>
+        )}
+
+        {/* Type synthesis: functioning, strengths, weaknesses, improvement axes */}
+        {selectedType ? (
+          <>
+            <MBTITypeInfo selectedType={selectedType} />
+            <MBTIImprovements selectedType={selectedType} />
+          </>
+        ) : (
+          <div className="bg-white/5 rounded-2xl p-6 mb-5 border border-white/10 text-center">
+            <p className="text-gray-400 text-sm">Faites le test MBTI ou choisissez votre type ci-dessus pour découvrir votre synthèse de personnalité.</p>
+          </div>
         )}
 
         <div className="bg-white/10 backdrop-blur rounded-2xl p-5 mb-5 border border-white/20">
