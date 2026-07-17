@@ -14,6 +14,7 @@ import MeditationSection from "@/components/journal/MeditationSection";
 import ImprovementSection from "@/components/journal/ImprovementSection";
 import BesoinSection from "@/components/journal/BesoinSection";
 import WoundSection from "@/components/journal/WoundSection";
+import ScrollableTabBar from "@/components/journal/ScrollableTabBar";
 import PersonalizedVideoDisplay from "@/components/video/PersonalizedVideoDisplay";
 
 const SERIF = "'Playfair Display', Georgia, serif";
@@ -273,7 +274,7 @@ export default function Journal() {
             </div>
 
             {/* Tool sub-tabs */}
-            <div className="flex gap-1.5 mb-4 overflow-x-auto pb-1">
+            <ScrollableTabBar className="mb-4">
               {TOOLS.map(tool => {
                 const Icon = tool.icon;
                 const active = activeTool === tool.id;
@@ -291,7 +292,7 @@ export default function Journal() {
                   </button>
                 );
               })}
-            </div>
+            </ScrollableTabBar>
 
             <div className="mb-4">
               <PersonalizedVideoDisplay />
