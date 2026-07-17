@@ -163,22 +163,25 @@ function BigFiveSection() {
                   fontSize="10" fontWeight="700" fill={BIG5[i].color}>{BIG5[i].label}</text>
               );
             })}
-            {/* Qualités renseignées, affichées autour de chaque axe */}
+            {/* Qualités renseignées, réparties en éventail autour de chaque axe */}
             {points.map((p, i) => {
               const traitQualites = qualites.filter(q => q.trait === BIG5[i].key);
               if (!traitQualites.length) return null;
               const dx = p.ax - cx, dy = p.ay - cy;
-              let anchor = "middle";
-              if (dx > 30) anchor = "start";
-              else if (dx < -30) anchor = "end";
-              const half = (traitQualites.length - 1) / 2;
+              const axisAngle = Math.atan2(dy, dx);
+              const n = traitQualites.length;
+              const step = 0.17;
               return traitQualites.map((q, qi) => {
-                const along = 1.30;
-                const perp = (qi - half) * 11;
-                const px = -dy / r;
-                const py = dx / r;
-                const qx = cx + dx * along + px * perp;
-                const qy = cy + dy * along + py * perp;
+                const deltaIdx = qi - (n - 1) / 2;
+                const delta = deltaIdx * step;
+                const dist = r * 1.28 + Math.abs(deltaIdx) * r * 0.22;
+                const angle = axisAngle + delta;
+                const qx = cx + dist * Math.cos(angle);
+                const qy = cy + dist * Math.sin(angle);
+                let anchor = "middle";
+                const cosA = Math.cos(angle);
+                if (cosA > 0.3) anchor = "start";
+                else if (cosA < -0.3) anchor = "end";
                 return (
                   <text key={`ql-${i}-${qi}`} x={qx} y={qy} textAnchor={anchor}
                     dominantBaseline="middle" fontSize="8.5" fontWeight="600"
