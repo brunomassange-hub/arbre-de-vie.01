@@ -163,25 +163,25 @@ function BigFiveSection() {
                   fontSize="10" fontWeight="700" fill={BIG5[i].color}>{BIG5[i].label}</text>
               );
             })}
-            {/* Qualités renseignées, réparties en éventail autour de chaque axe */}
+            {/* Qualités décalées latéralement (jamais dans l'axe), alternance gauche/droite */}
             {points.map((p, i) => {
               const traitQualites = qualites.filter(q => q.trait === BIG5[i].key);
               if (!traitQualites.length) return null;
               const dx = p.ax - cx, dy = p.ay - cy;
-              const axisAngle = Math.atan2(dy, dx);
-              const n = traitQualites.length;
-              const step = 0.17;
+              const ux = dx / r, uy = dy / r;
+              const tx = -uy, ty = ux;
+              const spacing = r * 0.18;
               return traitQualites.map((q, qi) => {
-                const deltaIdx = qi - (n - 1) / 2;
-                const delta = deltaIdx * step;
-                const dist = r * 1.28 + Math.abs(deltaIdx) * r * 0.22;
-                const angle = axisAngle + delta;
-                const qx = cx + dist * Math.cos(angle);
-                const qy = cy + dist * Math.sin(angle);
+                const side = qi % 2 === 0 ? 1 : -1;
+                const distFromCenter = Math.floor(qi / 2) + 0.5;
+                const perp = side * distFromCenter * spacing;
+                const along = r * 1.25 + distFromCenter * r * 0.22;
+                const qx = cx + ux * along + tx * perp;
+                const qy = cy + uy * along + ty * perp;
                 let anchor = "middle";
-                const cosA = Math.cos(angle);
-                if (cosA > 0.3) anchor = "start";
-                else if (cosA < -0.3) anchor = "end";
+                const totalDx = qx - cx;
+                if (totalDx > 25) anchor = "start";
+                else if (totalDx < -25) anchor = "end";
                 return (
                   <text key={`ql-${i}-${qi}`} x={qx} y={qy} textAnchor={anchor}
                     dominantBaseline="middle" fontSize="8.5" fontWeight="600"
