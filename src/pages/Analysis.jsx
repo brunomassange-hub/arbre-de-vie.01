@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
-import { Loader2, ArrowRight, Sparkles } from "lucide-react";
-import { generateSuggestions, CATEGORIES, JOURNAL_TOOLS, aggregateData } from "@/lib/analysisEngine";
+import { Loader2, Sparkles } from "lucide-react";
+import { generateSuggestions, CATEGORIES, aggregateData } from "@/lib/analysisEngine";
 import SuggestionCard from "@/components/analysis/SuggestionCard";
 import AggregateView from "@/components/analysis/AggregateView";
 import PersonalityPerspective from "@/components/analysis/PersonalityPerspective";
@@ -145,7 +144,6 @@ export default function Analysis() {
                 return !isExcluded;
               }).map(item => {
                 const cat = CATEGORIES[item.category];
-                const tool = JOURNAL_TOOLS[item.journal_tool];
                 return (
                   <div key={item.id} className="rounded-xl border p-3"
                     style={{ background: "rgba(34,197,94,0.05)", borderColor: "rgba(34,197,94,0.2)" }}>
@@ -156,14 +154,6 @@ export default function Analysis() {
                         <p className="text-xs text-gray-400 mt-0.5">{item.description}</p>
                       </div>
                     </div>
-                    {tool && (
-                      <Link to={`/Journal?theme=${item.journal_theme}&tool=${item.journal_tool}`}
-                        className="mt-2 flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg"
-                        style={{ background: "rgba(139,157,195,0.1)", color: "#8b9dc3" }}>
-                        {tool.icon} Aller vers : {tool.label}
-                        <ArrowRight className="w-3 h-3 ml-auto" />
-                      </Link>
-                    )}
                   </div>
                 );
               })}
