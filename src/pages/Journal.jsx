@@ -28,6 +28,14 @@ const THEMES = [
     context: "L'objectif thérapeutique est de gérer les émotions, la pensée et l'image de soi : aide la personne à réguler ses émotions, transformer son dialogue intérieur et cultiver une estime de soi saine.",
   },
   {
+    id: "besoin",
+    label: "Besoin",
+    fullLabel: "Explorer les besoins non comblés",
+    icon: HandHeart,
+    desc: "Identifier et nommer les besoins fondamentaux non satisfaits derrière vos émotions et vos blessures.",
+    context: "L'objectif thérapeutique est d'explorer les besoins non comblés : aide la personne à identifier et nommer les besoins fondamentaux non satisfaits derrière ses émotions, les reconnaître comme légitimes et commencer à y répondre.",
+  },
+  {
     id: "wound",
     label: "Blessure de l'âme",
     fullLabel: "Guérir les blessures de l'âme",
@@ -82,7 +90,6 @@ const TOOLS = [
   { id: "meditation", label: "Méditation", icon: Wind },
   { id: "hypnose", label: "Hypnose", icon: Brain },
   { id: "amelioration", label: "Axes", icon: TrendingUp },
-  { id: "besoin", label: "Besoin", icon: HandHeart },
 ];
 
 const TOOL_INTROS = {
@@ -90,7 +97,6 @@ const TOOL_INTROS = {
   meditation: "🌬️ Des méditations guidées pour apaiser le mental, relâcher le corps et harmoniser vos énergies.",
   hypnose: "🌀 L'hypnose éricksonnienne accompagne la transformation intérieure, guidée par vos besoins profonds.",
   amelioration: "📈 Une analyse personnalisée de vos données pour identifier vos axes de croissance.",
-  besoin: "💎 Explorez les besoins non satisfaits derrière vos émotions pour les reconnaître et commencer à y répondre.",
 };
 
 const BRANCHES = ["Corps", "Esprit", "Âme", "Social", "Professionnel", "Créativité", "Racines", "Tronc"];
@@ -270,40 +276,50 @@ export default function Journal() {
               <p className="text-xs" style={{ color: "#8d6e63" }}>{selectedTheme.desc}</p>
             </div>
 
-            {/* Tool sub-tabs */}
-            <ScrollableTabBar className="mb-4">
-              {TOOLS.map(tool => {
-                const Icon = tool.icon;
-                const active = activeTool === tool.id;
-                return (
-                  <button key={tool.id} onClick={() => setActiveTool(tool.id)}
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition whitespace-nowrap border"
-                    style={{
-                      background: active ? "#7fae7e" : "transparent",
-                      borderColor: active ? "#7fae7e" : "#e0d6c8",
-                      color: active ? "#fff" : "#8d6e63",
-                      fontFamily: SERIF,
-                    }}>
-                    <Icon className="w-3.5 h-3.5" />
-                    {tool.label}
-                  </button>
-                );
-              })}
-            </ScrollableTabBar>
+            {activeTheme === "besoin" ? (
+              <>
+                <div className="mb-4">
+                  <PersonalizedVideoDisplay />
+                </div>
+                <BesoinSection theme={selectedTheme.context} />
+              </>
+            ) : (
+              <>
+                {/* Tool sub-tabs */}
+                <ScrollableTabBar className="mb-4">
+                  {TOOLS.map(tool => {
+                    const Icon = tool.icon;
+                    const active = activeTool === tool.id;
+                    return (
+                      <button key={tool.id} onClick={() => setActiveTool(tool.id)}
+                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition whitespace-nowrap border"
+                        style={{
+                          background: active ? "#7fae7e" : "transparent",
+                          borderColor: active ? "#7fae7e" : "#e0d6c8",
+                          color: active ? "#fff" : "#8d6e63",
+                          fontFamily: SERIF,
+                        }}>
+                        <Icon className="w-3.5 h-3.5" />
+                        {tool.label}
+                      </button>
+                    );
+                  })}
+                </ScrollableTabBar>
 
-            <div className="mb-4">
-              <PersonalizedVideoDisplay />
-            </div>
+                <div className="mb-4">
+                  <PersonalizedVideoDisplay />
+                </div>
 
-            <p className="text-sm mb-4" style={{ color: "#5d4037", fontFamily: SERIF }}>
-              {TOOL_INTROS[activeTool]}
-            </p>
+                <p className="text-sm mb-4" style={{ color: "#5d4037", fontFamily: SERIF }}>
+                  {TOOL_INTROS[activeTool]}
+                </p>
 
-            {activeTool === "grounding" && <GroundingSection theme={selectedTheme.context} />}
-            {activeTool === "meditation" && <MeditationSection theme={selectedTheme.context} />}
-            {activeTool === "hypnose" && <HypnosisSection theme={selectedTheme.context} />}
-            {activeTool === "amelioration" && <ImprovementSection theme={selectedTheme.context} />}
-            {activeTool === "besoin" && <BesoinSection theme={selectedTheme.context} />}
+                {activeTool === "grounding" && <GroundingSection theme={selectedTheme.context} />}
+                {activeTool === "meditation" && <MeditationSection theme={selectedTheme.context} />}
+                {activeTool === "hypnose" && <HypnosisSection theme={selectedTheme.context} />}
+                {activeTool === "amelioration" && <ImprovementSection theme={selectedTheme.context} />}
+              </>
+            )}
           </div>
         )}
       </div>

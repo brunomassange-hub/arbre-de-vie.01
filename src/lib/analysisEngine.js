@@ -18,6 +18,7 @@ export const JOURNAL_TOOLS = {
 
 export const JOURNAL_THEMES = {
   emotions: { label: "Émotion", icon: "🧠" },
+  besoin: { label: "Besoin", icon: "💎" },
   wound: { label: "Blessure de l'âme", icon: "💔" },
   trauma: { label: "Traumatisme", icon: "❤️" },
   conflits: { label: "Conflit psychique", icon: "✨" },
@@ -32,7 +33,7 @@ export const LIST_JOURNAL_RECOMMENDATIONS = {
   conflict: { theme: "conflits", tool: "meditation" },
   behavior: { theme: "comportement", tool: "amelioration" },
   wound: { theme: "wound", tool: "hypnose" },
-  need: { theme: "emotions", tool: "amelioration" },
+  need: { theme: "besoin", tool: "amelioration" },
 };
 
 const WOUND_DESC = {
