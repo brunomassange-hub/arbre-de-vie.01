@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import VideoDisplay from "./VideoDisplay";
 import { createPageUrl } from "@/utils";
+import { migrateNeedTags } from "@/lib/clinicalCategories";
 
 export default function PersonalizedVideoDisplay({ dark = false }) {
   const [tags, setTags] = useState(null);
@@ -26,7 +27,7 @@ export default function PersonalizedVideoDisplay({ dark = false }) {
 
         [...events, ...links, ...beliefs].forEach(item => {
           (item.clinical_tags || []).forEach(tag => collected.add(tag));
-          (item.need_tags || []).forEach(tag => collected.add(tag));
+          migrateNeedTags(item.need_tags).forEach(tag => collected.add(tag));
         });
 
         events.forEach(ev => {

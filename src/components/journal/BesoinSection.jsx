@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { CHAKRAS } from "@/lib/chakras";
 import { getMaslowByChakra, getMaslowInfo } from "@/lib/therapy";
-import { getTagLabel } from "@/lib/clinicalCategories";
+import { getTagLabel, migrateNeedTags } from "@/lib/clinicalCategories";
 import { Loader2, Sparkles } from "lucide-react";
 
 const SERIF = "'Playfair Display', Georgia, serif";
@@ -105,9 +105,9 @@ Réponds en français, ton chaleureux et sécurisant.`;
                   color: maslowInfo.color,
                 }}>{maslowInfo.icon} Besoin : {maslowNeed}</span>
               </div>
-              {(selected.need_tags || []).length > 0 && (
+              {migrateNeedTags(selected.need_tags).length > 0 && (
                 <div className="flex flex-wrap gap-1.5 mt-1.5">
-                  {(selected.need_tags || []).map(tag => (
+                  {migrateNeedTags(selected.need_tags).map(tag => (
                     <span key={tag} className="text-xs px-2 py-0.5 rounded-full"
                       style={{ background: "#06b6d420", color: "#06b6d4" }}>
                       💎 {getTagLabel(tag)}

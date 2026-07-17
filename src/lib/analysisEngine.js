@@ -1,4 +1,4 @@
-import { CLINICAL_LISTS, getTagLabel, getTagDescription, getListLabel } from "@/lib/clinicalCategories";
+import { CLINICAL_LISTS, getTagLabel, getTagDescription, getListLabel, migrateNeedTags } from "@/lib/clinicalCategories";
 
 export const CATEGORIES = {
   type_trauma: { label: "Type de trauma", icon: "🔥", color: "#ef4444" },
@@ -183,7 +183,7 @@ export function aggregateData({ traumaticEvents = [], links = [], limitingBelief
     (item.clinical_tags || []).forEach(tag => {
       tagCount[tag] = (tagCount[tag] || 0) + 1;
     });
-    (item.need_tags || []).forEach(tag => {
+    migrateNeedTags(item.need_tags).forEach(tag => {
       tagCount[tag] = (tagCount[tag] || 0) + 1;
     });
   });

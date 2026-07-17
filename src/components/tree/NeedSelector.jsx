@@ -1,14 +1,15 @@
 import React from "react";
-import { CLINICAL_LISTS } from "@/lib/clinicalCategories";
+import { CLINICAL_LISTS, migrateNeedTags } from "@/lib/clinicalCategories";
 
 const NEED_LIST = CLINICAL_LISTS.find(l => l.id === "need");
 
 export default function NeedSelector({ value = [], onChange, label = "Besoin" }) {
+  const migrated = migrateNeedTags(value);
   const toggle = (fullId) => {
-    if (value.includes(fullId)) {
-      onChange(value.filter(v => v !== fullId));
+    if (migrated.includes(fullId)) {
+      onChange(migrated.filter(v => v !== fullId));
     } else {
-      onChange([...value, fullId]);
+      onChange([...migrated, fullId]);
     }
   };
 
@@ -18,7 +19,7 @@ export default function NeedSelector({ value = [], onChange, label = "Besoin" })
       <div className="flex flex-wrap gap-1">
         {NEED_LIST.items.map(item => {
           const fullId = `${NEED_LIST.id}:${item.id}`;
-          const sel = value.includes(fullId);
+          const sel = migrated.includes(fullId);
           return (
             <button key={item.id} type="button" title={item.description}
               onClick={() => toggle(fullId)}

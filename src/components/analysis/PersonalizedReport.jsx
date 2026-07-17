@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Loader2, RefreshCw, FileText, AlertCircle } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import { base44 } from "@/api/base44Client";
-import { getTagLabel } from "@/lib/clinicalCategories";
+import { getTagLabel, migrateNeedTags } from "@/lib/clinicalCategories";
 
 export default function PersonalizedReport({
   events = [],
@@ -55,9 +55,11 @@ export default function PersonalizedReport({
       sections.push("--- ÉVÉNEMENTS DE VIE (Blessures) ---");
       events.forEach(ev => {
         const tags = (ev.clinical_tags || []).map(t => getTagLabel(t)).filter(Boolean);
+        const needs = migrateNeedTags(ev.need_tags).map(t => getTagLabel(t)).filter(Boolean);
         sections.push(`• "${ev.title}" — émotion: ${ev.emotion || "?"}, blessure de l'âme: ${ev.wound_type || "?"}, âge: ${ev.age ?? "?"}`);
         if (ev.description) sections.push(`  Description: ${ev.description}`);
         if (tags.length) sections.push(`  Catégories cliniques: ${tags.join(", ")}`);
+        if (needs.length) sections.push(`  Besoins troublés: ${needs.join(", ")}`);
       });
       sections.push("");
     }

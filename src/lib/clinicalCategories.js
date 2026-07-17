@@ -126,18 +126,13 @@ export const CLINICAL_LISTS = [
   },
   {
     id: "need",
-    label: "Besoins fondamentaux non comblés",
+    label: "Besoins fondamentaux (Maslow)",
     items: [
-      { id: "securite", label: "Besoin de sécurité", description: "Besoin de se sentir en sécurité physique et émotionnelle." },
-      { id: "appartenance", label: "Besoin d'appartenance", description: "Besoin de faire partie d'un groupe, de se sentir inclus·e." },
-      { id: "reconnaissance", label: "Besoin de reconnaissance", description: "Besoin d'être reconnu·e pour sa valeur et ses contributions." },
-      { id: "autonomie", label: "Besoin d'autonomie", description: "Besoin de décider par soi-même et d'agir librement." },
-      { id: "etre_vu_entendu", label: "Besoin d'être vu / entendu", description: "Besoin d'être vu·e et entendu·e dans son authenticité." },
-      { id: "justice", label: "Besoin de justice", description: "Besoin d'être traité·e avec équité et justesse." },
-      { id: "stabilite", label: "Besoin de stabilité", description: "Besoin de prévisibilité et de continuité dans son environnement." },
-      { id: "controle", label: "Besoin de contrôle", description: "Besoin de maîtriser son environnement et son destin." },
-      { id: "affection", label: "Besoin d'affection", description: "Besoin de tendresse, de chaleur et d'amour." },
-      { id: "valorisation", label: "Besoin de valorisation", description: "Besoin de se sentir valorisé·e aux yeux d'autrui." },
+      { id: "physiologique", label: "Physiologique", description: "Respiration, sommeil, nourriture, survie" },
+      { id: "securite", label: "Sécurité", description: "Stabilité, protection, ancrage matériel" },
+      { id: "appartenance", label: "Appartenance", description: "Connexion, amour, lien social" },
+      { id: "estime", label: "Estime", description: "Valeur personnelle, confiance, reconnaissance" },
+      { id: "accomplissement", label: "Accomplissement", description: "Sens, créativité, réalisation de soi" },
     ]
   },
 ];
@@ -158,4 +153,31 @@ export function getTagDescription(fullId) {
 
 export function getListLabel(listId) {
   return CLINICAL_LISTS.find(l => l.id === listId)?.label || listId;
+}
+
+const NEED_MIGRATION = {
+  securite: "securite",
+  stabilite: "securite",
+  controle: "securite",
+  justice: "securite",
+  appartenance: "appartenance",
+  affection: "appartenance",
+  reconnaissance: "estime",
+  valorisation: "estime",
+  etre_vu_entendu: "estime",
+  autonomie: "accomplissement",
+};
+
+export function migrateNeedTags(tags = []) {
+  const seen = new Set();
+  return (tags || []).map(tag => {
+    if (!tag.startsWith("need:")) return tag;
+    const oldId = tag.split(":")[1];
+    const newId = NEED_MIGRATION[oldId] || oldId;
+    return `need:${newId}`;
+  }).filter(tag => {
+    if (seen.has(tag)) return false;
+    seen.add(tag);
+    return true;
+  });
 }
