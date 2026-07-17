@@ -64,28 +64,6 @@ export default function EgoOmbreGrid({ functions, selectedType, onFnClick }) {
           </div>
         </div>
       </div>
-
-      {/* Hierarchy bar */}
-      <div className="bg-white/10 backdrop-blur rounded-2xl p-4 mb-5 border border-white/20">
-        <h3 className="text-white font-semibold text-sm mb-3">Hiérarchie des fonctions — {selectedType}</h3>
-        <div className="space-y-2">
-          {functions.ego.map((fn, i) => {
-            const info = FUNCTION_DESCRIPTIONS[fn];
-            const widths = [100, 75, 55, 35];
-            return (
-              <div key={fn} className="flex items-center gap-3">
-                <span className="text-xs w-20 text-gray-400">{POSITION_LABELS[i]}</span>
-                <div className="flex-1 bg-white/10 rounded-full h-2">
-                  <div className="h-2 rounded-full transition-all duration-700" style={{ width: `${widths[i]}%`, backgroundColor: info.color }} />
-                </div>
-                <button onClick={() => onFnClick(fn)} className="text-xs font-bold w-6 cursor-pointer hover:underline" style={{ color: info.color }}>
-                  {fn}
-                </button>
-              </div>
-            );
-          })}
-        </div>
-      </div>
     </>
   );
 }

@@ -11,6 +11,7 @@ import MBTIQuiz from "@/components/cognitive/MBTIQuiz";
 import EnneagramQuiz from "@/components/cognitive/EnneagramQuiz";
 import AttachmentSection from "@/components/cognitive/AttachmentSection";
 import AttachmentQuiz from "@/components/cognitive/AttachmentQuiz";
+import { FUNCTION_DESCRIPTIONS } from "@/lib/mbti-data";
 import { HelpCircle } from "lucide-react";
 
 // MBTI cognitive function stacks
@@ -32,6 +33,8 @@ const MBTI_FUNCTIONS = {
   ESFP: { ego: ["Se", "Fi", "Te", "Ni"], shadow: ["Si", "Fe", "Ti", "Ne"] },
   ESFJ: { ego: ["Fe", "Si", "Ne", "Ti"], shadow: ["Fi", "Se", "Ni", "Te"] },
 };
+
+const POSITION_LABELS = ["Dominante", "Auxiliaire", "Tertiaire", "Inférieure"];
 
 const MBTI_TYPES = Object.keys(MBTI_FUNCTIONS);
 
@@ -62,6 +65,8 @@ export default function Cognitive() {
       }
     });
   }, []);
+
+  const functions = selectedType ? MBTI_FUNCTIONS[selectedType] : null;
 
   const handleSave = async () => {
     setSaving(true);
@@ -155,6 +160,31 @@ export default function Cognitive() {
             />
           )}
         </div>
+
+        {/* Visual hierarchy bar */}
+        {selectedType && functions && (
+        <div className="bg-white/10 backdrop-blur rounded-2xl p-4 mb-5 border border-white/20">
+          <h3 className="text-white font-semibold text-sm mb-3">Hiérarchie des fonctions — {selectedType}</h3>
+          <div className="space-y-2">
+            {functions.ego.map((fn, i) => {
+              const info = FUNCTION_DESCRIPTIONS[fn];
+              const widths = [100, 75, 55, 35];
+              return (
+                <div key={fn} className="flex items-center gap-3">
+                  <span className="text-xs w-20 text-gray-400">{POSITION_LABELS[i]}</span>
+                  <div className="flex-1 bg-white/10 rounded-full h-2">
+                    <div className="h-2 rounded-full transition-all duration-700"
+                      style={{ width: `${widths[i]}%`, backgroundColor: info.color }} />
+                  </div>
+                  <span className="text-xs font-bold w-6" style={{ color: info.color }}>
+                    {fn}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+        )}
 
         <div className="bg-white/10 backdrop-blur rounded-2xl p-5 mb-5 border border-white/20">
           <div className="flex items-center justify-between mb-3">
