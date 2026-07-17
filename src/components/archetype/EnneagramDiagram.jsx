@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { base44 } from "@/api/base44Client";
 
 const POINTS = [
   { num: 9, label: "Médiateur", color: "#FACC2E", angle: 0, desc: "Harmonieux, accommodant, évite les conflits. Voit tous les points de vue et cherche l'unité." },
@@ -18,8 +19,24 @@ const LINES = [
   [1, 4], [4, 2], [2, 8], [8, 5], [5, 7], [7, 1],
 ];
 
+// Integration (growth) and disintegration (stress) targets per type
+const GROWTH = { 1:7, 2:4, 3:6, 4:1, 5:8, 6:9, 7:5, 8:2, 9:3 };
+const STRESS = { 1:4, 2:8, 3:9, 4:2, 5:7, 6:3, 7:1, 8:5, 9:6 };
+
 export default function EnneagramDiagram() {
   const [selected, setSelected] = useState(null);
+  const [userType, setUserType] = useState(null);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const profiles = await base44.entities.CognitiveProfile.list();
+        if (profiles[0]?.enneagram_type) {
+          setUserType(profiles[0].enneagram_type);
+        }
+      } catch { /* ignore */ }
+    })();
+  }, []);
 
   const cx = 150, cy = 150, r = 105;
 
@@ -59,19 +76,47 @@ export default function EnneagramDiagram() {
         {/* Outer circle */}
         <circle cx={cx} cy={cy} r={r} fill="none" stroke="#707070" strokeWidth="1" opacity="0.5" />
 
-        {/* Internal lines */}
-        {LINES.map(([a, b], i) => (
-          <line
-            key={i}
-            x1={coords[a].x}
-            y1={coords[a].y}
-            x2={coords[b].x}
-            y2={coords[b].y}
-            stroke="#707070"
-            strokeWidth="1"
-            opacity="0.35"
-          />
-        ))}
+        {/* Determine highlighted lines based on user type */}
+        {(() => {
+          const growthTarget = userType ? GROWTH[userType] : null;
+          const stressTarget = userType ? STRESS[userType] : null;
+
+          // Internal lines: dim default, highlight growth (green, solid) and stress (red, dashed)
+          return LINES.map(([a, b], i) => {
+            const isGrowth = userType && ((a === userType && b === growthTarget) || (b === userType && a === growthTarget));
+            const isStress = userType && ((a === userType && b === stressTarget) || (b === userType && a === stressTarget));
+
+            let stroke = "#707070";
+            let strokeWidth = 1;
+            let opacity = userType ? 0.2 : 0.35;
+            let strokeDasharray = undefined;
+
+            if (isGrowth) {
+              stroke = "#4ade80";
+              strokeWidth = 2.5;
+              opacity = 0.9;
+            } else if (isStress) {
+              stroke = "#f87171";
+              strokeWidth = 2.5;
+              opacity = 0.9;
+              strokeDasharray = "5,3";
+            }
+
+            return (
+              <line
+                key={i}
+                x1={coords[a].x}
+                y1={coords[a].y}
+                x2={coords[b].x}
+                y2={coords[b].y}
+                stroke={stroke}
+                strokeWidth={strokeWidth}
+                opacity={opacity}
+                strokeDasharray={strokeDasharray}
+              />
+            );
+          });
+        })()}
 
         {/* Labels outside the circle */}
         {POINTS.map(p => {
@@ -95,20 +140,31 @@ export default function EnneagramDiagram() {
         {POINTS.map(p => {
           const c = coords[p.num];
           const isSelected = selected === p.num;
+          const isUserType = userType === p.num;
+          const growthTarget = userType ? GROWTH[userType] : null;
+          const stressTarget = userType ? STRESS[userType] : null;
+          const isConnected = userType && (p.num === growthTarget || p.num === stressTarget);
+
+          // Dim non-connected types when a user type is set
+          const dimOpacity = userType && !isUserType && !isConnected ? 0.35 : 1;
+
           return (
             <g
               key={p.num}
               onClick={() => setSelected(isSelected ? null : p.num)}
               style={{ cursor: "pointer" }}
             >
-              {isSelected && <circle cx={c.x} cy={c.y} r="18" fill={p.color} opacity="0.2" />}
+              {(isSelected || isUserType) && (
+                <circle cx={c.x} cy={c.y} r={isUserType ? 20 : 18} fill={p.color} opacity={isUserType ? "0.3" : "0.2"} />
+              )}
               <circle
                 cx={c.x}
                 cy={c.y}
-                r="13"
+                r={isUserType ? 15 : 13}
                 fill={p.color}
-                stroke={isSelected ? "#fff" : "rgba(255,255,255,0.3)"}
-                strokeWidth={isSelected ? 2 : 1}
+                stroke={isSelected ? "#fff" : isUserType ? p.color : isConnected ? p.color : "rgba(255,255,255,0.3)"}
+                strokeWidth={isUserType ? 3 : isSelected ? 2 : isConnected ? 2 : 1}
+                opacity={dimOpacity}
               />
               <text
                 x={c.x}
@@ -117,6 +173,7 @@ export default function EnneagramDiagram() {
                 fontSize="11"
                 fontWeight="bold"
                 fill="#fff"
+                opacity={dimOpacity}
               >
                 {p.num}
               </text>
