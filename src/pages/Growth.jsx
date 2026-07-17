@@ -170,13 +170,13 @@ function BigFiveSection() {
               const dx = p.ax - cx, dy = p.ay - cy;
               const ux = dx / r, uy = dy / r;
               const tx = -uy, ty = ux;
-              const baseOffset = r * 0.42;
+              const baseOffset = r * 0.38;
               const spacing = r * 0.14;
               return traitQualites.map((q, qi) => {
                 const side = qi % 2 === 0 ? 1 : -1;
                 const distFromCenter = Math.floor(qi / 2) + 0.5;
                 const perp = side * (baseOffset + (distFromCenter - 0.5) * spacing);
-                const along = r * 1.25 + (distFromCenter - 0.5) * r * 0.15;
+                const along = r * 1.12 + (distFromCenter - 0.5) * r * 0.15;
                 const qx = cx + ux * along + tx * perp;
                 const qy = cy + uy * along + ty * perp;
                 let anchor = "middle";
