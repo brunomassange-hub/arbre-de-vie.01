@@ -6,11 +6,12 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Plus, Trash2, Pencil, Save } from "lucide-react";
 import { CHAKRAS } from "@/lib/chakras";
+import NeedSelector from "@/components/tree/NeedSelector";
 
 export default function PositiveEventsSection() {
   const [events, setEvents] = useState([]);
   const [showForm, setShowForm] = useState(false);
-  const [form, setForm] = useState({ age: "", title: "", description: "", emotion: "Joie" });
+  const [form, setForm] = useState({ age: "", title: "", description: "", emotion: "Joie", need_tags: [] });
   const [editingId, setEditingId] = useState(null);
   const [editForm, setEditForm] = useState(null);
 
@@ -30,7 +31,7 @@ export default function PositiveEventsSection() {
     if (!form.title.trim() || !form.age) return;
     const chakra = CHAKRAS.find(c => c.light === form.emotion)?.name || "Stabilité";
     await base44.entities.PositiveEvent.create({ ...form, age: Number(form.age), chakra });
-    setForm({ age: "", title: "", description: "", emotion: "Joie" });
+    setForm({ age: "", title: "", description: "", emotion: "Joie", need_tags: [] });
     setShowForm(false);
     reload();
   };
@@ -71,6 +72,11 @@ export default function PositiveEventsSection() {
           <p className="text-xs text-[#8d6e63]">
             Chakra : {CHAKRAS.find(c => c.light === form.emotion)?.name || "—"}
           </p>
+          <NeedSelector
+            value={form.need_tags || []}
+            onChange={(tags) => setForm({ ...form, need_tags: tags })}
+            label="Besoin comblé"
+          />
           <Input value={form.title} onChange={e => setForm({ ...form, title: e.target.value })}
             placeholder="Titre de l'événement" className="bg-white/60 border-[#e0d6c8] text-[#3e2723] placeholder:text-[#8d6e63]/50" />
           <Textarea value={form.description} onChange={e => setForm({ ...form, description: e.target.value })}
@@ -100,6 +106,11 @@ export default function PositiveEventsSection() {
                       <SelectContent>{CHAKRAS.map(c => <SelectItem key={c.light} value={c.light}>{c.light}</SelectItem>)}</SelectContent>
                     </Select>
                   </div>
+                  <NeedSelector
+                    value={editForm.need_tags || []}
+                    onChange={(tags) => setEditForm({ ...editForm, need_tags: tags })}
+                    label="Besoin comblé"
+                  />
                   <Input value={editForm.title} onChange={e => setEditForm({ ...editForm, title: e.target.value })}
                     placeholder="Titre" className="bg-white/60 border-[#e0d6c8] text-[#3e2723] text-sm h-8" />
                   <Textarea value={editForm.description || ""} onChange={e => setEditForm({ ...editForm, description: e.target.value })}
@@ -125,7 +136,7 @@ export default function PositiveEventsSection() {
                     )}
                   </div>
                   <div className="flex gap-1 flex-shrink-0">
-                    <button onClick={() => { setEditingId(ev.id); setEditForm({ ...ev }); }} className="text-[#a1887f] hover:text-green-600 transition">
+                    <button onClick={() => { setEditingId(ev.id);                      setEditForm({ ...ev, need_tags: ev.need_tags || [] }); }} className="text-[#a1887f] hover:text-green-600 transition">
                       <Pencil className="w-4 h-4" />
                     </button>
                     <button onClick={() => handleDelete(ev.id)} className="text-[#a1887f] hover:text-red-600 transition">

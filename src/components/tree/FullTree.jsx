@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import TreeAddPanel from "@/components/tree/TreeAddPanel";
 import BigFiveRadarModal from "@/components/tree/BigFiveRadarModal";
 import { CHAKRAS } from "@/lib/chakras";
+import NeedSelector from "@/components/tree/NeedSelector";
 import {
   cx, trunkTop, trunkBot, BRANCH_DEFS, BRANCH_COLORS,
   getBranchGeometry, ROOT_DEFS, ROOT_CATEGORIES, TRUNK_PATH, bezier
@@ -493,6 +494,11 @@ export default function FullTree({ mode, zoomable = false }) {
                             <SelectContent>{["Trahison", "Rejet", "Abandon", "Humiliation", "Injustice"].map(w => <SelectItem key={w} value={w}>{w}</SelectItem>)}</SelectContent>
                           </Select>
                         )}
+                        <NeedSelector
+                          value={editData.need_tags || []}
+                          onChange={(tags) => setEditData({ ...editData, need_tags: tags })}
+                          label={detail.type === "event" ? "Besoin troublé" : "Besoin comblé"}
+                        />
                         <Input value={editData.title ?? ""} onChange={e => setEditData({ ...editData, title: e.target.value })}
                           placeholder="Titre" className="bg-white/60 border-[#e0d6c8] text-[#3e2723] text-sm h-9" />
                         <Textarea value={editData.description ?? ""} onChange={e => setEditData({ ...editData, description: e.target.value })}

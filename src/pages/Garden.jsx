@@ -11,6 +11,7 @@ import LinkQualification from "@/components/garden/LinkQualification";
 import BeliefQualification from "@/components/garden/BeliefQualification";
 import ClinicalTagBadges from "@/components/clinical/ClinicalTagBadges";
 import { CHAKRAS } from "@/lib/chakras";
+import NeedSelector from "@/components/tree/NeedSelector";
 
 // ─── TRONC ───────────────────────────────────────────────
 const EMOTIONS = ["Solitude", "Colère", "Anxiété", "Peur", "Culpabilité", "Honte", "Tristesse"];
@@ -64,7 +65,7 @@ function Section({ emoji, title, subtitle, accentClass, children }) {
 function TroncSection() {
   const [events, setEvents] = useState([]);
   const [showForm, setShowForm] = useState(false);
-  const [form, setForm] = useState({ age: "", title: "", description: "", emotion: "Peur", wound_type: "", clinical_tags: [] });
+  const [form, setForm] = useState({ age: "", title: "", description: "", emotion: "Peur", wound_type: "", clinical_tags: [], need_tags: [] });
   const [editingId, setEditingId] = useState(null);
   const [editForm, setEditForm] = useState(null);
   const [showQualForm, setShowQualForm] = useState(false);
@@ -78,7 +79,7 @@ function TroncSection() {
     if (!form.title.trim() || !form.age) return;
     const chakra = CHAKRAS.find(c => c.shadow === form.emotion)?.name || "Connexion";
     await base44.entities.TraumaticEvent.create({ ...form, age: Number(form.age), chakra });
-    setForm({ age: "", title: "", description: "", emotion: "Peur", wound_type: "", clinical_tags: [] });
+    setForm({ age: "", title: "", description: "", emotion: "Peur", wound_type: "", clinical_tags: [], need_tags: [] });
     setShowForm(false);
     setShowQualForm(false);
     base44.entities.TraumaticEvent.list().then(d => setEvents([...d].sort((a, b) => a.age - b.age)));
@@ -122,6 +123,11 @@ function TroncSection() {
               {["Trahison", "Rejet", "Abandon", "Humiliation", "Injustice"].map(w => <SelectItem key={w} value={w}>{w}</SelectItem>)}
             </SelectContent>
           </Select>
+          <NeedSelector
+            value={form.need_tags || []}
+            onChange={(tags) => setForm({ ...form, need_tags: tags })}
+            label="Besoin troublé"
+          />
           <Input value={form.title} onChange={e => setForm({ ...form, title: e.target.value })}
             placeholder="Titre de l'événement" className="bg-white/60 border-[#e0d6c8] text-[#3e2723] placeholder:text-[#8d6e63]/50" />
           <Textarea value={form.description} onChange={e => setForm({ ...form, description: e.target.value })}
@@ -165,6 +171,11 @@ function TroncSection() {
                       <SelectTrigger className="bg-white/60 border-[#e0d6c8] text-[#3e2723] h-8 text-sm"><SelectValue placeholder="Type de blessure" /></SelectTrigger>
                       <SelectContent>{["Trahison", "Rejet", "Abandon", "Humiliation", "Injustice"].map(w => <SelectItem key={w} value={w}>{w}</SelectItem>)}</SelectContent>
                     </Select>
+                    <NeedSelector
+                      value={editForm.need_tags || []}
+                      onChange={(tags) => setEditForm({ ...editForm, need_tags: tags })}
+                      label="Besoin troublé"
+                    />
                     <Input value={editForm.title} onChange={e => setEditForm({ ...editForm, title: e.target.value })}
                       placeholder="Titre" className="bg-white/60 border-[#e0d6c8] text-[#3e2723] text-sm h-8" />
                     <Textarea value={editForm.description || ""} onChange={e => setEditForm({ ...editForm, description: e.target.value })}
@@ -198,7 +209,7 @@ function TroncSection() {
                       )}
                     </div>
                     <div className="flex gap-1 flex-shrink-0">
-                      <button onClick={() => { setEditingId(ev.id); setEditForm({ ...ev, clinical_tags: ev.clinical_tags || [] }); setShowQualEdit(!!ev.clinical_tags?.length); }} className="text-[#a1887f] hover:text-amber-600 transition">
+                      <button onClick={() => { setEditingId(ev.id);                        setEditForm({ ...ev, clinical_tags: ev.clinical_tags || [], need_tags: ev.need_tags || [] }); setShowQualEdit(!!ev.clinical_tags?.length); }} className="text-[#a1887f] hover:text-amber-600 transition">
                         <Pencil className="w-4 h-4" />
                       </button>
                       <button onClick={() => handleDelete(ev.id)} className="text-[#a1887f] hover:text-red-600 transition">
