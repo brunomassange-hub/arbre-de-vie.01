@@ -260,11 +260,11 @@ export default function Home() {
       {/* Detail panel */}
       {selected && info && (
         <div
-          className="fixed inset-0 bg-black/50 z-40 flex items-end justify-center"
+          className="fixed inset-0 bg-black/50 z-40 flex items-center justify-center px-4"
           onClick={() => setSelected(null)}
         >
           <div
-            className="bg-white rounded-t-2xl p-6 w-full max-w-lg shadow-2xl"
+            className="bg-white rounded-2xl p-6 w-full max-w-lg shadow-2xl max-h-[80vh] overflow-y-auto"
             onClick={e => e.stopPropagation()}
           >
             <div className="flex justify-between items-start mb-3">
