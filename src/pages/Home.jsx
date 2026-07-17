@@ -51,16 +51,16 @@ const SEPHIROTS = [
 ];
 
 const SEPHIROT_INFO = {
-  foi: { title: "Foi (Keter)", desc: "La couronne, connexion au divin, conscience pure, potentiel infini.", chakra: "Spiritualité", maslow: "Accomplissement" },
-  comprehension: { title: "Compréhension (Binah)", desc: "La grande mère, réception, structure, intuition profonde.", chakra: "Intuition", maslow: "Estime" },
-  sagesse: { title: "Sagesse (Hokhmah)", desc: "Le père, éclair de l'inspiration, point originel de l'idée.", chakra: "Intuition", maslow: "Estime" },
-  desir: { title: "Désir (Hod)", desc: "Splendeur, intellect, communication, pensée analytique.", chakra: "Communication", maslow: "Appartenance" },
-  amour: { title: "Amour (Netzah)", desc: "Victoire des émotions, désir, nature, instinct, créativité.", chakra: "Amour Peur", maslow: "Appartenance" },
-  beaute: { title: "Beauté (Tiferet)", desc: "Le cœur, équilibre, harmonie, compassion, beauté spirituelle.", chakra: "Connexion", maslow: "Appartenance" },
-  gloire: { title: "Gloire (Hod)", desc: "Splendeur, intellect, communication, pensée analytique.", chakra: "Pouvoir Culpabilité", maslow: "Sécurité" },
-  victoire: { title: "Victoire (Netzah)", desc: "Victoire, endurance, émotion, désir, créativité.", chakra: "Volonté", maslow: "Sécurité" },
-  personnalite: { title: "Personnalité (Yesod)", desc: "Fondation, ego, inconscient, pont entre spirituel et matériel.", chakra: "Créativité", maslow: "Sécurité" },
-  instinct: { title: "Instinct (Malkuth)", desc: "Le royaume, manifestation physique, la Terre, instinct de survie.", chakra: "Stabilité", maslow: "Physiologique" },
+  foi: { title: "Foi (Keter)", desc: "Ce en quoi vous croyez profondément — ce qui donne du sens à votre vie.", chakra: "Spiritualité", maslow: "Accomplissement" },
+  comprehension: { title: "Compréhension (Binah)", desc: "Compréhension externe, intellectuelle, du monde, qui s'applique ensuite à l'être humain puis à soi-même.", chakra: "Intuition", maslow: "Estime" },
+  sagesse: { title: "Sagesse (Hokhmah)", desc: "Compréhension interne, intuitive, de soi-même, qui s'étend ensuite à l'être humain puis au monde.", chakra: "Intuition", maslow: "Estime" },
+  desir: { title: "Désir (Hod)", desc: "Force interne qui dirige vers l'objet désiré et impose les limites.", chakra: "Communication", maslow: "Appartenance" },
+  amour: { title: "Amour (Netzah)", desc: "Force externe de l'objet aimé qui s'incorpore en soi et crée le sentiment de générosité.", chakra: "Amour Peur", maslow: "Appartenance" },
+  beaute: { title: "Beauté (Tiferet)", desc: "Équilibre psychique et physique — le cœur, pilier de l'identité profonde.", chakra: "Connexion", maslow: "Appartenance" },
+  gloire: { title: "Gloire (Hod)", desc: "Reconnaissance sociale obtenue comme résultat de l'action.", chakra: "Pouvoir Culpabilité", maslow: "Sécurité" },
+  victoire: { title: "Victoire (Netzah)", desc: "Victoire des émotions qui permet d'engager l'action.", chakra: "Volonté", maslow: "Sécurité" },
+  personnalite: { title: "Personnalité (Yesod)", desc: "Lien entre l'intérieur et l'extérieur — base de l'imagination, de l'inconscient et de la sexualité.", chakra: "Créativité", maslow: "Sécurité" },
+  instinct: { title: "Instinct (Malkuth)", desc: "Réaction du corps physique au monde extérieur.", chakra: "Stabilité", maslow: "Physiologique" },
 };
 
 export default function Home() {
