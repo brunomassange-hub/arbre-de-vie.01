@@ -13,7 +13,6 @@ import HypnosisSection from "@/components/journal/HypnosisSection";
 import MeditationSection from "@/components/journal/MeditationSection";
 import ImprovementSection from "@/components/journal/ImprovementSection";
 import BesoinSection from "@/components/journal/BesoinSection";
-import WoundSection from "@/components/journal/WoundSection";
 import ScrollableTabBar from "@/components/journal/ScrollableTabBar";
 import PersonalizedVideoDisplay from "@/components/video/PersonalizedVideoDisplay";
 
@@ -84,7 +83,6 @@ const TOOLS = [
   { id: "hypnose", label: "Hypnose", icon: Brain },
   { id: "amelioration", label: "Axes", icon: TrendingUp },
   { id: "besoin", label: "Besoin", icon: HandHeart },
-  { id: "wound", label: "Blessure de l'âme", icon: HeartCrack },
 ];
 
 const TOOL_INTROS = {
@@ -93,7 +91,6 @@ const TOOL_INTROS = {
   hypnose: "🌀 L'hypnose éricksonnienne accompagne la transformation intérieure, guidée par vos besoins profonds.",
   amelioration: "📈 Une analyse personnalisée de vos données pour identifier vos axes de croissance.",
   besoin: "💎 Explorez les besoins non satisfaits derrière vos émotions pour les reconnaître et commencer à y répondre.",
-  wound: "🩹 Reconnaissance et guérison des cinq blessures de l'âme : rejet, abandon, trahison, humiliation, injustice.",
 };
 
 const BRANCHES = ["Corps", "Esprit", "Âme", "Social", "Professionnel", "Créativité", "Racines", "Tronc"];
@@ -307,7 +304,6 @@ export default function Journal() {
             {activeTool === "hypnose" && <HypnosisSection theme={selectedTheme.context} />}
             {activeTool === "amelioration" && <ImprovementSection theme={selectedTheme.context} />}
             {activeTool === "besoin" && <BesoinSection theme={selectedTheme.context} />}
-            {activeTool === "wound" && <WoundSection theme={selectedTheme.context} />}
           </div>
         )}
       </div>

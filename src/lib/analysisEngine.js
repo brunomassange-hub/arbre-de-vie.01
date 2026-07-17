@@ -31,7 +31,7 @@ export const LIST_JOURNAL_RECOMMENDATIONS = {
   rel: { theme: "relations", tool: "amelioration" },
   conflict: { theme: "conflits", tool: "meditation" },
   behavior: { theme: "comportement", tool: "amelioration" },
-  wound: { theme: "trauma", tool: "hypnose" },
+  wound: { theme: "wound", tool: "hypnose" },
   need: { theme: "emotions", tool: "amelioration" },
 };
 
