@@ -9,12 +9,8 @@ import EnneagramSection from "@/components/cognitive/EnneagramSection";
 import EnneagramImprovements from "@/components/cognitive/EnneagramImprovements";
 import MBTIQuiz from "@/components/cognitive/MBTIQuiz";
 import EnneagramQuiz from "@/components/cognitive/EnneagramQuiz";
-import MBTITypeInfo from "@/components/cognitive/MBTITypeInfo";
-import MBTIImprovements from "@/components/cognitive/MBTIImprovements";
 import AttachmentSection from "@/components/cognitive/AttachmentSection";
 import AttachmentQuiz from "@/components/cognitive/AttachmentQuiz";
-import { FUNCTION_DESCRIPTIONS } from "@/lib/mbti-data";
-import { FUNCTION_SHORT } from "@/lib/mbti-data";
 import { HelpCircle } from "lucide-react";
 
 // MBTI cognitive function stacks
@@ -37,9 +33,6 @@ const MBTI_FUNCTIONS = {
   ESFJ: { ego: ["Fe", "Si", "Ne", "Ti"], shadow: ["Fi", "Se", "Ni", "Te"] },
 };
 
-const POSITION_LABELS = ["Dominante", "Auxiliaire", "Tertiaire", "Inférieure"];
-const SHADOW_LABELS = ["Opposant", "Critique", "Filou", "Démon"];
-
 const MBTI_TYPES = Object.keys(MBTI_FUNCTIONS);
 
 export default function Cognitive() {
@@ -55,7 +48,6 @@ export default function Cognitive() {
   const [showMBTIQuiz, setShowMBTIQuiz] = useState(false);
   const [showEnneagramQuiz, setShowEnneagramQuiz] = useState(false);
   const [showAttachmentQuiz, setShowAttachmentQuiz] = useState(false);
-  const [fnDetail, setFnDetail] = useState(null);
 
   useEffect(() => {
     base44.entities.CognitiveProfile.list().then(data => {
@@ -70,8 +62,6 @@ export default function Cognitive() {
       }
     });
   }, []);
-
-  const functions = selectedType ? MBTI_FUNCTIONS[selectedType] : null;
 
   const handleSave = async () => {
     setSaving(true);
@@ -166,114 +156,6 @@ export default function Cognitive() {
           )}
         </div>
 
-        {/* Type description: strengths, weaknesses, functioning */}
-        <MBTITypeInfo selectedType={selectedType} />
-
-        {/* Personalized improvement axes based on MBTI type */}
-        <MBTIImprovements selectedType={selectedType} />
-
-        {selectedType && functions ? (
-        <>
-        {/* Ego / Ombre split */}
-        <div className="grid grid-cols-2 gap-4 mb-5">
-          {/* EGO */}
-          <div>
-            <div className="text-center mb-3">
-              <span className="bg-indigo-600/30 text-indigo-300 text-xs font-bold px-3 py-1 rounded-full border border-indigo-500/30">
-                ☀️ EGO
-              </span>
-            </div>
-            <div className="space-y-2">
-              {functions.ego.map((fn, i) => {
-                const info = FUNCTION_DESCRIPTIONS[fn];
-                return (
-                  <div key={fn} className="bg-white/10 rounded-xl p-3 border border-white/10">
-                    <div className="flex items-center gap-2 mb-1">
-                      <button
-                        onClick={() => setFnDetail(fn)}
-                        className="text-lg font-black cursor-pointer hover:underline"
-                        style={{ color: info.color }}
-                      >
-                        {fn}
-                      </button>
-                      <span className="text-xs font-semibold" style={{ color: info.color + "cc" }}>{FUNCTION_SHORT[fn]}</span>
-                      <span className="text-xs text-gray-500 ml-auto">{POSITION_LABELS[i]}</span>
-                    </div>
-                    <p className="text-white text-xs font-medium">{info.label}</p>
-                    <p className="text-gray-400 text-xs mt-0.5 leading-relaxed">{info.desc}</p>
-                    <p className="text-gray-500 text-[11px] mt-1.5 leading-relaxed border-t border-white/10 pt-1.5">{info.fonctionnement}</p>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* OMBRE */}
-          <div>
-            <div className="text-center mb-3">
-              <span className="bg-gray-700/50 text-gray-300 text-xs font-bold px-3 py-1 rounded-full border border-gray-600/30">
-                🌑 OMBRE
-              </span>
-            </div>
-            <div className="space-y-2">
-              {functions.shadow.map((fn, i) => {
-                const info = FUNCTION_DESCRIPTIONS[fn];
-                return (
-                  <div key={fn} className="bg-white/5 rounded-xl p-3 border border-white/5 opacity-80">
-                    <div className="flex items-center gap-2 mb-1">
-                      <button
-                        onClick={() => setFnDetail(fn)}
-                        className="text-lg font-black cursor-pointer hover:underline"
-                        style={{ color: info.color + "99" }}
-                      >
-                        {fn}
-                      </button>
-                      <span className="text-xs font-semibold" style={{ color: info.color + "aa" }}>{FUNCTION_SHORT[fn]}</span>
-                      <span className="text-xs text-gray-600 ml-auto">{SHADOW_LABELS[i]}</span>
-                    </div>
-                    <p className="text-gray-300 text-xs font-medium">{info.label}</p>
-                    <p className="text-gray-500 text-xs mt-0.5 leading-relaxed">{info.desc}</p>
-                    <p className="text-gray-600 text-[11px] mt-1.5 leading-relaxed border-t border-white/5 pt-1.5">{info.fonctionnement}</p>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        </div>
-
-        {/* Visual hierarchy bar */}
-        <div className="bg-white/10 backdrop-blur rounded-2xl p-4 mb-5 border border-white/20">
-          <h3 className="text-white font-semibold text-sm mb-3">Hiérarchie des fonctions — {selectedType}</h3>
-          <div className="space-y-2">
-            {functions.ego.map((fn, i) => {
-              const info = FUNCTION_DESCRIPTIONS[fn];
-              const widths = [100, 75, 55, 35];
-              return (
-                <div key={fn} className="flex items-center gap-3">
-                  <span className="text-xs w-20 text-gray-400">{POSITION_LABELS[i]}</span>
-                  <div className="flex-1 bg-white/10 rounded-full h-2">
-                    <div className="h-2 rounded-full transition-all duration-700"
-                      style={{ width: `${widths[i]}%`, backgroundColor: info.color }} />
-                  </div>
-                  <button
-                    onClick={() => setFnDetail(fn)}
-                    className="text-xs font-bold w-6 cursor-pointer hover:underline"
-                    style={{ color: info.color }}
-                  >
-                    {fn}
-                  </button>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-        </>
-        ) : (
-          <div className="bg-white/5 rounded-2xl p-6 mb-5 border border-white/10 text-center">
-            <p className="text-gray-400 text-sm">Complétez le test MBTI ou choisissez votre type pour explorer vos fonctions cognitives (Ego & Ombre).</p>
-          </div>
-        )}
-
         <div className="bg-white/10 backdrop-blur rounded-2xl p-5 mb-5 border border-white/20">
           <div className="flex items-center justify-between mb-3">
             <h2 className="text-white font-semibold">🔮 Ennéagramme</h2>
@@ -331,32 +213,6 @@ export default function Cognitive() {
         </Button>
       </div>
 
-      {/* Function detail modal */}
-      {fnDetail && (() => {
-        const info = FUNCTION_DESCRIPTIONS[fnDetail];
-        return (
-          <div
-            className="fixed inset-0 bg-black/60 z-50 flex items-end justify-center"
-            onClick={() => setFnDetail(null)}
-          >
-            <div
-              className="bg-[#0d1f2d] rounded-t-2xl p-6 w-full max-w-lg shadow-2xl border-t border-white/20"
-              onClick={e => e.stopPropagation()}
-            >
-              <div className="flex justify-between items-start mb-3">
-                <div className="flex items-baseline gap-2">
-                  <span className="text-2xl font-black" style={{ color: info.color }}>{fnDetail}</span>
-                  <span className="text-sm font-semibold" style={{ color: info.color + "cc" }}>{FUNCTION_SHORT[fnDetail]}</span>
-                </div>
-                <button onClick={() => setFnDetail(null)} className="text-gray-400 text-2xl leading-none">×</button>
-              </div>
-              <h3 className="text-white font-semibold mb-1">{info.label}</h3>
-              <p className="text-gray-400 text-sm mb-3">{info.desc}</p>
-              <p className="text-gray-500 text-xs leading-relaxed border-t border-white/10 pt-3">{info.fonctionnement}</p>
-            </div>
-          </div>
-        );
-      })()}
     </div>
   );
 }

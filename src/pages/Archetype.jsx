@@ -1,5 +1,6 @@
 import React from "react";
 import SilhouetteMBTI from "@/components/archetype/SilhouetteMBTI";
+import MBTIFunctionsDetail from "@/components/archetype/MBTIFunctionsDetail";
 import EnneagramDiagram from "@/components/archetype/EnneagramDiagram";
 import AttachmentGrid from "@/components/archetype/AttachmentGrid";
 import EnneagramInfoCards from "@/components/archetype/EnneagramInfoCards";
@@ -21,6 +22,8 @@ export default function Archetype() {
         </div>
 
         <SilhouetteMBTI />
+
+        <MBTIFunctionsDetail />
 
         <EnneagramDiagram />
 
