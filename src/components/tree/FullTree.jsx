@@ -353,7 +353,7 @@ export default function FullTree({ mode, zoomable = false }) {
                   })}
 
                   {sBeliefs.slice(0, 4).map((b, i) => {
-                    const p = bezierFn(0.35 + i * 0.18);
+                    const p = bezierFn(0.18 + i * 0.14);
                     const txt = b.belief.length > 28 ? b.belief.slice(0, 28) + "…" : b.belief;
                     return (
                       <g key={b.id} style={{ cursor: "pointer" }}
@@ -373,7 +373,7 @@ export default function FullTree({ mode, zoomable = false }) {
                     // so they never overlap the branch label which sits above the tip.
                     const n = Math.min(bActivities.length, 8);
                     const angle = n === 1 ? Math.PI / 2 : (i / (n - 1)) * Math.PI;
-                    const lr = 22;
+                    const lr = 34;
                     const lx = end.x + lr * Math.cos(angle) + (bd.side === "left" ? -4 : 4);
                     const ly = end.y + lr * Math.sin(angle);
                     // Wrap activity name into multiple lines instead of truncating
