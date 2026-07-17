@@ -14,8 +14,8 @@ const LIST_COLORS = {
   need: { bg: "rgba(6,182,212,0.05)", border: "rgba(6,182,212,0.15)", text: "#06b6d4" },
 };
 
-export default function AggregateView({ traumaticEvents, links, limitingBeliefs }) {
-  const data = aggregateData({ traumaticEvents, links, limitingBeliefs });
+export default function AggregateView({ traumaticEvents, links, limitingBeliefs, positiveEvents = [] }) {
+  const data = aggregateData({ traumaticEvents, links, limitingBeliefs, positiveEvents });
   const hasData = Object.keys(data.byList).length > 0;
   if (!hasData) return null;
 

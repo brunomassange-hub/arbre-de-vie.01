@@ -57,6 +57,13 @@
         "type": "string"
       },
       "description": "Cat\u00e9gories cliniques s\u00e9lectionn\u00e9es (format listId:itemId)"
+    },
+    "need_tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Besoins fondamentaux troubl\u00e9s par cet \u00e9v\u00e9nement (format need:itemId)"
     }
   },
   "required": [

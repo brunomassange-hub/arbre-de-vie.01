@@ -6,6 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { X } from "lucide-react";
 import { CHAKRAS } from "@/lib/chakras";
+import NeedSelector from "./NeedSelector";
 
 const LINK_TYPES = ["Famille", "Ami(e)", "Partenaire", "Mentor", "Collègue", "Autre"];
 
@@ -35,7 +36,7 @@ export default function TreeAddPanel({ zone, onClose, onSaved, polarityLock }) {
   const [activityForm, setActivityForm] = useState({ name: "", description: "" });
 
   // Trunk wound form
-  const [eventForm, setEventForm] = useState({ age: "", title: "", description: "", emotion: "Peur", wound_type: "" });
+  const [eventForm, setEventForm] = useState({ age: "", title: "", description: "", emotion: "Peur", wound_type: "", need_tags: [] });
   // Link form (root)
   const lockedCategory = zone?.category;
   const [linkForm, setLinkForm] = useState({ name: "", type: lockedCategory || "Famille", description: "" });
@@ -43,7 +44,7 @@ export default function TreeAddPanel({ zone, onClose, onSaved, polarityLock }) {
   const [beliefForm, setBeliefForm] = useState({ belief: "", age: "", origin: "", reframe: "", note: "" });
   // Quality form (trunk strength)
   const [quality, setQuality] = useState("");
-  const [posEventForm, setPosEventForm] = useState({ age: "", title: "", description: "", emotion: "Amour" });
+  const [posEventForm, setPosEventForm] = useState({ age: "", title: "", description: "", emotion: "Amour", need_tags: [] });
   const [trunkSubType, setTrunkSubType] = useState("event");
 
   const meta = ZONE_META[zone?.type] || ZONE_META.trunk;
@@ -57,7 +58,7 @@ export default function TreeAddPanel({ zone, onClose, onSaved, polarityLock }) {
           if (!eventForm.title.trim() || !eventForm.age) return;
           const chakra = CHAKRAS.find(c => c.shadow === eventForm.emotion)?.name || "Connexion";
           await base44.entities.TraumaticEvent.create({ ...eventForm, age: Number(eventForm.age), chakra });
-          setEventForm({ age: "", title: "", description: "", emotion: "Peur", wound_type: "" });
+          setEventForm({ age: "", title: "", description: "", emotion: "Peur", wound_type: "", need_tags: [] });
         } else {
           if (trunkSubType === "quality") {
             if (!quality.trim()) return;
@@ -73,7 +74,7 @@ export default function TreeAddPanel({ zone, onClose, onSaved, polarityLock }) {
             if (!posEventForm.title.trim() || !posEventForm.age) return;
             const chakra = CHAKRAS.find(c => c.light === posEventForm.emotion)?.name || "Connexion";
             await base44.entities.PositiveEvent.create({ ...posEventForm, age: Number(posEventForm.age), chakra });
-            setPosEventForm({ age: "", title: "", description: "", emotion: "Amour" });
+            setPosEventForm({ age: "", title: "", description: "", emotion: "Amour", need_tags: [] });
           }
         }
       } else if (zone.type === "root") {
@@ -198,6 +199,11 @@ export default function TreeAddPanel({ zone, onClose, onSaved, polarityLock }) {
               <Textarea value={eventForm.description} onChange={e => setEventForm({ ...eventForm, description: e.target.value })}
                 placeholder="Description (optionnel)" rows={2}
                 className="bg-white/60 border-[#e0d6c8] text-[#3e2723] placeholder:text-[#8d6e63]/50 resize-none" />
+              <NeedSelector
+                value={eventForm.need_tags || []}
+                onChange={(tags) => setEventForm({ ...eventForm, need_tags: tags })}
+                label="Besoin troublé"
+              />
             </>
           )}
 
@@ -235,6 +241,11 @@ export default function TreeAddPanel({ zone, onClose, onSaved, polarityLock }) {
                   <Textarea value={posEventForm.description} onChange={e => setPosEventForm({ ...posEventForm, description: e.target.value })}
                     placeholder="Description (optionnel)" rows={2}
                     className="bg-white/60 border-[#e0d6c8] text-[#3e2723] placeholder:text-[#8d6e63]/50 resize-none" />
+                  <NeedSelector
+                    value={posEventForm.need_tags || []}
+                    onChange={(tags) => setPosEventForm({ ...posEventForm, need_tags: tags })}
+                    label="Besoin comblé"
+                  />
                 </>
               )}
             </>

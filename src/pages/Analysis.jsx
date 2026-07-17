@@ -17,12 +17,13 @@ export default function Analysis() {
   const [cognitiveProfile, setCognitiveProfile] = useState(null);
   const [positiveLinks, setPositiveLinks] = useState([]);
   const [positiveBeliefs, setPositiveBeliefs] = useState([]);
+  const [positiveEvents, setPositiveEvents] = useState([]);
 
   useEffect(() => { loadData(); }, []);
 
   const loadData = async () => {
     setLoading(true);
-    const [events, links, beliefs, existing, bigFiveList, cogList, posLinks, posBeliefs] = await Promise.all([
+    const [events, links, beliefs, existing, bigFiveList, cogList, posLinks, posBeliefs, posEvents] = await Promise.all([
       base44.entities.TraumaticEvent.list(),
       base44.entities.Link.list(),
       base44.entities.LimitingBelief.list(),
@@ -31,12 +32,14 @@ export default function Analysis() {
       base44.entities.CognitiveProfile.list(),
       base44.entities.PositiveLink.list(),
       base44.entities.PositiveBelief.list(),
+      base44.entities.PositiveEvent.list(),
     ]);
     const bigFive = bigFiveList[0] || null;
     setRawData({ events, links, beliefs, bigFive });
     setCognitiveProfile(cogList[0] || null);
     setPositiveLinks(posLinks);
     setPositiveBeliefs(posBeliefs);
+    setPositiveEvents(posEvents);
     const keys = new Set(existing.map(e => `${e.category}|${e.title}`));
     setValidated(existing.filter(e => e.status === "validated"));
     const all = generateSuggestions({ traumaticEvents: events, links, limitingBeliefs: beliefs });
@@ -103,7 +106,7 @@ export default function Analysis() {
           </p>
         </div>
 
-        <AggregateView traumaticEvents={rawData.events} links={rawData.links} limitingBeliefs={rawData.beliefs} />
+        <AggregateView traumaticEvents={rawData.events} links={rawData.links} limitingBeliefs={rawData.beliefs} positiveEvents={positiveEvents} />
         <PersonalityPerspective bigFive={rawData.bigFive} cognitiveProfile={cognitiveProfile} events={rawData.events} links={rawData.links} beliefs={rawData.beliefs} />
         <BeliefSynthesis limitingBeliefs={rawData.beliefs} />
 

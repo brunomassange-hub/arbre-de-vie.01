@@ -26,6 +26,7 @@ export default function PersonalizedVideoDisplay({ dark = false }) {
 
         [...events, ...links, ...beliefs].forEach(item => {
           (item.clinical_tags || []).forEach(tag => collected.add(tag));
+          (item.need_tags || []).forEach(tag => collected.add(tag));
         });
 
         events.forEach(ev => {

@@ -176,11 +176,14 @@ export function generateSuggestions({ traumaticEvents = [], links = [], limiting
 }
 
 // ─── Aggregated data from clinical_tags ──────────────────
-export function aggregateData({ traumaticEvents = [], links = [], limitingBeliefs = [] }) {
+export function aggregateData({ traumaticEvents = [], links = [], limitingBeliefs = [], positiveEvents = [] }) {
   const tagCount = {};
-  const allItems = [...traumaticEvents, ...links, ...limitingBeliefs];
+  const allItems = [...traumaticEvents, ...links, ...limitingBeliefs, ...positiveEvents];
   allItems.forEach(item => {
     (item.clinical_tags || []).forEach(tag => {
+      tagCount[tag] = (tagCount[tag] || 0) + 1;
+    });
+    (item.need_tags || []).forEach(tag => {
       tagCount[tag] = (tagCount[tag] || 0) + 1;
     });
   });
