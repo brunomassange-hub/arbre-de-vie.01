@@ -16,6 +16,16 @@ export const JOURNAL_TOOLS = {
   amelioration: { label: "Axes", icon: "📈" },
 };
 
+export const JOURNAL_THEMES = {
+  emotions: { label: "Émotion", icon: "🧠" },
+  wound: { label: "Blessure de l'âme", icon: "💔" },
+  trauma: { label: "Traumatisme", icon: "❤️" },
+  conflits: { label: "Conflit psychique", icon: "✨" },
+  relations: { label: "Relation", icon: "👥" },
+  comportement: { label: "Comportement", icon: "📈" },
+  sens: { label: "Sens de vie", icon: "☀️" },
+};
+
 export const LIST_JOURNAL_RECOMMENDATIONS = {
   trauma: { theme: "trauma", tool: "grounding" },
   rel: { theme: "relations", tool: "amelioration" },

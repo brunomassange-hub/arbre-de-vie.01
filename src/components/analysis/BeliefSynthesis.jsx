@@ -1,7 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
-import { synthesizeBeliefs, JOURNAL_TOOLS, LIST_JOURNAL_RECOMMENDATIONS } from "@/lib/analysisEngine";
+import { synthesizeBeliefs, JOURNAL_THEMES, LIST_JOURNAL_RECOMMENDATIONS } from "@/lib/analysisEngine";
 import { getListLabel } from "@/lib/clinicalCategories";
 
 export default function BeliefSynthesis({ limitingBeliefs }) {
@@ -20,7 +20,7 @@ export default function BeliefSynthesis({ limitingBeliefs }) {
         <div className="space-y-2">
           {data.byTheme.map(theme => {
             const rec = LIST_JOURNAL_RECOMMENDATIONS[theme.listId];
-            const tool = JOURNAL_TOOLS[rec?.tool];
+            const journalTheme = JOURNAL_THEMES[rec?.theme];
             return (
               <div key={theme.key} className="rounded-xl border p-3" style={{ background: "rgba(6,182,212,0.05)", borderColor: "rgba(6,182,212,0.15)" }}>
                 <div className="flex items-center justify-between mb-1">
@@ -35,11 +35,11 @@ export default function BeliefSynthesis({ limitingBeliefs }) {
                     <p key={i} className="text-[11px] text-gray-400">• {b.belief}</p>
                   ))}
                 </div>
-                {tool && (
-                  <Link to={`/Journal?theme=${rec.theme}&tool=${rec.tool}`}
+                {journalTheme && (
+                  <Link to={`/Journal?theme=${rec.theme}`}
                     className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg transition hover:opacity-80"
                     style={{ background: "rgba(139,157,195,0.1)", color: "#8b9dc3" }}>
-                    {tool.icon} Aller vers : {tool.label}
+                    {journalTheme.icon} Aller vers : {journalTheme.label}
                     <ArrowRight className="w-3 h-3 ml-auto" />
                   </Link>
                 )}
