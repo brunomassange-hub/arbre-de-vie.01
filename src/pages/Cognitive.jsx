@@ -204,7 +204,7 @@ export default function Cognitive() {
         )}
 
         <div className="bg-white/10 backdrop-blur rounded-2xl p-5 mb-5 border border-white/20">
-          <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center justify-between mb-1">
             <h2 className="text-white font-semibold">🔮 Ennéagramme</h2>
             <button onClick={() => setShowEnneagramQuiz(!showEnneagramQuiz)}
               className={`flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg border transition ${showEnneagramQuiz ? "bg-amber-600 text-white border-amber-400" : "bg-white/10 text-amber-300 border-white/20 hover:bg-white/20"}`}>
@@ -212,6 +212,7 @@ export default function Cognitive() {
               {showEnneagramQuiz ? "Fermer le test" : "Faire le test"}
             </button>
           </div>
+          <p className="text-gray-400 text-xs mb-4">9 types de personnalité — centres, ailes et dynamiques</p>
           {showEnneagramQuiz ? (
             <EnneagramQuiz
               onComplete={(typeN, scoresArr) => { selectEnneagramType(typeN, scoresArr); setShowEnneagramQuiz(false); }}

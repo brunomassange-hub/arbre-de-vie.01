@@ -6,10 +6,7 @@ export default function EnneagramSection({ selected, onSelect }) {
   const selectedType = ENNEAGRAM_TYPES.find(t => t.num === selected);
 
   return (
-    <div className="bg-white/10 backdrop-blur rounded-2xl p-5 mb-5 border border-white/20">
-      <h2 className="text-white font-semibold mb-1">🔮 Ennéagramme</h2>
-      <p className="text-gray-400 text-xs mb-4">9 types de personnalité — centres, ailes et dynamiques</p>
-
+    <>
       {/* Type selector grid */}
       <div className="grid grid-cols-3 gap-2 mb-4">
         {ENNEAGRAM_TYPES.map(t => (
@@ -159,6 +156,6 @@ export default function EnneagramSection({ selected, onSelect }) {
           </span>
         ))}
       </div>
-    </div>
+    </>
   );
 }

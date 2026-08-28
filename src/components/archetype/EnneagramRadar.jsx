@@ -50,22 +50,13 @@ export default function EnneagramRadar({ onStartTest }) {
   // État neutre : questionnaire non complété
   if (loaded && !scores) {
     return (
-      <div
-        className="rounded-2xl p-5 mb-6 text-center"
-        style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}
-      >
-        <h2
-          className="text-center text-lg font-semibold mb-1"
-          style={{ fontFamily: "'Playfair Display', serif", color: "#e8d5c4" }}
-        >
-          ✦ Profil Ennéagramme complet
-        </h2>
-        <p className="text-center text-xs mb-4" style={{ color: "#6b7b94" }}>
-          Visualisation radar de votre répartition sur les 9 types
+      <div className="mt-5 pt-4 text-center" style={{ borderTop: "1px solid rgba(255,255,255,0.08)" }}>
+        <p className="text-xs mb-2" style={{ color: "#e8d5c4" }}>
+          ✦ Profil radar complet — visualisation de votre répartition sur les 9 types
         </p>
-        <div className="py-6 px-4 rounded-xl" style={{ background: "rgba(255,255,255,0.03)" }}>
+        <div className="py-4 px-4 rounded-xl" style={{ background: "rgba(255,255,255,0.03)" }}>
           <p className="text-sm mb-3" style={{ color: "#9ba8bc" }}>
-            Completez le test Ennéagramme pour révéler votre profil radar complet.
+            Complétez le test Ennéagramme pour révéler votre profil radar complet.
           </p>
           {onStartTest ? (
             <button
@@ -101,17 +92,11 @@ export default function EnneagramRadar({ onStartTest }) {
   const dominantPos = wheelOrder.indexOf(dominant);
 
   return (
-    <div
-      className="rounded-2xl p-5 mb-6"
-      style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}
-    >
-      <h2
-        className="text-center text-lg font-semibold mb-1"
-        style={{ fontFamily: "'Playfair Display', serif", color: "#e8d5c4" }}
-      >
-        ✦ Profil Ennéagramme complet
-      </h2>
-      <p className="text-center text-xs mb-4" style={{ color: "#6b7b94" }}>
+    <div className="mt-5 pt-4" style={{ borderTop: "1px solid rgba(255,255,255,0.08)" }}>
+      <p className="text-center text-xs mb-1" style={{ color: "#e8d5c4" }}>
+        ✦ Profil radar complet
+      </p>
+      <p className="text-center text-xs mb-3" style={{ color: "#6b7b94" }}>
         Répartition de vos 9 types (%) · type dominant : {dominant}
       </p>
 
