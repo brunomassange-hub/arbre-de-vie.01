@@ -69,6 +69,63 @@ const PART1 = [
   { dim: "JP", a: { val: "J", text: "Je veux que les choses soient tranchées et décidées" }, b: { val: "P", text: "Je veux garder la liberté de changer d'avis" } },
 ];
 
+// Single-affirmation items (agreement scale 1-5). Alternating poles within each block.
+const OPPOSITE = { E: "I", I: "E", S: "N", N: "S", T: "F", F: "T", J: "P", P: "J" };
+
+const PART1_SINGLE = [
+  // E / I (10) — alternance I, E
+  { dim: "EI", pole: "I", text: "Dans un grand groupe, j'ai tendance à m'effacer et à parler peu." },
+  { dim: "EI", pole: "E", text: "Après une longue période seul, je deviens agité." },
+  { dim: "EI", pole: "I", text: "En réunion, je préfère écouter plutôt que prendre la parole." },
+  { dim: "EI", pole: "E", text: "J'engage souvent la conversation avec des inconnus dans une file d'attente." },
+  { dim: "EI", pole: "I", text: "Être observé pendant que je travaille me met mal à l'aise." },
+  { dim: "EI", pole: "E", text: "Quand je vais mal, je me tourne vers les autres plutôt que de me replier." },
+  { dim: "EI", pole: "I", text: "Je garde mon téléphone en silencieux et je ressens rarement l'envie d'appeler les gens." },
+  { dim: "EI", pole: "E", text: "Je me sens le plus vivant quand la journée est remplie de monde et d'activité." },
+  { dim: "EI", pole: "I", text: "Je préfère réfléchir avant de parler, même si cela ralentit la conversation." },
+  { dim: "EI", pole: "E", text: "Je recharge mon énergie en enchaînant les activités sociales plutôt qu'en m'isolant." },
+  // T / F (10) — alternance T, F
+  { dim: "TF", pole: "T", text: "Je repère la faille d'un argument même quand j'apprécie la personne." },
+  { dim: "TF", pole: "F", text: "Je fais tout mon possible pour que personne ne se sente exclu." },
+  { dim: "TF", pole: "T", text: "Je reste calme et détaché quand les autres deviennent émotifs." },
+  { dim: "TF", pole: "F", text: "Un film triste peut me hanter pour le reste de la journée." },
+  { dim: "TF", pole: "T", text: "Je veux connaître la logique derrière une règle avant d'accepter de la suivre." },
+  { dim: "TF", pole: "F", text: "J'ai besoin de sentir qu'une décision est en accord avec mes valeurs." },
+  { dim: "TF", pole: "T", text: "Avoir raison compte plus pour moi que préserver la paix." },
+  { dim: "TF", pole: "F", text: "Complimenter quelqu'un sincèrement me vient facilement." },
+  { dim: "TF", pole: "T", text: "Je juge une idée sur ses mérites, peu importe qui l'a proposée." },
+  { dim: "TF", pole: "F", text: "Je fais souvent passer les besoins des autres avant les miens sans qu'on me le demande." },
+  // N / S (10) — alternance N, S
+  { dim: "SN", pole: "N", text: "Je suis attiré par le sens derrière les événements plus que par les événements eux-mêmes." },
+  { dim: "SN", pole: "S", text: "J'apprends le mieux une compétence en la pratiquant de mes propres mains." },
+  { dim: "SN", pole: "N", text: "Je continue à demander pourquoi jusqu'à atteindre le principe sous-jacent." },
+  { dim: "SN", pole: "S", text: "Je remarque vite quand un goût, une odeur ou un son cloche légèrement." },
+  { dim: "SN", pole: "N", text: "Je m'ennuie vite dès qu'un problème n'est plus nouveau." },
+  { dim: "SN", pole: "S", text: "Je veux les détails précis avant de m'intéresser à la vue d'ensemble." },
+  { dim: "SN", pole: "N", text: "J'aime imaginer d'autres versions de la façon dont l'histoire aurait pu se dérouler." },
+  { dim: "SN", pole: "S", text: "Je préfère réparer ce qui est cassé maintenant plutôt que tout repenser." },
+  { dim: "SN", pole: "N", text: "Le moindre soupçon d'idée peut lancer mon esprit dans dix directions à la fois." },
+  { dim: "SN", pole: "S", text: "Je reste ancré dans ce qui est réellement devant moi." },
+  // J / P (10) — alternance J, P
+  { dim: "JP", pole: "J", text: "J'aime avoir un plan de secours prêt avant de me lancer." },
+  { dim: "JP", pole: "P", text: "Un week-end sans rien de prévu, c'est un plaisir, pas du temps perdu." },
+  { dim: "JP", pole: "J", text: "Je fais mes valises un jour ou deux avant chaque voyage." },
+  { dim: "JP", pole: "P", text: "Je décide souvent au dernier moment quoi faire, et j'aime ça." },
+  { dim: "JP", pole: "J", text: "Je tiens les engagements que j'ai pris, même les plus petits." },
+  { dim: "JP", pole: "P", text: "Une routine rigide finit par me donner l'impression d'une cage." },
+  { dim: "JP", pole: "J", text: "J'aime des règles claires sur qui est responsable de quoi." },
+  { dim: "JP", pole: "P", text: "Je pars souvent sur une tangente et j'atterris là où je n'avais jamais prévu d'aller." },
+  { dim: "JP", pole: "J", text: "Je me fixe des échéances même quand personne ne les exige." },
+  { dim: "JP", pole: "P", text: "Je laisse les tâches de côté jusqu'à ce que la curiosité ou une échéance m'y ramène." },
+];
+
+const PART1_SINGLE_GROUPS = [
+  { dim: "EI", label: "Extraversion / Introversion" },
+  { dim: "TF", label: "Pensée / Sentiment" },
+  { dim: "SN", label: "Intuition / Sensation" },
+  { dim: "JP", label: "Jugement / Perception" },
+];
+
 const PART2 = [
   // Ti vs Te (7)
   { pair: "TiTe", prompt: "Face à un problème complexe, je préfère…", a: { val: "Ti", text: "Le résoudre selon ma propre logique interne cohérente, même si ça prend du temps" }, b: { val: "Te", text: "Appliquer une méthode efficace et éprouvée pour aller vite" } },
@@ -104,10 +161,13 @@ const PART2 = [
 
 export default function MBTIQuiz({ onComplete, onClose }) {
   const [part1Answers, setPart1Answers] = useState({});
+  const [part1SingleAnswers, setPart1SingleAnswers] = useState({});
   const [part2Answers, setPart2Answers] = useState({});
   const [step, setStep] = useState("part1");
 
   const part1Answered = Object.keys(part1Answers).length;
+  const part1SingleAnswered = Object.keys(part1SingleAnswers).length;
+  const part1Total = PART1.length + PART1_SINGLE.length;
   const part2Answered = Object.keys(part2Answers).length;
 
   const tally = () => {
@@ -117,6 +177,12 @@ export default function MBTIQuiz({ onComplete, onClose }) {
       if (ans === undefined) return;
       if (ans <= 2) scores[q.a.val] += (3 - ans);
       else if (ans >= 4) scores[q.b.val] += (ans - 3);
+    });
+    PART1_SINGLE.forEach((q, idx) => {
+      const ans = part1SingleAnswers[idx];
+      if (ans === undefined) return;
+      if (ans <= 2) scores[OPPOSITE[q.pole]] += (3 - ans);
+      else if (ans >= 4) scores[q.pole] += (ans - 3);
     });
     const type =
       (scores.E >= scores.I ? "E" : "I") +
@@ -246,13 +312,13 @@ export default function MBTIQuiz({ onComplete, onClose }) {
         <div className="flex justify-between items-center mb-4">
           <div>
             <h3 className="text-white font-semibold text-sm">📝 Test MBTI</h3>
-            <p className="text-gray-500 text-xs">Partie 1/2 — Dichotomies · {part1Answered}/{PART1.length}</p>
+            <p className="text-gray-500 text-xs">Partie 1/2 — Dichotomies · {part1Answered + part1SingleAnswered}/{part1Total}</p>
           </div>
           {onClose && <button onClick={onClose} className="text-gray-500 hover:text-white text-sm">✕</button>}
         </div>
 
         <div className="w-full bg-white/10 rounded-full h-1.5 mb-2">
-          <div className="bg-indigo-500 h-1.5 rounded-full transition-all" style={{ width: `${(part1Answered / PART1.length) * 100}%` }} />
+          <div className="bg-indigo-500 h-1.5 rounded-full transition-all" style={{ width: `${((part1Answered + part1SingleAnswered) / part1Total) * 100}%` }} />
         </div>
         <p className="text-gray-500 text-[10px] text-center mb-4">
           1 = tout à fait l'option de gauche · 3 = neutre · 5 = tout à fait l'option de droite
@@ -287,13 +353,49 @@ export default function MBTIQuiz({ onComplete, onClose }) {
               </div>
             </div>
           ))}
+
+          {/* Affirmations — échelle d'accord 1-5 */}
+          <div className="pt-4 mt-2 border-t border-white/10">
+            <p className="text-indigo-300 text-[10px] font-bold uppercase tracking-wide mb-1">Affirmations</p>
+            <p className="text-gray-500 text-[10px] text-center mb-3">
+              1 = Pas du tout d'accord · 3 = Neutre · 5 = Tout à fait d'accord
+            </p>
+            {PART1_SINGLE_GROUPS.map((group, gIdx) => {
+              const items = PART1_SINGLE.map((q, idx) => ({ ...q, idx })).filter(q => q.dim === group.dim);
+              return (
+                <div key={`s-${gIdx}`} className="mb-4">
+                  <p className="text-indigo-400 text-xs font-bold mb-2">{group.label}</p>
+                  <div className="space-y-2">
+                    {items.map(q => (
+                      <div key={q.idx} className="bg-white/5 rounded-xl p-3 border border-white/10">
+                        <p className="text-xs text-gray-300 mb-2">{q.text}</p>
+                        <div className="flex gap-1">
+                          {SCALE.map(val => {
+                            const sel = part1SingleAnswers[q.idx] === val;
+                            return (
+                              <button key={val} onClick={() => setPart1SingleAnswers({ ...part1SingleAnswers, [q.idx]: val })}
+                                className={`flex-1 py-2 rounded-lg text-xs font-bold transition border ${
+                                  sel ? "bg-indigo-600 border-indigo-400 text-white" : "bg-white/5 border-white/10 text-gray-400 hover:bg-white/10"
+                                }`}>
+                                {val}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         </div>
 
-        <Button onClick={() => setStep("part2")} disabled={part1Answered < 18}
+        <Button onClick={() => setStep("part2")} disabled={(part1Answered + part1SingleAnswered) < 30}
           className="w-full bg-indigo-700 hover:bg-indigo-600 text-white">
           Continuer vers la Partie 2 <ChevronRight className="w-4 h-4 ml-1" />
         </Button>
-        {part1Answered < 18 && <p className="text-gray-500 text-xs text-center mt-2">Répondez au moins à 18 questions sur {PART1.length}</p>}
+        {(part1Answered + part1SingleAnswered) < 30 && <p className="text-gray-500 text-xs text-center mt-2">Répondez au moins à 30 questions sur {part1Total}</p>}
       </div>
     );
   }
