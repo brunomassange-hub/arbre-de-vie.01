@@ -5,7 +5,6 @@ import { generateSuggestions, CATEGORIES, aggregateData } from "@/lib/analysisEn
 import SuggestionCard from "@/components/analysis/SuggestionCard";
 import AggregateView from "@/components/analysis/AggregateView";
 import PersonalityPerspective from "@/components/analysis/PersonalityPerspective";
-import BeliefSynthesis from "@/components/analysis/BeliefSynthesis";
 import SourceElementList from "@/components/analysis/SourceElementList";
 import PersonalizedReport from "@/components/analysis/PersonalizedReport";
 
@@ -107,7 +106,6 @@ export default function Analysis() {
         </div>
 
         <PersonalityPerspective bigFive={rawData.bigFive} cognitiveProfile={cognitiveProfile} events={rawData.events} links={rawData.links} beliefs={rawData.beliefs} />
-        <BeliefSynthesis limitingBeliefs={rawData.beliefs} />
 
         <PersonalizedReport
           events={rawData.events}
