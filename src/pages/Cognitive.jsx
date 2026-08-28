@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { base44 } from "@/api/base44Client";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -55,10 +55,13 @@ export default function Cognitive() {
   const [showMBTIQuiz, setShowMBTIQuiz] = useState(false);
   const [showEnneagramQuiz, setShowEnneagramQuiz] = useState(false);
   const [showAttachmentQuiz, setShowAttachmentQuiz] = useState(false);
+  const profileRef = useRef(null);
+  const creatingRef = useRef(null);
 
   useEffect(() => {
-    base44.entities.CognitiveProfile.list().then(data => {
+    base44.entities.CognitiveProfile.list('-updated_date').then(data => {
       if (data[0]) {
+        profileRef.current = data[0];
         setProfile(data[0]);
         setSelectedType(data[0].mbti_type || null);
         setNotes(data[0].notes || "");
@@ -87,14 +90,28 @@ export default function Cognitive() {
     setTimeout(() => setSaved(false), 2000);
   };
 
-  // Auto-persist a partial profile update (used for MBTI/Enneagram selections)
+  // Auto-persist a partial profile update (used for MBTI/Enneagram selections).
+  // On évite la création de profils en double quand plusieurs sauvegardes
+  // se déclenchent avant qu'un profil n'existe (ex. on complète le test
+  // avant la fin du chargement initial).
   const persistProfile = async (data) => {
-    if (profile) {
-      await base44.entities.CognitiveProfile.update(profile.id, data);
-    } else {
-      const created = await base44.entities.CognitiveProfile.create(data);
-      setProfile(created);
+    const current = profileRef.current;
+    if (current) {
+      await base44.entities.CognitiveProfile.update(current.id, data);
+      return;
     }
+    if (!creatingRef.current) {
+      creatingRef.current = base44.entities.CognitiveProfile.create(data).then((created) => {
+        profileRef.current = created;
+        setProfile(created);
+        return created;
+      });
+      await creatingRef.current;
+      return;
+    }
+    // Un create est déjà en vol : on l'attend, puis on applique nos données.
+    const created = await creatingRef.current;
+    await base44.entities.CognitiveProfile.update(created.id, data);
   };
 
   const selectMBTIType = (type) => {

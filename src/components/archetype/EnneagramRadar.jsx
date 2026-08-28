@@ -42,7 +42,7 @@ export default function EnneagramRadar({ onStartTest, scores: propScores }) {
     let cancelled = false;
     (async () => {
       try {
-        const profiles = await base44.entities.CognitiveProfile.list();
+        const profiles = await base44.entities.CognitiveProfile.list('-updated_date');
         if (cancelled) return;
         const arr = profiles[0]?.enneagram_scores;
         if (validScores(arr)) setFetchedScores(arr);
