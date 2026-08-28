@@ -93,10 +93,15 @@ export default function EnneagramRadar({ onStartTest, scores: propScores }) {
 
   if (!scores) return null;
 
-  // Points de données selon l'ordre de la roue (0-100 → 0-r)
+  // Échelle dynamique : le max du radar est calibré sur le score le plus élevé
+  // de l'utilisateur (avec une petite marge) pour que la forme remplisse le graphique,
+  // quel que soit le niveau des scores (25%, 32%, 50%...).
+  const maxScore = Math.max(...scores);
+  const scaleMax = Math.max(5, Math.ceil((maxScore + 1) / 5) * 5);
+  // Points de données selon l'ordre de la roue (0..scaleMax → 0..r)
   const dataPoints = angles.map((a, p) => {
     const raw = scores[scoreIndexAtPos(p)];
-    const val = (Math.max(0, Math.min(100, raw)) / 100) * r;
+    const val = (Math.max(0, Math.min(scaleMax, raw)) / scaleMax) * r;
     return { x: cx + val * Math.cos(a), y: cy + val * Math.sin(a) };
   });
   const dataPolygon = dataPoints.map((p) => `${p.x},${p.y}`).join(" ");
