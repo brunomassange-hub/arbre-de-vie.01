@@ -1,0 +1,42 @@
+{
+  "name": "Value",
+  "type": "object",
+  "properties": {
+    "branch": {
+      "type": "string",
+      "enum": [
+        "Social",
+        "Physique",
+        "Intellectuel",
+        "\u00c9motionnel",
+        "Artistique",
+        "Spirituel"
+      ],
+      "description": "La branche concern\u00e9e"
+    },
+    "value": {
+      "type": "string",
+      "description": "La valeur personnelle (ex: authenticit\u00e9, libert\u00e9, respect, courage)"
+    },
+    "note": {
+      "type": "string",
+      "description": "Note ou contexte suppl\u00e9mentaire"
+    }
+  },
+  "required": [
+    "branch",
+    "value"
+  ],
+  "rls": {
+    "create": true,
+    "read": {
+      "created_by_id": "{{user.id}}"
+    },
+    "update": {
+      "created_by_id": "{{user.id}}"
+    },
+    "delete": {
+      "created_by_id": "{{user.id}}"
+    }
+  }
+}

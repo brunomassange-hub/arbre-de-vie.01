@@ -34,6 +34,7 @@ export default function TreeAddPanel({ zone, onClose, onSaved, polarityLock }) {
   const [saving, setSaving] = useState(false);
   const [branchSubType, setBranchSubType] = useState("belief");
   const [activityForm, setActivityForm] = useState({ name: "", description: "" });
+  const [valueForm, setValueForm] = useState({ value: "", note: "" });
 
   // Trunk wound form
   const [eventForm, setEventForm] = useState({ age: "", title: "", description: "", emotion: "Peur", wound_type: "", need_tags: [] });
@@ -90,6 +91,10 @@ export default function TreeAddPanel({ zone, onClose, onSaved, polarityLock }) {
           if (!activityForm.name.trim()) return;
           await base44.entities.Activity.create({ ...activityForm, branch: branchName });
           setActivityForm({ name: "", description: "" });
+        } else if (polarity === "strength" && branchSubType === "value") {
+          if (!valueForm.value.trim()) return;
+          await base44.entities.Value.create({ value: valueForm.value.trim(), branch: branchName, note: valueForm.note.trim() || undefined });
+          setValueForm({ value: "", note: "" });
         } else {
           if (!beliefForm.belief.trim()) return;
           const bData = { belief: beliefForm.belief, branch: branchName };
@@ -120,6 +125,7 @@ export default function TreeAddPanel({ zone, onClose, onSaved, polarityLock }) {
     if (zone.type === "root") return linkForm.name.trim();
     if (zone.type === "branch") {
       if (polarity === "strength" && branchSubType === "activity") return activityForm.name.trim();
+      if (polarity === "strength" && branchSubType === "value") return valueForm.value.trim();
       return beliefForm.belief.trim();
     }
     return false;
@@ -294,6 +300,10 @@ export default function TreeAddPanel({ zone, onClose, onSaved, polarityLock }) {
                   className={`flex-1 py-2 rounded-lg text-xs font-semibold transition border ${branchSubType === "belief" ? "bg-green-100 text-green-700 border-green-300" : "bg-white/40 text-[#8d6e63] border-[#e0d6c8]/60"}`}>
                   ✦ Croyance
                 </button>
+                <button onClick={() => setBranchSubType("value")}
+                  className={`flex-1 py-2 rounded-lg text-xs font-semibold transition border ${branchSubType === "value" ? "bg-amber-100 text-amber-700 border-amber-300" : "bg-white/40 text-[#8d6e63] border-[#e0d6c8]/60"}`}>
+                  ★ Valeur
+                </button>
                 <button onClick={() => setBranchSubType("activity")}
                   className={`flex-1 py-2 rounded-lg text-xs font-semibold transition border ${branchSubType === "activity" ? "bg-green-100 text-green-700 border-green-300" : "bg-white/40 text-[#8d6e63] border-[#e0d6c8]/60"}`}>
                   🍃 Activité
@@ -306,6 +316,13 @@ export default function TreeAddPanel({ zone, onClose, onSaved, polarityLock }) {
                   <Input type="number" value={beliefForm.age} onChange={e => setBeliefForm({ ...beliefForm, age: e.target.value })}
                     placeholder="Âge (optionnel)" className="bg-white/60 border-[#e0d6c8] text-[#3e2723] placeholder:text-[#8d6e63]/50" />
                   <Input value={beliefForm.note} onChange={e => setBeliefForm({ ...beliefForm, note: e.target.value })}
+                    placeholder="Note (optionnel)" className="bg-white/60 border-[#e0d6c8] text-[#3e2723] placeholder:text-[#8d6e63]/50" />
+                </>
+              ) : branchSubType === "value" ? (
+                <>
+                  <Input value={valueForm.value} onChange={e => setValueForm({ ...valueForm, value: e.target.value })}
+                    placeholder="Ex: authenticité, liberté, respect, courage..." className="bg-white/60 border-[#e0d6c8] text-[#3e2723] placeholder:text-[#8d6e63]/50" />
+                  <Input value={valueForm.note} onChange={e => setValueForm({ ...valueForm, note: e.target.value })}
                     placeholder="Note (optionnel)" className="bg-white/60 border-[#e0d6c8] text-[#3e2723] placeholder:text-[#8d6e63]/50" />
                 </>
               ) : (

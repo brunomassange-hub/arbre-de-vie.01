@@ -30,6 +30,7 @@ const ENTITY_MAP = {
   pos_link: "PositiveLink",
   wound_belief: "LimitingBelief",
   pos_belief: "PositiveBelief",
+  pos_value: "Value",
   activity: "Activity",
 };
 
@@ -81,6 +82,7 @@ export default function FullTree({ mode, zoomable = false, refreshSignal = 0, on
   const [limitBeliefs, setLimitBeliefs] = useState([]);
   const [posLinks, setPosLinks] = useState([]);
   const [posBeliefs, setPosBeliefs] = useState([]);
+  const [values, setValues] = useState([]);
   const [activities, setActivities] = useState([]);
   const [posEvents, setPosEvents] = useState([]);
 
@@ -93,11 +95,12 @@ export default function FullTree({ mode, zoomable = false, refreshSignal = 0, on
           setLimitBeliefs(lb);
         });
     } else {
-      Promise.all([base44.entities.BigFiveProfile.list(), base44.entities.PositiveLink.list(), base44.entities.PositiveBelief.list(), base44.entities.Activity.list(), base44.entities.PositiveEvent.list()])
-        .then(([bf, pl, pb, act, pe]) => {
+      Promise.all([base44.entities.BigFiveProfile.list(), base44.entities.PositiveLink.list(), base44.entities.PositiveBelief.list(), base44.entities.Value.list(), base44.entities.Activity.list(), base44.entities.PositiveEvent.list()])
+        .then(([bf, pl, pb, val, act, pe]) => {
           setBigFive(bf[0] || null);
           setPosLinks(pl);
           setPosBeliefs(pb);
+          setValues(val);
           setActivities(act);
           setPosEvents([...pe].sort((a, b) => a.age - b.age));
         });
@@ -331,6 +334,7 @@ export default function FullTree({ mode, zoomable = false, refreshSignal = 0, on
               const color = BRANCH_COLORS[bd.name];
               const wBeliefs = isWound ? limitBeliefs.filter(b => b.branch === bd.name) : [];
               const sBeliefs = !isWound ? posBeliefs.filter(b => b.branch === bd.name) : [];
+              const bValues = !isWound ? values.filter(v => v.branch === bd.name) : [];
               const bActivities = !isWound ? activities.filter(a => a.branch === bd.name) : [];
               const bezierFn = (t) => bezier(t, startX, startY, midX, midY, end.x, end.y);
 
@@ -367,6 +371,32 @@ export default function FullTree({ mode, zoomable = false, refreshSignal = 0, on
                         <text x={p.x + (bd.side === "left" ? -11 : 11)} y={p.y + 1} dominantBaseline="middle"
                           textAnchor={bd.side === "left" ? "end" : "start"}
                           fontSize="6.5" fill={color} fontWeight="600" pointerEvents="none"
+                          style={{ paintOrder: "stroke", stroke: "#faf6f0", strokeWidth: 2.5, fontFamily: SERIF }}>{txt}</text>
+                      </g>
+                    );
+                  })}
+
+                  {bValues.slice(0, 3).map((v, i) => {
+                    const tVal = 0.18 + i * 0.14;
+                    const p = bezierFn(tVal);
+                    const p2 = bezierFn(Math.min(tVal + 0.01, 1));
+                    let tx = p2.x - p.x, ty = p2.y - p.y;
+                    const tlen = Math.hypot(tx, ty) || 1;
+                    tx /= tlen; ty /= tlen;
+                    let nx = -ty, ny = tx;
+                    if (ny < 0) { nx = -nx; ny = -ny; }
+                    const vx = p.x + nx * 12;
+                    const vy = p.y + ny * 12;
+                    const txt = v.value.length > 22 ? v.value.slice(0, 22) + "…" : v.value;
+                    return (
+                      <g key={v.id} style={{ cursor: "pointer" }}
+                        onClick={(e) => { e.stopPropagation(); setDetail({ type: "pos_value", data: v, color: "#c9a430" }); }}>
+                        <rect x={vx - 6} y={vy - 6} width={12} height={12} rx={2}
+                          fill="#f5e7b8" stroke="#c9a430" strokeWidth="1.5" transform={`rotate(45 ${vx} ${vy})`} />
+                        <text x={vx} y={vy + 1} textAnchor="middle" dominantBaseline="middle" fontSize="7" fill="#c9a430">★</text>
+                        <text x={vx + (bd.side === "left" ? -11 : 11)} y={vy + 1} dominantBaseline="middle"
+                          textAnchor={bd.side === "left" ? "end" : "start"}
+                          fontSize="6.5" fill="#c9a430" fontWeight="700" pointerEvents="none"
                           style={{ paintOrder: "stroke", stroke: "#faf6f0", strokeWidth: 2.5, fontFamily: SERIF }}>{txt}</text>
                       </g>
                     );
@@ -425,7 +455,7 @@ export default function FullTree({ mode, zoomable = false, refreshSignal = 0, on
                   )}
 
                   {/* Branch interactive badge */}
-                  {wBeliefs.length === 0 && sBeliefs.length === 0 && bActivities.length === 0 && (
+                  {wBeliefs.length === 0 && sBeliefs.length === 0 && bValues.length === 0 && bActivities.length === 0 && (
                     <g style={{ cursor: "pointer" }} onClick={() => setAddZone({ type: "branch", name: bd.name })}>
                       <circle cx={end.x} cy={end.y} r="9" fill="#faf6f0" stroke={color} strokeWidth="1.5" className="tree-pulse" />
                       <text x={end.x} y={end.y + 1} textAnchor="middle" dominantBaseline="middle" fontSize="10" fill={color} fontWeight="bold">+</text>
@@ -574,6 +604,14 @@ export default function FullTree({ mode, zoomable = false, refreshSignal = 0, on
                           placeholder="Note" rows={2} className="bg-white/60 border-[#e0d6c8] text-[#3e2723] text-sm resize-none" />
                       </>
                     )}
+                    {detail.type === "pos_value" && (
+                      <>
+                        <Input value={editData.value ?? ""} onChange={e => setEditData({ ...editData, value: e.target.value })}
+                          placeholder="Valeur (ex: authenticité, liberté...)" className="bg-white/60 border-[#e0d6c8] text-[#3e2723] text-sm h-9" />
+                        <Textarea value={editData.note ?? ""} onChange={e => setEditData({ ...editData, note: e.target.value })}
+                          placeholder="Note (optionnel)" rows={2} className="bg-white/60 border-[#e0d6c8] text-[#3e2723] text-sm resize-none" />
+                      </>
+                    )}
                     {detail.type === "activity" && (
                       <>
                         <Input value={editData.name ?? ""} onChange={e => setEditData({ ...editData, name: e.target.value })}
@@ -648,6 +686,13 @@ export default function FullTree({ mode, zoomable = false, refreshSignal = 0, on
                         <p className="text-xs mb-0.5" style={{ color: detail.color }}>Croyance positive — {detail.data.branch}</p>
                         <h2 className="text-lg font-bold" style={{ color: "#3e2723" }}>✦ {detail.data.belief}</h2>
                         {detail.data.age != null && <p className="text-sm mt-1" style={{ color: "#8d6e63" }}>Âge : {detail.data.age} ans</p>}
+                        {detail.data.note && <p className="text-sm mt-1" style={{ color: "#5d4037" }}>{detail.data.note}</p>}
+                      </>
+                    )}
+                    {detail.type === "pos_value" && (
+                      <>
+                        <p className="text-xs mb-0.5" style={{ color: detail.color }}>Valeur — {detail.data.branch}</p>
+                        <h2 className="text-lg font-bold" style={{ color: "#3e2723" }}>★ {detail.data.value}</h2>
                         {detail.data.note && <p className="text-sm mt-1" style={{ color: "#5d4037" }}>{detail.data.note}</p>}
                       </>
                     )}

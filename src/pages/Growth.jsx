@@ -9,6 +9,7 @@ import { Plus, Trash2, Save, X, Pencil } from "lucide-react";
 import FullTree from "@/components/tree/FullTree";
 import PositiveEventsSection from "@/components/sections/PositiveEventsSection";
 import PositiveBeliefSection from "@/components/growth/PositiveBeliefSection";
+import ValueSection from "@/components/growth/ValueSection";
 import ActivitySection from "@/components/growth/ActivitySection";
 
 // ─── SHARED ──────────────────────────────────────────────
@@ -397,6 +398,13 @@ export default function Growth() {
           <Section emoji="🌿" title="Les Branches — Croyances positives" subtitle="Vos convictions nourricières"
             accentClass="bg-green-50 border-green-200">
             <PositiveBeliefSection refreshKey={refreshKey} onRefresh={() => setRefreshKey(k => k + 1)} />
+          </Section>
+        </div>
+
+        <div className="mb-8">
+          <Section emoji="🌟" title="Les Branches — Valeurs personnelles" subtitle="Vos principes directeurs"
+            accentClass="bg-amber-50 border-amber-200">
+            <ValueSection refreshKey={refreshKey} onRefresh={() => setRefreshKey(k => k + 1)} />
           </Section>
         </div>
 
