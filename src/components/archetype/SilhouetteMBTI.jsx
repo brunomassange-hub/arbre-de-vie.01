@@ -132,12 +132,15 @@ export default function SilhouetteMBTI() {
         {DOTS.map(({ fn, x, y }) => {
           const info = FUNCTION_DESCRIPTIONS[fn];
           const rank = functions ? functions.ego.indexOf(fn) : -1;
+          const shadowRank = functions ? functions.shadow.indexOf(fn) : -1;
           const isActive = rank >= 0;
-          const isShadow = functions ? functions.shadow.includes(fn) : false;
+          const isShadow = shadowRank >= 0;
           const color = isActive ? info.color : "#4a5568";
           const opacity = isActive ? 1 : 0.3;
 
-          // Taille visuelle selon la hiérarchie (dominante > auxiliaire > tertiaire > inférieure > ombre)
+          // Taille visuelle selon la hiérarchie :
+          // Ego : dominante > auxiliaire > tertiaire > inférieure (avec surbrillance colorée)
+          // Ombre : opposant > critique > filou > démon (sans surbrillance, atténué)
           // Sans type MBTI : toutes égales et neutres (comportement actuel)
           let glowR = 0, dotR = 9, fontSz = 8, stroke = 1.5;
           if (functions && isActive) {
@@ -146,7 +149,10 @@ export default function SilhouetteMBTI() {
             else if (rank === 2) { glowR = 12; dotR = 8; fontSz = 7.5; stroke = 1.4; }
             else { glowR = 10; dotR = 6.5; fontSz = 6.5; stroke = 1.2; }
           } else if (isShadow) {
-            dotR = 5; fontSz = 5; stroke = 1;
+            if (shadowRank === 0) { dotR = 6; fontSz = 6; stroke = 1.1; }
+            else if (shadowRank === 1) { dotR = 5.3; fontSz = 5.3; stroke = 1; }
+            else if (shadowRank === 2) { dotR = 4.6; fontSz = 4.6; stroke = 0.9; }
+            else { dotR = 4; fontSz = 4; stroke = 0.8; }
           }
 
           return (
