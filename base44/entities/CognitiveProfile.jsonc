@@ -10,7 +10,16 @@
       "type": "integer",
       "minimum": 1,
       "maximum": 9,
-      "description": "Type Enn\u00e9agramme (1-9)"
+      "description": "Type Enn\u00e9agramme dominant (1-9)"
+    },
+    "enneagram_scores": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      },
+      "maxItems": 9,
+      "minItems": 9,
+      "description": "R\u00e9partition compl\u00e8te Enn\u00e9agramme : 9 pourcentages (index 0 = type 1 ... index 8 = type 9)"
     },
     "attachment_style": {
       "type": "string",

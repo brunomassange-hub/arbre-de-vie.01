@@ -99,9 +99,11 @@ export default function Cognitive() {
     persistProfile({ mbti_type: type, enneagram_type: enneagramType, attachment_style: attachmentStyle, attachment_anxiety: attachmentAnxiety, attachment_avoidance: attachmentAvoidance, notes });
   };
 
-  const selectEnneagramType = (typeN) => {
+  const selectEnneagramType = (typeN, enneagramScores) => {
     setEnneagramType(typeN);
-    persistProfile({ mbti_type: selectedType, enneagram_type: typeN, attachment_style: attachmentStyle, attachment_anxiety: attachmentAnxiety, attachment_avoidance: attachmentAvoidance, notes });
+    const data = { mbti_type: selectedType, enneagram_type: typeN, attachment_style: attachmentStyle, attachment_anxiety: attachmentAnxiety, attachment_avoidance: attachmentAvoidance, notes };
+    if (enneagramScores) data.enneagram_scores = enneagramScores;
+    persistProfile(data);
   };
 
   const selectAttachmentResult = ({ style, anxiety, avoidance }) => {
@@ -211,7 +213,7 @@ export default function Cognitive() {
           </div>
           {showEnneagramQuiz ? (
             <EnneagramQuiz
-              onComplete={(typeN) => { selectEnneagramType(typeN); setShowEnneagramQuiz(false); }}
+              onComplete={(typeN, scoresArr) => { selectEnneagramType(typeN, scoresArr); setShowEnneagramQuiz(false); }}
               onClose={() => setShowEnneagramQuiz(false)}
             />
           ) : (

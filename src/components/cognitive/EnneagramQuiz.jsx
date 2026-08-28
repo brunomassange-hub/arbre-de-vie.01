@@ -42,6 +42,7 @@ export default function EnneagramQuiz({ onComplete, onClose }) {
     const { byType, total, bestType } = computeScores();
     const sorted = Object.entries(byType).sort((a, b) => b[1].pct - a[1].pct);
     const best = TYPE_META.find(t => t.n === bestType);
+    const scoresArr = Array.from({ length: 9 }, (_, i) => Number((byType[i + 1].pct).toFixed(1)));
     return (
       <div className="bg-white/10 backdrop-blur rounded-2xl p-5 border border-white/20">
         <div className="text-center mb-5">
@@ -82,7 +83,7 @@ export default function EnneagramQuiz({ onComplete, onClose }) {
             variant="outline" className="flex-1 bg-white/10 border-white/20 text-white hover:bg-white/20">
             <RotateCcw className="w-4 h-4 mr-1" /> Recommencer
           </Button>
-          <Button onClick={() => onComplete(bestType)}
+          <Button onClick={() => onComplete(bestType, scoresArr)}
             className="flex-1 bg-amber-700 hover:bg-amber-600 text-white">
             <ChevronRight className="w-4 h-4 mr-1" /> Type {bestType}
           </Button>
