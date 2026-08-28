@@ -67,7 +67,6 @@ export default function SilhouetteMBTI() {
   }, []);
 
   const functions = mbtiType ? MBTI_FUNCTIONS[mbtiType] : null;
-  const egoSet = functions ? new Set(functions.ego) : new Set();
 
   return (
     <div
@@ -131,20 +130,34 @@ export default function SilhouetteMBTI() {
 
         {/* Function dots */}
         {DOTS.map(({ fn, x, y }) => {
-          const isActive = egoSet.has(fn);
           const info = FUNCTION_DESCRIPTIONS[fn];
+          const rank = functions ? functions.ego.indexOf(fn) : -1;
+          const isActive = rank >= 0;
+          const isShadow = functions ? functions.shadow.includes(fn) : false;
           const color = isActive ? info.color : "#4a5568";
           const opacity = isActive ? 1 : 0.3;
 
+          // Taille visuelle selon la hiérarchie (dominante > auxiliaire > tertiaire > inférieure > ombre)
+          // Sans type MBTI : toutes égales et neutres (comportement actuel)
+          let glowR = 0, dotR = 9, fontSz = 8, stroke = 1.5;
+          if (functions && isActive) {
+            if (rank === 0) { glowR = 18; dotR = 12; fontSz = 11; stroke = 2; }
+            else if (rank === 1) { glowR = 15; dotR = 10; fontSz = 9.5; stroke = 1.8; }
+            else if (rank === 2) { glowR = 12; dotR = 8; fontSz = 7.5; stroke = 1.4; }
+            else { glowR = 10; dotR = 6.5; fontSz = 6.5; stroke = 1.2; }
+          } else if (isShadow) {
+            dotR = 5; fontSz = 5; stroke = 1;
+          }
+
           return (
             <g key={fn} opacity={opacity} onClick={() => setFnDetail(fn)} style={{ cursor: "pointer" }}>
-              {isActive && <circle cx={x} cy={y} r="14" fill={color} opacity="0.18" />}
-              <circle cx={x} cy={y} r="9" fill={color} stroke="#fff" strokeWidth="1.5" />
+              {glowR > 0 && <circle cx={x} cy={y} r={glowR} fill={color} opacity="0.18" />}
+              <circle cx={x} cy={y} r={dotR} fill={color} stroke="#fff" strokeWidth={stroke} />
               <text
                 x={x}
-                y={y + 3}
+                y={y + fontSz * 0.36}
                 textAnchor="middle"
-                fontSize="8"
+                fontSize={fontSz}
                 fontWeight="bold"
                 fill="#fff"
               >
