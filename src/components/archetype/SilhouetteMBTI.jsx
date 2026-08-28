@@ -26,6 +26,18 @@ const MBTI_FUNCTIONS = {
 
 const POSITION_LABELS = ["Dominante", "Auxiliaire", "Tertiaire", "Inférieure"];
 
+// Palette chakra appliquée aux fonctions actives (Ego) sur la silhouette
+const FN_CHAKRA_COLOR = {
+  Ni: "#800080", // Violet — couronne
+  Ti: "#3b6ee0", // Bleu — centre du cerveau
+  Ne: "#4b0082", // Indigo / bleu nuit — oreille gauche du sujet
+  Te: "#00CED1", // Turquoise — gorge
+  Fe: "#008000", // Vert — torse
+  Fi: "#FFD700", // Jaune — torse, côté opposé
+  Si: "#FFA500", // Orange — tête, zone souvenir
+  Se: "#dc3030", // Rouge — bassin
+};
+
 // Dot positions on the silhouette (viewBox 0 0 200 420)
 // Tête: Ni (sommet), Ti (cerveau droite sujet), Ne (oreille gauche sujet), Si (haut tête)
 // Gorge: Te · Torse: Fe/Fi · Bassin: Se
@@ -135,7 +147,7 @@ export default function SilhouetteMBTI() {
           const shadowRank = functions ? functions.shadow.indexOf(fn) : -1;
           const isActive = rank >= 0;
           const isShadow = shadowRank >= 0;
-          const color = isActive ? info.color : "#4a5568";
+          const color = isActive ? (FN_CHAKRA_COLOR[fn] || info.color) : "#4a5568";
           const opacity = isActive ? 1 : 0.3;
 
           // Taille visuelle selon la hiérarchie :
