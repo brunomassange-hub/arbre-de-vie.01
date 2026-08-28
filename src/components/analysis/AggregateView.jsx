@@ -1,7 +1,6 @@
 import React from "react";
 import { aggregateData } from "@/lib/analysisEngine";
 import { CLINICAL_LISTS } from "@/lib/clinicalCategories";
-import VideoDisplay from "@/components/video/VideoDisplay";
 
 const LIST_COLORS = {
   trauma: { bg: "rgba(239,68,68,0.05)", border: "rgba(239,68,68,0.15)", text: "#ef4444" },
@@ -20,23 +19,17 @@ export default function AggregateView({ traumaticEvents, links, limitingBeliefs,
   return (
     <div className="mb-8">
       <h2 className="text-sm font-bold mb-3" style={{ color: "#e8d5c4" }}>📊 Vue agrégée par catégorie</h2>
-      <div className="space-y-3">
+      <div className="space-y-2">
         {CLINICAL_LISTS.map(list => {
           const items = data.byList[list.id];
           if (!items || items.length === 0) return null;
           const colors = LIST_COLORS[list.id] || LIST_COLORS.trauma;
+          const total = items.reduce((sum, item) => sum + item.count, 0);
           return (
-            <div key={list.id} className="rounded-xl border p-3" style={{ background: colors.bg, borderColor: colors.border }}>
-              <p className="text-[10px] font-bold uppercase tracking-wide mb-2" style={{ color: colors.text }}>{list.label}</p>
-              <div className="space-y-1.5">
-                {items.map(item => (
-                  <div key={item.key} className="flex items-center justify-between gap-2">
-                    <span className="text-xs text-gray-300 flex-1 min-w-0 truncate">{item.label}</span>
-                    <span className="text-xs font-bold flex-shrink-0" style={{ color: colors.text }}>{item.count} occ.</span>
-                  </div>
-                ))}
-              </div>
-              <VideoDisplay tags={items.map(i => i.key)} dark />
+            <div key={list.id} className="rounded-xl border p-3 flex items-center justify-between gap-2"
+              style={{ background: colors.bg, borderColor: colors.border }}>
+              <span className="text-xs font-bold uppercase tracking-wide" style={{ color: colors.text }}>{list.label}</span>
+              <span className="text-xs font-bold flex-shrink-0" style={{ color: colors.text }}>{total} occ.</span>
             </div>
           );
         })}
