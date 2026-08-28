@@ -4,11 +4,16 @@ import { createPageUrl } from "@/utils";
 import { base44 } from "@/api/base44Client";
 import { TYPE_META } from "@/lib/enneagram-quiz-data";
 
-// 9 axes dans l'ordre de la roue (1 → 9), en partant du sommet et dans le sens horaire
+// 9 axes disposés selon la roue classique de l'Ennéagramme :
+// Type 9 au sommet (12h), puis 1 → 8 dans le sens horaire.
 const N = 9;
 const cx = 130, cy = 130, r = 95;
 const angles = Array.from({ length: N }, (_, i) => (Math.PI * 2 * i) / N - Math.PI / 2);
 const vertices = angles.map((a) => ({ x: cx + r * Math.cos(a), y: cy + r * Math.sin(a) }));
+// Type affiché à chaque position (sens horaire depuis le sommet)
+const wheelOrder = [9, 1, 2, 3, 4, 5, 6, 7, 8];
+const typeAtPos = (p) => wheelOrder[p];
+const scoreIndexAtPos = (p) => wheelOrder[p] - 1;
 
 const getAnchor = (x) => {
   if (x > cx + 12) return "start";
@@ -86,12 +91,14 @@ export default function EnneagramRadar({ onStartTest }) {
 
   if (!scores) return null;
 
-  // Points de données (0-100 → 0-r)
-  const dataPoints = scores.map((v, i) => {
-    const val = (Math.max(0, Math.min(100, v)) / 100) * r;
-    return { x: cx + val * Math.cos(angles[i]), y: cy + val * Math.sin(angles[i]) };
+  // Points de données selon l'ordre de la roue (0-100 → 0-r)
+  const dataPoints = angles.map((a, p) => {
+    const raw = scores[scoreIndexAtPos(p)];
+    const val = (Math.max(0, Math.min(100, raw)) / 100) * r;
+    return { x: cx + val * Math.cos(a), y: cy + val * Math.sin(a) };
   });
   const dataPolygon = dataPoints.map((p) => `${p.x},${p.y}`).join(" ");
+  const dominantPos = wheelOrder.indexOf(dominant);
 
   return (
     <div
@@ -113,7 +120,14 @@ export default function EnneagramRadar({ onStartTest }) {
         style={{ background: "linear-gradient(135deg, #ffffff 0%, #f5f0e8 100%)", boxShadow: "inset 0 1px 4px rgba(141,110,99,0.15)" }}
       >
         <svg width="260" height="260" viewBox="0 0 260 260">
-          {/* Fond noir (nonagone plein) */}
+          <defs>
+            <radialGradient id="enneaRadarFill" cx="50%" cy="50%" r="55%">
+              <stop offset="0%" stopColor="#fde68a" stopOpacity="0.75" />
+              <stop offset="60%" stopColor="#facc2e" stopOpacity="0.5" />
+              <stop offset="100%" stopColor="#b45309" stopOpacity="0.35" />
+            </radialGradient>
+          </defs>
+          {/* Fond nonagone plein */}
           <polygon points={vertices.map((v) => `${v.x},${v.y}`).join(" ")} fill="#1a1a1a" />
           {/* Grilles concentriques */}
           {[0.25, 0.5, 0.75, 1].map((f) => (
@@ -132,29 +146,32 @@ export default function EnneagramRadar({ onStartTest }) {
           {vertices.map((v, i) => (
             <line key={i} x1={cx} y1={cy} x2={v.x} y2={v.y} stroke="rgba(255,255,255,0.15)" strokeWidth="1" />
           ))}
-          {/* Coins colorés (centre → point[i] → point[i+1]) */}
-          {TYPE_META.map((meta, i) => {
-            const ni = (i + 1) % N;
-            const pts = `${cx},${cy} ${dataPoints[i].x},${dataPoints[i].y} ${dataPoints[ni].x},${dataPoints[ni].y}`;
-            return <polygon key={`w${i}`} points={pts} fill={meta.color} stroke="none" />;
-          })}
-          {/* Polygone de données par-dessus */}
-          <polygon points={dataPolygon} fill="none" stroke="#fff" strokeWidth="1.5" opacity="0.6" />
+          {/* Zone remplie (données) : dégradé semi-transparent + contour marqué */}
+          <polygon
+            points={dataPolygon}
+            fill="url(#enneaRadarFill)"
+            stroke="#facc2e"
+            strokeWidth="2.5"
+            strokeLinejoin="round"
+          />
           {/* Points + anneau sur le type dominant */}
           {dataPoints.map((p, i) => {
-            const isDom = dominant === i + 1;
+            const t = typeAtPos(i);
+            const isDom = dominantPos === i;
+            const color = TYPE_META[t - 1].color;
             return (
               <g key={`d${i}`}>
-                {isDom && <circle cx={p.x} cy={p.y} r="7" fill="none" stroke="#fff" strokeWidth="2" opacity="0.9" />}
-                <circle cx={p.x} cy={p.y} r="4" fill="#fff" stroke={TYPE_META[i].color} strokeWidth="2.5" />
+                {isDom && <circle cx={p.x} cy={p.y} r="7" fill="none" stroke="#fff" strokeWidth="2" opacity="0.95" />}
+                <circle cx={p.x} cy={p.y} r="4" fill="#fff" stroke={color} strokeWidth="2.5" />
               </g>
             );
           })}
-          {/* Étiquettes des types */}
+          {/* Étiquettes des types (numéro seul, ordre de la roue) */}
           {vertices.map((v, i) => {
             const dx = v.x - cx, dy = v.y - cy;
-            const lx = cx + dx * 1.2, ly = cy + dy * 1.2;
-            const meta = TYPE_META[i];
+            const lx = cx + dx * 1.22, ly = cy + dy * 1.22;
+            const t = typeAtPos(i);
+            const meta = TYPE_META[t - 1];
             return (
               <text
                 key={`l${i}`}
@@ -162,11 +179,11 @@ export default function EnneagramRadar({ onStartTest }) {
                 y={ly}
                 textAnchor={getAnchor(lx)}
                 dominantBaseline="middle"
-                fontSize="8"
-                fontWeight="700"
+                fontSize="11"
+                fontWeight="800"
                 fill={meta.color}
               >
-                {i + 1} · {meta.name.replace("Le ", "").replace("L'", "")}
+                {t}
               </text>
             );
           })}
