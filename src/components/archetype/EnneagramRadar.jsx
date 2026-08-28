@@ -21,31 +21,42 @@ const getAnchor = (x) => {
   return "middle";
 };
 
-export default function EnneagramRadar({ onStartTest }) {
-  const [scores, setScores] = useState(null);
-  const [dominant, setDominant] = useState(null);
+const validScores = (arr) => Array.isArray(arr) && arr.length === 9 && arr.some((v) => v > 0);
+const computeDominant = (arr) => {
+  let best = 0;
+  for (let i = 1; i < 9; i++) if (arr[i] > arr[best]) best = i;
+  return best + 1;
+};
+
+export default function EnneagramRadar({ onStartTest, scores: propScores }) {
+  const [fetchedScores, setFetchedScores] = useState(null);
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
+    // Scores fournis directement (page Personnalité) : pas de fetch, affichage immédiat.
+    if (validScores(propScores)) {
+      setLoaded(true);
+      return;
+    }
+    // Sinon (page Archétype, usage autonome) : lecture du profil sauvegardé.
+    let cancelled = false;
     (async () => {
       try {
         const profiles = await base44.entities.CognitiveProfile.list();
-        const p = profiles[0];
-        const arr = p?.enneagram_scores;
-        if (Array.isArray(arr) && arr.length === 9 && arr.some((v) => v > 0)) {
-          setScores(arr);
-          // Type dominant = pourcentage le plus élevé
-          let best = 0;
-          for (let i = 1; i < 9; i++) if (arr[i] > arr[best]) best = i;
-          setDominant(best + 1);
-        }
+        if (cancelled) return;
+        const arr = profiles[0]?.enneagram_scores;
+        if (validScores(arr)) setFetchedScores(arr);
       } catch {
         /* ignore */
       } finally {
-        setLoaded(true);
+        if (!cancelled) setLoaded(true);
       }
     })();
-  }, []);
+    return () => { cancelled = true; };
+  }, [propScores]);
+
+  const scores = validScores(propScores) ? propScores : fetchedScores;
+  const dominant = scores ? computeDominant(scores) : null;
 
   // État neutre : questionnaire non complété
   if (loaded && !scores) {

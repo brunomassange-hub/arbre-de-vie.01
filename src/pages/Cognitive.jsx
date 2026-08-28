@@ -46,6 +46,7 @@ export default function Cognitive() {
   const [selectedType, setSelectedType] = useState(null);
   const [notes, setNotes] = useState("");
   const [enneagramType, setEnneagramType] = useState(null);
+  const [enneagramScores, setEnneagramScores] = useState(null);
   const [attachmentStyle, setAttachmentStyle] = useState(null);
   const [attachmentAnxiety, setAttachmentAnxiety] = useState(null);
   const [attachmentAvoidance, setAttachmentAvoidance] = useState(null);
@@ -62,6 +63,7 @@ export default function Cognitive() {
         setSelectedType(data[0].mbti_type || null);
         setNotes(data[0].notes || "");
         setEnneagramType(data[0].enneagram_type || null);
+        setEnneagramScores(data[0].enneagram_scores || null);
         setAttachmentStyle(data[0].attachment_style || null);
         setAttachmentAnxiety(data[0].attachment_anxiety ?? null);
         setAttachmentAvoidance(data[0].attachment_avoidance ?? null);
@@ -100,10 +102,11 @@ export default function Cognitive() {
     persistProfile({ mbti_type: type, enneagram_type: enneagramType, attachment_style: attachmentStyle, attachment_anxiety: attachmentAnxiety, attachment_avoidance: attachmentAvoidance, notes });
   };
 
-  const selectEnneagramType = (typeN, enneagramScores) => {
+  const selectEnneagramType = (typeN, scoresArr) => {
     setEnneagramType(typeN);
+    if (scoresArr) setEnneagramScores(scoresArr);
     const data = { mbti_type: selectedType, enneagram_type: typeN, attachment_style: attachmentStyle, attachment_anxiety: attachmentAnxiety, attachment_avoidance: attachmentAvoidance, notes };
-    if (enneagramScores) data.enneagram_scores = enneagramScores;
+    if (scoresArr) data.enneagram_scores = scoresArr;
     persistProfile(data);
   };
 
@@ -220,7 +223,7 @@ export default function Cognitive() {
             />
           ) : (
             <>
-              <EnneagramRadar onStartTest={() => setShowEnneagramQuiz(true)} />
+              <EnneagramRadar onStartTest={() => setShowEnneagramQuiz(true)} scores={enneagramScores} />
               <EnneagramSection selected={enneagramType} onSelect={selectEnneagramType} />
             </>
           )}
