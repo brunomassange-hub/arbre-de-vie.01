@@ -220,8 +220,8 @@ export default function Cognitive() {
             />
           ) : (
             <>
-              <EnneagramSection selected={enneagramType} onSelect={selectEnneagramType} />
               <EnneagramRadar onStartTest={() => setShowEnneagramQuiz(true)} />
+              <EnneagramSection selected={enneagramType} onSelect={selectEnneagramType} />
             </>
           )}
         </div>

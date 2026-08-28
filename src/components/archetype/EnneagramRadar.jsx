@@ -3,7 +3,6 @@ import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { base44 } from "@/api/base44Client";
 import { TYPE_META } from "@/lib/enneagram-quiz-data";
-import EnneagramBars from "@/components/archetype/EnneagramBars";
 
 // 9 axes disposés selon la roue classique de l'Ennéagramme :
 // Type 9 au sommet (12h), puis 1 → 8 dans le sens horaire.
@@ -100,8 +99,6 @@ export default function EnneagramRadar({ onStartTest }) {
       <p className="text-center text-xs mb-3" style={{ color: "#6b7b94" }}>
         Répartition de vos 9 types (%) · type dominant : {dominant}
       </p>
-
-      <EnneagramBars scores={scores} />
 
       <div
         className="flex justify-center mb-3 rounded-xl p-2"
