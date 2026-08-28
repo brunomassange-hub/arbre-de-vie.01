@@ -8,6 +8,8 @@ import { Badge } from "@/components/ui/badge";
 import { Plus, Trash2, Save, X, Pencil } from "lucide-react";
 import FullTree from "@/components/tree/FullTree";
 import PositiveEventsSection from "@/components/sections/PositiveEventsSection";
+import PositiveBeliefSection from "@/components/growth/PositiveBeliefSection";
+import ActivitySection from "@/components/growth/ActivitySection";
 
 // ─── SHARED ──────────────────────────────────────────────
 const LINK_TYPES = ["Famille", "Ami(e)", "Partenaire", "Mentor", "Collègue", "Autre"];
@@ -364,13 +366,14 @@ function RacinesPositivesSection() {
 
 // ─── PAGE PRINCIPALE ─────────────────────────────────────
 export default function Growth() {
+  const [refreshKey, setRefreshKey] = useState(0);
   return (
     <div className="min-h-screen px-4 py-8" style={{ background: "#faf6f0" }}>
       <div className="max-w-xl mx-auto">
         <h1 className="text-3xl font-bold mb-1" style={{ fontFamily: "'Playfair Display', serif", color: "#3e2723" }}>✨ Forces</h1>
         <p className="text-sm mb-4" style={{ color: "#8d6e63" }}>Cliquez sur l'arbre ou les sections ci-dessous</p>
 
-        <FullTree mode="strengths" zoomable />
+        <FullTree mode="strengths" zoomable refreshSignal={refreshKey} onDataChange={() => setRefreshKey(k => k + 1)} />
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
           <Section emoji="🌱" title="Les Racines" subtitle="Relations nourrissantes"
@@ -387,6 +390,20 @@ export default function Growth() {
           <Section emoji="🌳" title="Le Tronc — Événements positifs" subtitle="Vos expériences marquantes"
             accentClass="bg-green-50 border-green-200">
             <PositiveEventsSection />
+          </Section>
+        </div>
+
+        <div className="mb-8">
+          <Section emoji="🌿" title="Les Branches — Croyances positives" subtitle="Vos convictions nourricières"
+            accentClass="bg-green-50 border-green-200">
+            <PositiveBeliefSection refreshKey={refreshKey} onRefresh={() => setRefreshKey(k => k + 1)} />
+          </Section>
+        </div>
+
+        <div className="mb-8">
+          <Section emoji="🍃" title="Les Feuilles — Activités ressources" subtitle="Ce qui vous fait du bien"
+            accentClass="bg-green-50 border-green-200">
+            <ActivitySection refreshKey={refreshKey} onRefresh={() => setRefreshKey(k => k + 1)} />
           </Section>
         </div>
       </div>

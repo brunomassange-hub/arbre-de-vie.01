@@ -354,7 +354,7 @@ function RacinesSection() {
 }
 
 // ─── BRANCHES SECTION ────────────────────────────────────
-function BranchesSection() {
+function BranchesSection({ refreshKey = 0, onRefresh }) {
   const [beliefs, setBeliefs] = useState([]);
   const [openAxis, setOpenAxis] = useState(null);
   const [showFormFor, setShowFormFor] = useState(null);
@@ -370,7 +370,7 @@ function BranchesSection() {
     base44.entities.LimitingBelief.list().then(setBeliefs);
     base44.entities.TraumaticEvent.list().then(setEvents);
     base44.entities.Link.list().then(setLinks);
-  }, []);
+  }, [refreshKey]);
 
   const handleCreate = async (branch) => {
     if (!form.belief.trim()) return;
@@ -380,6 +380,7 @@ function BranchesSection() {
     setForm({ belief: "", age: "", origin: "", reframe: "", clinical_tags: [] });
     setShowFormFor(null);
     setShowQualForm(false);
+    onRefresh?.();
     base44.entities.LimitingBelief.list().then(setBeliefs);
   };
 
@@ -388,11 +389,13 @@ function BranchesSection() {
     if (data.age) data.age = Number(data.age); else delete data.age;
     await base44.entities.LimitingBelief.update(editingId, data);
     setEditingId(null); setEditForm(null); setShowQualEdit(false);
+    onRefresh?.();
     base44.entities.LimitingBelief.list().then(setBeliefs);
   };
 
   const handleDelete = async (id) => {
     await base44.entities.LimitingBelief.delete(id);
+    onRefresh?.();
     setBeliefs(beliefs.filter(b => b.id !== id));
   };
 
@@ -523,13 +526,14 @@ function BranchesSection() {
 
 // ─── PAGE PRINCIPALE ─────────────────────────────────────
 export default function Garden() {
+  const [refreshKey, setRefreshKey] = useState(0);
   return (
     <div className="min-h-screen px-4 py-8" style={{ background: "#faf6f0" }}>
       <div className="max-w-xl mx-auto">
         <h1 className="text-3xl font-bold mb-1" style={{ fontFamily: "'Playfair Display', serif", color: "#3e2723" }}>🩸 Blessures</h1>
         <p className="text-sm mb-4" style={{ color: "#8d6e63" }}>Cliquez sur l'arbre ou les sections ci-dessous</p>
 
-        <FullTree mode="wounds" zoomable />
+        <FullTree mode="wounds" zoomable refreshSignal={refreshKey} onDataChange={() => setRefreshKey(k => k + 1)} />
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
           <Section emoji="🌱" title="Les Racines" subtitle="Relations douloureuses"
@@ -544,7 +548,7 @@ export default function Garden() {
 
         <Section emoji="🍃" title="Les Branches" subtitle="Croyances limitantes selon les 6 axes de vie"
           accentClass="bg-green-50 border-green-200">
-          <BranchesSection />
+          <BranchesSection refreshKey={refreshKey} onRefresh={() => setRefreshKey(k => k + 1)} />
         </Section>
       </div>
     </div>

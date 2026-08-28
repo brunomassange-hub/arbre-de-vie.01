@@ -9,6 +9,7 @@ import TreeAddPanel from "@/components/tree/TreeAddPanel";
 import BigFiveRadarModal from "@/components/tree/BigFiveRadarModal";
 import { CHAKRAS } from "@/lib/chakras";
 import NeedSelector from "@/components/tree/NeedSelector";
+import BeliefQualification from "@/components/garden/BeliefQualification";
 import {
   cx, trunkTop, trunkBot, BRANCH_DEFS, BRANCH_COLORS,
   getBranchGeometry, ROOT_DEFS, ROOT_CATEGORIES, TRUNK_PATH, bezier
@@ -61,7 +62,7 @@ const STYLES = [
   { id: "line", label: "Linéaire", art: LineArtArt },
 ];
 
-export default function FullTree({ mode, zoomable = false }) {
+export default function FullTree({ mode, zoomable = false, refreshSignal = 0, onDataChange }) {
   const isWound = mode === "wounds";
   const polarityLock = isWound ? "wound" : "strength";
   const accent = isWound ? "#a1887f" : "#7fae7e";
@@ -72,6 +73,7 @@ export default function FullTree({ mode, zoomable = false }) {
   const [addZone, setAddZone] = useState(null);
   const [treeStyle, setTreeStyle] = useState("illus");
   const [showBigFive, setShowBigFive] = useState(false);
+  const [showQualEdit, setShowQualEdit] = useState(false);
 
   const [bigFive, setBigFive] = useState(null);
   const [events, setEvents] = useState([]);
@@ -102,7 +104,7 @@ export default function FullTree({ mode, zoomable = false }) {
     }
   };
 
-  useEffect(() => { loadData(); }, [mode]);
+  useEffect(() => { loadData(); }, [mode, refreshSignal]);
 
   const trunkEvents = (isWound ? events.slice(0, 6) : posEvents.slice(0, 6)).slice().reverse();
   const allRootLinks = isWound ? woundLinks : posLinks;
@@ -112,7 +114,8 @@ export default function FullTree({ mode, zoomable = false }) {
   const handleDetailSave = async () => {
     const entityName = ENTITY_MAP[detail.type];
     const data = { ...editData };
-    if (data.age !== undefined && data.age !== "") data.age = Number(data.age);
+    if (data.age !== undefined && data.age !== null && data.age !== "") data.age = Number(data.age);
+    else if (data.age !== undefined) delete data.age;
     if (detail.type === "event" || detail.type === "pos_event") {
       const chakra = CHAKRAS.find(c => detail.type === "event" ? c.shadow === data.emotion : c.light === data.emotion)?.name;
       if (chakra) data.chakra = chakra;
@@ -121,6 +124,7 @@ export default function FullTree({ mode, zoomable = false }) {
     setIsEditing(false);
     setDetail(null);
     loadData();
+    onDataChange?.();
   };
 
   const BRANCH_DISPLAY_ORDER = ["Émotionnel", "Physique", "Social", "Artistique", "Intellectuel", "Spirituel"];
@@ -482,7 +486,7 @@ export default function FullTree({ mode, zoomable = false }) {
       </div>
 
       {addZone && (
-        <TreeAddPanel zone={addZone} onClose={() => setAddZone(null)} onSaved={loadData} polarityLock={polarityLock} />
+        <TreeAddPanel zone={addZone} onClose={() => setAddZone(null)} onSaved={() => { loadData(); onDataChange?.(); }} polarityLock={polarityLock} />
       )}
 
       {showBigFive && !isWound && (
@@ -550,6 +554,14 @@ export default function FullTree({ mode, zoomable = false }) {
                           placeholder="Origine" className="bg-white/60 border-[#e0d6c8] text-[#3e2723] text-sm h-9" />
                         <Input value={editData.reframe ?? ""} onChange={e => setEditData({ ...editData, reframe: e.target.value })}
                           placeholder="Reformulation positive" className="bg-white/60 border-[#e0d6c8] text-[#3e2723] text-sm h-9" />
+                        <button onClick={() => setShowQualEdit(!showQualEdit)} className="text-xs text-[#8d6e63] hover:text-amber-700 transition">
+                          {showQualEdit ? "− Masquer la qualification" : "+ Qualifier (tags, optionnel)"}
+                        </button>
+                        {showQualEdit && (
+                          <div className="bg-white/40 rounded-lg p-3 border border-[#e0d6c8]/60">
+                            <BeliefQualification value={editData} onChange={(updates) => setEditData({ ...editData, ...updates })} events={events} links={woundLinks} />
+                          </div>
+                        )}
                       </>
                     )}
                     {detail.type === "pos_belief" && (
@@ -651,7 +663,7 @@ export default function FullTree({ mode, zoomable = false }) {
               </div>
               <div className="flex gap-2 flex-shrink-0">
                 {!isEditing && (
-                  <button onClick={() => { setIsEditing(true); setEditData({ ...detail.data }); }} className="transition" style={{ color: "#8d6e63" }}>
+                  <button onClick={() => { setIsEditing(true); setEditData({ ...detail.data }); setShowQualEdit(!!(detail.data.clinical_tags?.length || detail.data.source_event_id || detail.data.source_link_id)); }} className="transition" style={{ color: "#8d6e63" }}>
                     <Pencil className="w-5 h-5" />
                   </button>
                 )}
