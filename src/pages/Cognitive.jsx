@@ -241,6 +241,11 @@ export default function Cognitive() {
           ) : (
             <>
               <EnneagramRadar onStartTest={() => setShowEnneagramQuiz(true)} scores={enneagramScores} />
+              {enneagramScores && (
+                <p className="text-amber-300/90 text-xs mb-3 mt-1 text-center italic">
+                  Cliquez sur votre type pour confirmer et enregistrer ce résultat comme votre profil Ennéagramme.
+                </p>
+              )}
               <EnneagramSection selected={enneagramType} onSelect={selectEnneagramType} />
             </>
           )}
