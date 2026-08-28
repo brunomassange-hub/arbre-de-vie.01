@@ -12,6 +12,7 @@ import BeliefQualification from "@/components/garden/BeliefQualification";
 import ClinicalTagBadges from "@/components/clinical/ClinicalTagBadges";
 import { CHAKRAS } from "@/lib/chakras";
 import NeedSelector from "@/components/tree/NeedSelector";
+import EmotionNeedFields from "@/components/tree/EmotionNeedFields";
 
 // ─── TRONC ───────────────────────────────────────────────
 const EMOTIONS = ["Solitude", "Colère", "Anxiété", "Peur", "Culpabilité", "Honte", "Tristesse"];
@@ -232,7 +233,7 @@ function TroncSection() {
 function RacinesSection() {
   const [links, setLinks] = useState([]);
   const [showForm, setShowForm] = useState(false);
-  const [form, setForm] = useState({ name: "", type: "Famille", description: "", clinical_tags: [] });
+  const [form, setForm] = useState({ name: "", type: "Famille", description: "", emotion: "", need_tags: [], clinical_tags: [] });
   const [editingId, setEditingId] = useState(null);
   const [editForm, setEditForm] = useState(null);
   const [showQualForm, setShowQualForm] = useState(false);
@@ -243,7 +244,7 @@ function RacinesSection() {
   const handleCreate = async () => {
     if (!form.name.trim()) return;
     await base44.entities.Link.create(form);
-    setForm({ name: "", type: "Famille", description: "", clinical_tags: [] });
+    setForm({ name: "", type: "Famille", description: "", emotion: "", need_tags: [], clinical_tags: [] });
     setShowForm(false);
     setShowQualForm(false);
     base44.entities.Link.list().then(setLinks);
@@ -280,6 +281,7 @@ function RacinesSection() {
           <Textarea value={form.description} onChange={e => setForm({ ...form, description: e.target.value })}
             placeholder="Ce qui était douloureux dans cette relation..." rows={2}
             className="bg-white/60 border-[#e0d6c8] text-[#3e2723] placeholder:text-[#8d6e63]/50 resize-none" />
+          <EmotionNeedFields value={form} onChange={(updates) => setForm({ ...form, ...updates })} polarity="wound" />
           <button onClick={() => setShowQualForm(!showQualForm)} className="text-xs text-[#8d6e63] hover:text-rose-700 transition">
             {showQualForm ? "− Masquer la qualification" : "+ Qualifier cette relation (optionnel)"}
           </button>
@@ -310,6 +312,7 @@ function RacinesSection() {
                 </div>
                 <Textarea value={editForm.description || ""} onChange={e => setEditForm({ ...editForm, description: e.target.value })}
                   placeholder="Description" rows={2} className="bg-white/60 border-[#e0d6c8] text-[#3e2723] text-sm resize-none" />
+                <EmotionNeedFields value={editForm} onChange={(updates) => setEditForm({ ...editForm, ...updates })} polarity="wound" compact />
                 <button onClick={() => setShowQualEdit(!showQualEdit)} className="text-xs text-[#8d6e63] hover:text-rose-700 transition">
                   {showQualEdit ? "− Masquer la qualification" : "+ Qualifier (optionnel)"}
                 </button>
@@ -336,7 +339,7 @@ function RacinesSection() {
                   )}
                 </div>
                 <div className="flex gap-1 flex-shrink-0">
-                  <button onClick={() => { setEditingId(lk.id); setEditForm({ ...lk, clinical_tags: lk.clinical_tags || [] }); setShowQualEdit(!!lk.clinical_tags?.length); }} className="text-[#a1887f] hover:text-rose-600 transition">
+                  <button onClick={() => { setEditingId(lk.id); setEditForm({ ...lk, clinical_tags: lk.clinical_tags || [], need_tags: lk.need_tags || [] }); setShowQualEdit(!!lk.clinical_tags?.length); }} className="text-[#a1887f] hover:text-rose-600 transition">
                     <Pencil className="w-4 h-4" />
                   </button>
                   <button onClick={() => handleDelete(lk.id)} className="text-[#a1887f] hover:text-red-600 transition">
@@ -358,7 +361,7 @@ function BranchesSection({ refreshKey = 0, onRefresh }) {
   const [beliefs, setBeliefs] = useState([]);
   const [openAxis, setOpenAxis] = useState(null);
   const [showFormFor, setShowFormFor] = useState(null);
-  const [form, setForm] = useState({ belief: "", age: "", origin: "", reframe: "", clinical_tags: [] });
+  const [form, setForm] = useState({ belief: "", age: "", origin: "", reframe: "", emotion: "", need_tags: [], clinical_tags: [] });
   const [editingId, setEditingId] = useState(null);
   const [editForm, setEditForm] = useState(null);
   const [showQualForm, setShowQualForm] = useState(false);
@@ -377,7 +380,7 @@ function BranchesSection({ refreshKey = 0, onRefresh }) {
     const data = { ...form, branch };
     if (data.age) data.age = Number(data.age); else delete data.age;
     await base44.entities.LimitingBelief.create(data);
-    setForm({ belief: "", age: "", origin: "", reframe: "", clinical_tags: [] });
+    setForm({ belief: "", age: "", origin: "", reframe: "", emotion: "", need_tags: [], clinical_tags: [] });
     setShowFormFor(null);
     setShowQualForm(false);
     onRefresh?.();
@@ -434,6 +437,7 @@ function BranchesSection({ refreshKey = 0, onRefresh }) {
                           placeholder="Origine" className="bg-white/60 border-[#e0d6c8] text-[#3e2723] text-sm h-8" />
                         <Input value={editForm.reframe || ""} onChange={e => setEditForm({ ...editForm, reframe: e.target.value })}
                           placeholder="Reformulation positive" className="bg-white/60 border-[#e0d6c8] text-[#3e2723] text-sm h-8" />
+                        <EmotionNeedFields value={editForm} onChange={(updates) => setEditForm({ ...editForm, ...updates })} polarity="wound" compact />
                         <button onClick={() => setShowQualEdit(!showQualEdit)} className="text-xs text-[#8d6e63] hover:text-green-700 transition">
                           {showQualEdit ? "− Masquer" : "+ Qualifier (optionnel)"}
                         </button>
@@ -471,7 +475,7 @@ function BranchesSection({ refreshKey = 0, onRefresh }) {
                           )}
                         </div>
                         <div className="flex gap-1 flex-shrink-0">
-                          <button onClick={() => { setEditingId(b.id); setEditForm({ ...b, clinical_tags: b.clinical_tags || [] }); setShowQualEdit(!!(b.clinical_tags?.length || b.source_event_id || b.source_link_id)); }} className="text-[#a1887f] hover:text-green-600 transition">
+                          <button onClick={() => { setEditingId(b.id); setEditForm({ ...b, clinical_tags: b.clinical_tags || [], need_tags: b.need_tags || [] }); setShowQualEdit(!!(b.clinical_tags?.length || b.source_event_id || b.source_link_id)); }} className="text-[#a1887f] hover:text-green-600 transition">
                             <Pencil className="w-4 h-4" />
                           </button>
                           <button onClick={() => handleDelete(b.id)} className="text-[#a1887f] hover:text-red-600 transition">
@@ -493,6 +497,7 @@ function BranchesSection({ refreshKey = 0, onRefresh }) {
                       placeholder="D'où vient-elle ? (optionnel)" className="bg-white/60 border-[#e0d6c8] text-[#3e2723] placeholder:text-[#8d6e63]/50 text-sm" />
                     <Input value={form.reframe} onChange={e => setForm({ ...form, reframe: e.target.value })}
                       placeholder="Reformulation positive (optionnel)" className="bg-white/60 border-[#e0d6c8] text-[#3e2723] placeholder:text-[#8d6e63]/50 text-sm" />
+                    <EmotionNeedFields value={form} onChange={(updates) => setForm({ ...form, ...updates })} polarity="wound" compact />
                     <button onClick={() => setShowQualForm(!showQualForm)} className="text-xs text-[#8d6e63] hover:text-green-700 transition">
                       {showQualForm ? "− Masquer" : "+ Qualifier (optionnel)"}
                     </button>
@@ -503,7 +508,7 @@ function BranchesSection({ refreshKey = 0, onRefresh }) {
                     )}
                     <div className="flex gap-2">
                       <Button onClick={() => handleCreate(axis.name)} size="sm" className="flex-1 bg-green-800 hover:bg-green-700 text-xs">Ajouter</Button>
-                      <Button onClick={() => { setShowFormFor(null); setForm({ belief: "", age: "", origin: "", reframe: "", clinical_tags: [] }); setShowQualForm(false); }}
+                      <Button onClick={() => { setShowFormFor(null); setForm({ belief: "", age: "", origin: "", reframe: "", emotion: "", need_tags: [], clinical_tags: [] }); setShowQualForm(false); }}
                         size="sm" variant="outline" className="border-[#e0d6c8] text-[#3e2723] hover:bg-white/60 text-xs">Annuler</Button>
                     </div>
                   </div>

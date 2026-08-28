@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Plus, Trash2, Save, Pencil, ChevronDown, ChevronUp } from "lucide-react";
+import EmotionNeedFields from "@/components/tree/EmotionNeedFields";
 
 const BRANCH_AXES = [
   { name: "Émotionnel", icon: "❤️", color: "text-rose-300", bg: "bg-rose-500/10 border-rose-500/20" },
@@ -18,7 +19,7 @@ export default function PositiveBeliefSection({ refreshKey = 0, onRefresh }) {
   const [beliefs, setBeliefs] = useState([]);
   const [openAxis, setOpenAxis] = useState(null);
   const [showFormFor, setShowFormFor] = useState(null);
-  const [form, setForm] = useState({ belief: "", age: "", note: "" });
+  const [form, setForm] = useState({ belief: "", age: "", note: "", emotion: "", need_tags: [] });
   const [editingId, setEditingId] = useState(null);
   const [editForm, setEditForm] = useState(null);
 
@@ -31,7 +32,7 @@ export default function PositiveBeliefSection({ refreshKey = 0, onRefresh }) {
     const data = { ...form, branch };
     if (data.age) data.age = Number(data.age); else delete data.age;
     await base44.entities.PositiveBelief.create(data);
-    setForm({ belief: "", age: "", note: "" });
+    setForm({ belief: "", age: "", note: "", emotion: "", need_tags: [] });
     setShowFormFor(null);
     onRefresh?.();
     base44.entities.PositiveBelief.list().then(setBeliefs);
@@ -83,6 +84,7 @@ export default function PositiveBeliefSection({ refreshKey = 0, onRefresh }) {
                           placeholder="Âge (optionnel)" className="bg-white/60 border-[#e0d6c8] text-[#3e2723] text-sm h-8" />
                         <Textarea value={editForm.note || ""} onChange={e => setEditForm({ ...editForm, note: e.target.value })}
                           placeholder="Note (optionnel)" rows={2} className="bg-white/60 border-[#e0d6c8] text-[#3e2723] text-sm resize-none" />
+                        <EmotionNeedFields value={editForm} onChange={(updates) => setEditForm({ ...editForm, ...updates })} polarity="strength" compact />
                         <div className="flex gap-2">
                           <Button onClick={handleUpdate} size="sm" className="flex-1 bg-emerald-700 hover:bg-emerald-600 h-8"><Save className="w-3 h-3 mr-1" />Enregistrer</Button>
                           <Button onClick={() => { setEditingId(null); setEditForm(null); }} size="sm" variant="outline" className="border-[#e0d6c8] text-[#3e2723] h-8">Annuler</Button>
@@ -96,7 +98,7 @@ export default function PositiveBeliefSection({ refreshKey = 0, onRefresh }) {
                           {b.note && <p className="text-[#5d4037] text-xs mt-1">{b.note}</p>}
                         </div>
                         <div className="flex gap-1 flex-shrink-0">
-                          <button onClick={() => { setEditingId(b.id); setEditForm({ ...b }); }} className="text-[#a1887f] hover:text-emerald-600 transition">
+                          <button onClick={() => { setEditingId(b.id); setEditForm({ ...b, need_tags: b.need_tags || [] }); }} className="text-[#a1887f] hover:text-emerald-600 transition">
                             <Pencil className="w-4 h-4" />
                           </button>
                           <button onClick={() => handleDelete(b.id)} className="text-[#a1887f] hover:text-red-600 transition">
@@ -116,9 +118,10 @@ export default function PositiveBeliefSection({ refreshKey = 0, onRefresh }) {
                       placeholder="Âge (optionnel)" className="bg-white/60 border-[#e0d6c8] text-[#3e2723] placeholder:text-[#8d6e63]/50 text-sm" />
                     <Textarea value={form.note} onChange={e => setForm({ ...form, note: e.target.value })}
                       placeholder="Note (optionnel)" rows={2} className="bg-white/60 border-[#e0d6c8] text-[#3e2723] placeholder:text-[#8d6e63]/50 text-sm resize-none" />
+                    <EmotionNeedFields value={form} onChange={(updates) => setForm({ ...form, ...updates })} polarity="strength" compact />
                     <div className="flex gap-2">
                       <Button onClick={() => handleCreate(axis.name)} size="sm" className="flex-1 bg-emerald-700 hover:bg-emerald-600 text-xs">Ajouter</Button>
-                      <Button onClick={() => { setShowFormFor(null); setForm({ belief: "", age: "", note: "" }); }}
+                      <Button onClick={() => { setShowFormFor(null); setForm({ belief: "", age: "", note: "", emotion: "", need_tags: [] }); }}
                         size="sm" variant="outline" className="border-[#e0d6c8] text-[#3e2723] hover:bg-white/60 text-xs">Annuler</Button>
                     </div>
                   </div>

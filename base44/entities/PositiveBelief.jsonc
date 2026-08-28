@@ -25,6 +25,17 @@
     "note": {
       "type": "string",
       "description": "Note ou contexte suppl\u00e9mentaire"
+    },
+    "emotion": {
+      "type": "string",
+      "description": "\u00c9motion positive associ\u00e9e \u00e0 cette croyance (lumi\u00e8re du chakra)"
+    },
+    "need_tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Besoins fondamentaux combl\u00e9s par cette croyance (format need:itemId)"
     }
   },
   "required": [

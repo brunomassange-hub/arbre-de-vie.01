@@ -30,6 +30,17 @@
       "type": "string",
       "description": "Comment la reformuler positivement ?"
     },
+    "emotion": {
+      "type": "string",
+      "description": "\u00c9motion principale associ\u00e9e \u00e0 cette croyance (ombre du chakra)"
+    },
+    "need_tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Besoins fondamentaux troubl\u00e9s par cette croyance (format need:itemId)"
+    },
     "clinical_tags": {
       "type": "array",
       "items": {

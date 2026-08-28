@@ -11,6 +11,7 @@ import PositiveEventsSection from "@/components/sections/PositiveEventsSection";
 import PositiveBeliefSection from "@/components/growth/PositiveBeliefSection";
 import ValueSection from "@/components/growth/ValueSection";
 import ActivitySection from "@/components/growth/ActivitySection";
+import EmotionNeedFields from "@/components/tree/EmotionNeedFields";
 
 // ─── SHARED ──────────────────────────────────────────────
 const LINK_TYPES = ["Famille", "Ami(e)", "Partenaire", "Mentor", "Collègue", "Autre"];
@@ -268,7 +269,7 @@ function BigFiveSection() {
 function RacinesPositivesSection() {
   const [links, setLinks] = useState([]);
   const [showForm, setShowForm] = useState(false);
-  const [form, setForm] = useState({ name: "", type: "Famille", description: "" });
+  const [form, setForm] = useState({ name: "", type: "Famille", description: "", emotion: "", need_tags: [] });
   const [editingId, setEditingId] = useState(null);
   const [editForm, setEditForm] = useState(null);
 
@@ -277,7 +278,7 @@ function RacinesPositivesSection() {
   const handleCreate = async () => {
     if (!form.name.trim()) return;
     await base44.entities.PositiveLink.create(form);
-    setForm({ name: "", type: "Famille", description: "" });
+    setForm({ name: "", type: "Famille", description: "", emotion: "", need_tags: [] });
     setShowForm(false);
     base44.entities.PositiveLink.list().then(setLinks);
   };
@@ -313,6 +314,7 @@ function RacinesPositivesSection() {
           <Textarea value={form.description} onChange={e => setForm({ ...form, description: e.target.value })}
             placeholder="Ce que cette relation vous apporte de positif..." rows={2}
             className="bg-white/60 border-[#e0d6c8] text-[#3e2723] placeholder:text-[#8d6e63]/50 resize-none" />
+          <EmotionNeedFields value={form} onChange={(updates) => setForm({ ...form, ...updates })} polarity="strength" />
           <div className="flex gap-2">
             <Button onClick={handleCreate} size="sm" className="flex-1 bg-emerald-800 hover:bg-emerald-700">Ajouter</Button>
             <Button onClick={() => setShowForm(false)} size="sm" variant="outline" className="border-[#e0d6c8] text-[#3e2723] hover:bg-white/60">Annuler</Button>
@@ -335,6 +337,7 @@ function RacinesPositivesSection() {
                 </div>
                 <Textarea value={editForm.description || ""} onChange={e => setEditForm({ ...editForm, description: e.target.value })}
                   placeholder="Ce que cette relation vous apporte..." rows={2} className="bg-white/60 border-[#e0d6c8] text-[#3e2723] text-sm resize-none" />
+                <EmotionNeedFields value={editForm} onChange={(updates) => setEditForm({ ...editForm, ...updates })} polarity="strength" compact />
                 <div className="flex gap-2">
                   <Button onClick={handleUpdate} size="sm" className="flex-1 bg-emerald-800 hover:bg-emerald-700 h-8"><Save className="w-3 h-3 mr-1" />Enregistrer</Button>
                   <Button onClick={() => { setEditingId(null); setEditForm(null); }} size="sm" variant="outline" className="border-[#e0d6c8] text-[#3e2723] h-8">Annuler</Button>
@@ -348,7 +351,7 @@ function RacinesPositivesSection() {
                   {lk.description && <p className="text-emerald-600 text-xs mt-0.5">💚 {lk.description}</p>}
                 </div>
                 <div className="flex gap-1 flex-shrink-0">
-                  <button onClick={() => { setEditingId(lk.id); setEditForm({ ...lk }); }} className="text-[#a1887f] hover:text-emerald-600 transition">
+                  <button onClick={() => { setEditingId(lk.id); setEditForm({ ...lk, need_tags: lk.need_tags || [] }); }} className="text-[#a1887f] hover:text-emerald-600 transition">
                     <Pencil className="w-4 h-4" />
                   </button>
                   <button onClick={() => handleDelete(lk.id)} className="text-[#a1887f] hover:text-red-600 transition">

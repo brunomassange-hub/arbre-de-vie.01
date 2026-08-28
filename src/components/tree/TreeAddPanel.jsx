@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { X } from "lucide-react";
 import { CHAKRAS } from "@/lib/chakras";
 import NeedSelector from "./NeedSelector";
+import EmotionNeedFields from "./EmotionNeedFields";
 
 const LINK_TYPES = ["Famille", "Ami(e)", "Partenaire", "Mentor", "Collègue", "Autre"];
 
@@ -40,9 +41,9 @@ export default function TreeAddPanel({ zone, onClose, onSaved, polarityLock }) {
   const [eventForm, setEventForm] = useState({ age: "", title: "", description: "", emotion: "Peur", wound_type: "", need_tags: [] });
   // Link form (root)
   const lockedCategory = zone?.category;
-  const [linkForm, setLinkForm] = useState({ name: "", type: lockedCategory || "Famille", description: "" });
+  const [linkForm, setLinkForm] = useState({ name: "", type: lockedCategory || "Famille", description: "", emotion: "", need_tags: [] });
   // Belief form (branch)
-  const [beliefForm, setBeliefForm] = useState({ belief: "", age: "", origin: "", reframe: "", note: "" });
+  const [beliefForm, setBeliefForm] = useState({ belief: "", age: "", origin: "", reframe: "", note: "", emotion: "", need_tags: [] });
   // Quality form (trunk strength)
   const [quality, setQuality] = useState("");
   const [posEventForm, setPosEventForm] = useState({ age: "", title: "", description: "", emotion: "Amour", need_tags: [] });
@@ -85,7 +86,7 @@ export default function TreeAddPanel({ zone, onClose, onSaved, polarityLock }) {
         } else {
           await base44.entities.PositiveLink.create(linkForm);
         }
-        setLinkForm({ name: "", type: "Famille", description: "" });
+        setLinkForm({ name: "", type: "Famille", description: "", emotion: "", need_tags: [] });
       } else if (zone.type === "branch") {
         if (polarity === "strength" && branchSubType === "activity") {
           if (!activityForm.name.trim()) return;
@@ -99,6 +100,8 @@ export default function TreeAddPanel({ zone, onClose, onSaved, polarityLock }) {
           if (!beliefForm.belief.trim()) return;
           const bData = { belief: beliefForm.belief, branch: branchName };
           if (beliefForm.age) bData.age = Number(beliefForm.age);
+          if (beliefForm.emotion) bData.emotion = beliefForm.emotion;
+          if (beliefForm.need_tags?.length) bData.need_tags = beliefForm.need_tags;
           if (polarity === "wound") {
             bData.origin = beliefForm.origin;
             bData.reframe = beliefForm.reframe;
@@ -107,7 +110,7 @@ export default function TreeAddPanel({ zone, onClose, onSaved, polarityLock }) {
             bData.note = beliefForm.note;
             await base44.entities.PositiveBelief.create(bData);
           }
-          setBeliefForm({ belief: "", age: "", origin: "", reframe: "", note: "" });
+          setBeliefForm({ belief: "", age: "", origin: "", reframe: "", note: "", emotion: "", need_tags: [] });
         }
       }
       onSaved?.();

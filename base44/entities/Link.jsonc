@@ -22,6 +22,17 @@
       "type": "string",
       "description": "Description libre de ce lien"
     },
+    "emotion": {
+      "type": "string",
+      "description": "\u00c9motion principale associ\u00e9e \u00e0 cette relation (ombre du chakra)"
+    },
+    "need_tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Besoins fondamentaux troubl\u00e9s par cette relation (format need:itemId)"
+    },
     "clinical_tags": {
       "type": "array",
       "items": {

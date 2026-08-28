@@ -21,6 +21,17 @@
     "description": {
       "type": "string",
       "description": "Ce que cette relation vous apporte de positif"
+    },
+    "emotion": {
+      "type": "string",
+      "description": "\u00c9motion positive associ\u00e9e \u00e0 cette relation (lumi\u00e8re du chakra)"
+    },
+    "need_tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Besoins fondamentaux combl\u00e9s par cette relation (format need:itemId)"
     }
   },
   "required": [
