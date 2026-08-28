@@ -106,7 +106,6 @@ export default function Analysis() {
           </p>
         </div>
 
-        <AggregateView traumaticEvents={rawData.events} links={rawData.links} limitingBeliefs={rawData.beliefs} positiveEvents={positiveEvents} />
         <PersonalityPerspective bigFive={rawData.bigFive} cognitiveProfile={cognitiveProfile} events={rawData.events} links={rawData.links} beliefs={rawData.beliefs} />
         <BeliefSynthesis limitingBeliefs={rawData.beliefs} />
 
@@ -126,6 +125,8 @@ export default function Analysis() {
           beliefs={rawData.beliefs}
           onTagsChange={handleTagsChange}
         />
+
+        <AggregateView traumaticEvents={rawData.events} links={rawData.links} limitingBeliefs={rawData.beliefs} positiveEvents={positiveEvents} />
 
         {validated.filter(item => {
           const isExcluded = (item.title || "").toLowerCase().includes("pattern relationnel") ||
