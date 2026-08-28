@@ -16,7 +16,7 @@ const getAnchor = (x) => {
   return "middle";
 };
 
-export default function EnneagramRadar() {
+export default function EnneagramRadar({ onStartTest }) {
   const [scores, setScores] = useState(null);
   const [dominant, setDominant] = useState(null);
   const [loaded, setLoaded] = useState(false);
@@ -62,13 +62,23 @@ export default function EnneagramRadar() {
           <p className="text-sm mb-3" style={{ color: "#9ba8bc" }}>
             Completez le test Ennéagramme pour révéler votre profil radar complet.
           </p>
-          <Link
-            to={createPageUrl("Cognitive")}
-            className="inline-flex items-center gap-1.5 text-xs px-4 py-2 rounded-lg transition"
-            style={{ background: "rgba(250,204,46,0.15)", color: "#facc2e", border: "1px solid rgba(250,204,46,0.3)" }}
-          >
-            → Faire le test sur la page Personnalité
-          </Link>
+          {onStartTest ? (
+            <button
+              onClick={onStartTest}
+              className="inline-flex items-center gap-1.5 text-xs px-4 py-2 rounded-lg transition"
+              style={{ background: "rgba(250,204,46,0.15)", color: "#facc2e", border: "1px solid rgba(250,204,46,0.3)" }}
+            >
+              → Faire le test Ennéagramme
+            </button>
+          ) : (
+            <Link
+              to={createPageUrl("Cognitive")}
+              className="inline-flex items-center gap-1.5 text-xs px-4 py-2 rounded-lg transition"
+              style={{ background: "rgba(250,204,46,0.15)", color: "#facc2e", border: "1px solid rgba(250,204,46,0.3)" }}
+            >
+              → Faire le test sur la page Personnalité
+            </Link>
+          )}
         </div>
       </div>
     );

@@ -6,6 +6,7 @@ import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { ArrowLeft, Save } from "lucide-react";
 import EnneagramSection from "@/components/cognitive/EnneagramSection";
+import EnneagramRadar from "@/components/archetype/EnneagramRadar";
 import EnneagramImprovements from "@/components/cognitive/EnneagramImprovements";
 import MBTIQuiz from "@/components/cognitive/MBTIQuiz";
 import MBTITypeInfo from "@/components/cognitive/MBTITypeInfo";
@@ -217,7 +218,10 @@ export default function Cognitive() {
               onClose={() => setShowEnneagramQuiz(false)}
             />
           ) : (
-            <EnneagramSection selected={enneagramType} onSelect={selectEnneagramType} />
+            <>
+              <EnneagramSection selected={enneagramType} onSelect={selectEnneagramType} />
+              <EnneagramRadar onStartTest={() => setShowEnneagramQuiz(true)} />
+            </>
           )}
         </div>
 
