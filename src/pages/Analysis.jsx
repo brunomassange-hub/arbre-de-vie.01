@@ -77,6 +77,19 @@ export default function Analysis() {
     });
   };
 
+  // Édition directe des champs principaux (émotion, besoin, blessure de l'âme)
+  // depuis la page Analyse — se répercute sur les cartes Force/Blessure.
+  const handleFieldsChange = async (entityType, entityId, patch) => {
+    const entityMap = { event: "TraumaticEvent", link: "Link", belief: "LimitingBelief" };
+    const entityName = entityMap[entityType];
+    if (!entityName) return;
+    await base44.entities[entityName].update(entityId, patch);
+    setRawData(prev => {
+      const key = entityType === "event" ? "events" : entityType === "link" ? "links" : "beliefs";
+      return { ...prev, [key]: prev[key].map(item => item.id === entityId ? { ...item, ...patch } : item) };
+    });
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center" style={{ background: "#0a1628" }}>
@@ -122,6 +135,7 @@ export default function Analysis() {
           links={rawData.links}
           beliefs={rawData.beliefs}
           onTagsChange={handleTagsChange}
+          onFieldsChange={handleFieldsChange}
         />
 
         <AggregateView traumaticEvents={rawData.events} links={rawData.links} limitingBeliefs={rawData.beliefs} positiveEvents={positiveEvents} />

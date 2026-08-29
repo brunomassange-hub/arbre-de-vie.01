@@ -7,7 +7,6 @@ const THEMES = [
   { listId: "trauma", label: "Traumatisme" },
   { listId: "conflict", label: "Conflit psychique" },
   { listId: "behavior", label: "Troubles du comportement" },
-  { listId: "need", label: "Défaillance d'un besoin essentiel" },
 ];
 
 const THEME_COLORS = {
