@@ -13,6 +13,7 @@ import ClinicalTagBadges from "@/components/clinical/ClinicalTagBadges";
 import { CHAKRAS } from "@/lib/chakras";
 import NeedSelector from "@/components/tree/NeedSelector";
 import EmotionNeedFields from "@/components/tree/EmotionNeedFields";
+import RelationTags from "@/components/relations/RelationTags";
 
 // ─── TRONC ───────────────────────────────────────────────
 const EMOTIONS = ["Solitude", "Colère", "Anxiété", "Peur", "Culpabilité", "Honte", "Tristesse"];
@@ -332,6 +333,7 @@ function RacinesSection() {
                 <div className="flex-1 min-w-0">
                   <span className="text-[#3e2723] text-sm font-semibold">{lk.name}</span>
                   {lk.description && <p className="text-[#8d6e63] text-xs mt-0.5">{lk.description}</p>}
+                  <RelationTags emotion={lk.emotion} need_tags={lk.need_tags} polarity="wound" />
                   {lk.clinical_tags?.length > 0 && (
                     <div className="mt-1">
                       <ClinicalTagBadges tags={lk.clinical_tags} />

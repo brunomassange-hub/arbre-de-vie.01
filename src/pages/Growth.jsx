@@ -12,6 +12,7 @@ import PositiveBeliefSection from "@/components/growth/PositiveBeliefSection";
 import ValueSection from "@/components/growth/ValueSection";
 import ActivitySection from "@/components/growth/ActivitySection";
 import EmotionNeedFields from "@/components/tree/EmotionNeedFields";
+import RelationTags from "@/components/relations/RelationTags";
 
 // ─── SHARED ──────────────────────────────────────────────
 const LINK_TYPES = ["Famille", "Ami(e)", "Partenaire", "Mentor", "Collègue", "Autre"];
@@ -350,6 +351,7 @@ function RacinesPositivesSection() {
                 <div className="flex-1 min-w-0">
                   <span className="text-[#3e2723] text-sm font-semibold">{lk.name}</span>
                   {lk.description && <p className="text-emerald-600 text-xs mt-0.5">💚 {lk.description}</p>}
+                  <RelationTags emotion={lk.emotion} need_tags={lk.need_tags} polarity="strength" />
                 </div>
                 <div className="flex gap-1 flex-shrink-0">
                   <button onClick={() => { setEditingId(lk.id); setEditForm({ ...lk, need_tags: lk.need_tags || [] }); }} className="text-[#a1887f] hover:text-emerald-600 transition">
