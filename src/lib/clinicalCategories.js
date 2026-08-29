@@ -141,12 +141,26 @@ const ALL_ITEMS = CLINICAL_LISTS.flatMap(list =>
   list.items.map(item => ({ ...item, listId: list.id, fullId: `${list.id}:${item.id}` }))
 );
 
+export const GENERAL_ITEM_ID = "general";
+
+export function isGeneralTag(fullId) {
+  return fullId?.split(":")[1] === GENERAL_ITEM_ID;
+}
+
+export function generalTagFor(listId) {
+  return `${listId}:${GENERAL_ITEM_ID}`;
+}
+
 export function getTagLabel(fullId) {
+  const [listId, itemId] = fullId.split(":");
+  if (itemId === GENERAL_ITEM_ID) return getListLabel(listId);
   const item = ALL_ITEMS.find(i => i.fullId === fullId);
   return item?.label || fullId;
 }
 
 export function getTagDescription(fullId) {
+  const [listId, itemId] = fullId.split(":");
+  if (itemId === GENERAL_ITEM_ID) return `Sélection générale de la catégorie « ${getListLabel(listId)} »`;
   const item = ALL_ITEMS.find(i => i.fullId === fullId);
   return item?.description || "";
 }

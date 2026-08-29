@@ -1,4 +1,4 @@
-import { CLINICAL_LISTS, getTagLabel, getTagDescription, getListLabel, migrateNeedTags } from "@/lib/clinicalCategories";
+import { CLINICAL_LISTS, getTagLabel, getTagDescription, getListLabel, migrateNeedTags, isGeneralTag } from "@/lib/clinicalCategories";
 
 export const CATEGORIES = {
   type_trauma: { label: "Type de trauma", icon: "🔥", color: "#ef4444" },
@@ -194,6 +194,7 @@ export function aggregateData({ traumaticEvents = [], links = [], limitingBelief
       .filter(([tag]) => tag.startsWith(`${list.id}:`))
       .map(([tag, count]) => {
         const itemId = tag.split(":")[1];
+        if (isGeneralTag(tag)) return { key: itemId, label: list.label, count };
         const item = list.items.find(i => i.id === itemId);
         return { key: itemId, label: item?.label || itemId, count };
       })
@@ -415,6 +416,15 @@ export function synthesizeBeliefs({ limitingBeliefs = [] }) {
     .map(([tag, count]) => {
       const [listId, itemId] = tag.split(":");
       const list = CLINICAL_LISTS.find(l => l.id === listId);
+      if (isGeneralTag(tag)) {
+        return {
+          key: tag,
+          listId,
+          label: list?.label || listId,
+          count,
+          beliefs: limitingBeliefs.filter(b => (b.clinical_tags || []).includes(tag)),
+        };
+      }
       const item = list?.items.find(i => i.id === itemId);
       return {
         key: tag,

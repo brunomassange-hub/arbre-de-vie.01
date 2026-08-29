@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { Play, ExternalLink } from "lucide-react";
-import { getEmbedInfo, getVideoTagLabel } from "@/lib/videoCategories";
+import { getEmbedInfo, getVideoTagLabel, userTagMatchesVideoTag } from "@/lib/videoCategories";
 
 const SERIF = "'Playfair Display', Georgia, serif";
 
@@ -18,7 +18,7 @@ export default function VideoDisplay({ tags = [], dark = false, fallbackToAll = 
   const matching = videos
     .map(v => ({
       video: v,
-      matchCount: (v.category_tags || []).filter(tag => tags.includes(tag)).length,
+      matchCount: (v.category_tags || []).filter(vTag => tags.some(uTag => userTagMatchesVideoTag(uTag, vTag))).length,
     }))
     .filter(item => item.matchCount > 0)
     .sort((a, b) => b.matchCount - a.matchCount)

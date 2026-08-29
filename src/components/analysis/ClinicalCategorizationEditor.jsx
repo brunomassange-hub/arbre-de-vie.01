@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { X, ChevronDown, ChevronUp } from "lucide-react";
-import { CLINICAL_LISTS, getTagLabel } from "@/lib/clinicalCategories";
+import { CLINICAL_LISTS, getTagLabel, generalTagFor, isGeneralTag } from "@/lib/clinicalCategories";
 
 const THEMES = [
   { listId: "rel", label: "Difficulté relationnelle" },
@@ -32,12 +32,18 @@ export default function ClinicalCategorizationEditor({ value = [], onChange }) {
     setExpandedThemes(prev => ({ ...prev, [listId]: !prev[listId] }));
   };
 
+  const toggleGeneral = (listId) => {
+    const generalTag = generalTagFor(listId);
+    if (value.includes(generalTag)) onChange(value.filter(v => v !== generalTag));
+    else onChange([...value, generalTag]);
+  };
+
   const toggleTag = (fullId) => {
     if (value.includes(fullId)) onChange(value.filter(v => v !== fullId));
     else onChange([...value, fullId]);
   };
 
-  const getSelectedCount = (listId) => value.filter(tag => tag.startsWith(`${listId}:`)).length;
+  const getSelectedCount = (listId) => value.filter(tag => tag.startsWith(`${listId}:`) && !isGeneralTag(tag)).length;
 
   return (
     <div className="space-y-2">
@@ -63,20 +69,31 @@ export default function ClinicalCategorizationEditor({ value = [], onChange }) {
           const isExpanded = expandedThemes[theme.listId];
           const count = getSelectedCount(theme.listId);
           return (
-            <button
+            <div
               key={theme.listId}
-              type="button"
-              onClick={() => toggleTheme(theme.listId)}
-              className={`px-2 py-0.5 rounded-full text-[9px] border transition flex items-center gap-1 ${
+              className={`inline-flex items-stretch rounded-full border overflow-hidden ${
                 isActive
                   ? `${THEME_COLORS[theme.listId]} text-white border-transparent`
                   : "bg-white/5 text-gray-400 border-white/10 hover:bg-white/10"
               }`}
             >
-              {theme.label}
-              {count > 0 && <span className="text-[8px] opacity-80">({count})</span>}
-              {isExpanded ? <ChevronUp className="w-2.5 h-2.5" /> : <ChevronDown className="w-2.5 h-2.5" />}
-            </button>
+              <button
+                type="button"
+                onClick={() => toggleGeneral(theme.listId)}
+                className="px-2 py-0.5 text-[9px] flex items-center gap-1 transition"
+              >
+                {theme.label}
+                {count > 0 && <span className="text-[8px] opacity-80">({count})</span>}
+              </button>
+              <button
+                type="button"
+                onClick={() => toggleTheme(theme.listId)}
+                className="px-1 flex items-center transition hover:bg-white/10"
+                aria-label={isExpanded ? "Replier" : "Déplier"}
+              >
+                {isExpanded ? <ChevronUp className="w-2.5 h-2.5" /> : <ChevronDown className="w-2.5 h-2.5" />}
+              </button>
+            </div>
           );
         })}
       </div>

@@ -1,4 +1,4 @@
-import { CLINICAL_LISTS } from "@/lib/clinicalCategories";
+import { CLINICAL_LISTS, GENERAL_ITEM_ID } from "@/lib/clinicalCategories";
 
 export const EMOTION_ITEMS = [
   { id: "Solitude", label: "Solitude", description: "Sentiment d'isolement, d'être seul au monde." },
@@ -55,4 +55,13 @@ export function getEmbedInfo(url) {
   const vimeoMatch = url.match(/vimeo\.com\/(\d+)/);
   if (vimeoMatch) return { type: "vimeo", embedUrl: `https://player.vimeo.com/video/${vimeoMatch[1]}` };
   return { type: "file", embedUrl: url };
+}
+
+// Un tag utilisateur "général" (listId:general) correspond à toute vidéo
+// taggée avec une sous-catégorie de la même liste.
+export function userTagMatchesVideoTag(userTag, videoTag) {
+  if (!userTag || !videoTag) return false;
+  if (userTag === videoTag) return true;
+  const [uList, uItem] = userTag.split(":");
+  return uItem === GENERAL_ITEM_ID && videoTag.startsWith(`${uList}:`);
 }
