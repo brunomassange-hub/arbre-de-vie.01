@@ -5,6 +5,7 @@ import { pagesConfig } from './pages.config'
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Onboarding from './pages/Onboarding';
 import PageNotFound from './lib/PageNotFound';
+import { usePortraitLock } from './hooks/usePortraitLock';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 
@@ -72,6 +73,7 @@ const AuthenticatedApp = () => {
 
 
 function App() {
+  usePortraitLock();
 
   return (
     <AuthProvider>
