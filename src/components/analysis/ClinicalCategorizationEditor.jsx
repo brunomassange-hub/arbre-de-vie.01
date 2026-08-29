@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { X, ChevronDown, ChevronUp } from "lucide-react";
-import { CLINICAL_LISTS, getTagLabel, generalTagFor, isGeneralTag } from "@/lib/clinicalCategories";
+import { ChevronDown, ChevronUp } from "lucide-react";
+import { CLINICAL_LISTS, generalTagFor, isGeneralTag } from "@/lib/clinicalCategories";
 
 const THEMES = [
   { listId: "rel", label: "Difficulté relationnelle" },
@@ -49,22 +49,6 @@ export default function ClinicalCategorizationEditor({ value = [], onChange }) {
 
   return (
     <div className="space-y-2">
-      {value.length > 0 && (
-        <div className="flex flex-wrap gap-1">
-          {value.map(tag => {
-            const [listId] = tag.split(":");
-            return (
-              <span key={tag} className={`text-[9px] px-1.5 py-0.5 rounded-full text-white flex items-center gap-0.5 ${THEME_COLORS[listId] || "bg-gray-600"}`}>
-                {getTagLabel(tag)}
-                <button type="button" onClick={() => toggleTag(tag)} className="hover:opacity-70">
-                  <X className="w-2.5 h-2.5" />
-                </button>
-              </span>
-            );
-          })}
-        </div>
-      )}
-
       <div className="flex flex-wrap gap-1">
         {THEMES.map(theme => {
           const isActive = activeThemes.has(theme.listId);
