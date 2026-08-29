@@ -52,6 +52,15 @@ export default function TreeAddPanel({ zone, onClose, onSaved, polarityLock }) {
   const meta = ZONE_META[zone?.type] || ZONE_META.trunk;
   const branchName = zone?.name || "";
 
+  const guidanceText = (() => {
+    if (zone?.type === "branch" && polarity === "strength") {
+      if (branchSubType === "belief") return "Quelles croyances vous élèvent et vous permettent de voir le bon dans la vie et en vous ?";
+      if (branchSubType === "value") return "Quelles valeurs comptent le plus pour vous et guident vos choix au quotidien ?";
+      return "Quelles activités vous apportent de la joie et du bien-être ?";
+    }
+    return GUIDANCE[polarity]?.[zone.type];
+  })();
+
   const handleSave = async () => {
     setSaving(true);
     try {
@@ -169,7 +178,7 @@ export default function TreeAddPanel({ zone, onClose, onSaved, polarityLock }) {
         )}
 
         {/* Guidance prompt */}
-        {zone.type && GUIDANCE[polarity]?.[zone.type] && (
+        {guidanceText && (
           <div className="px-5 pb-3">
             <div className="text-sm font-medium leading-relaxed rounded-xl px-4 py-2.5"
               style={{
@@ -177,7 +186,7 @@ export default function TreeAddPanel({ zone, onClose, onSaved, polarityLock }) {
                 color: "#3e2723",
                 fontFamily: "'Playfair Display', Georgia, serif",
               }}>
-              {GUIDANCE[polarity][zone.type]}
+              {guidanceText}
             </div>
           </div>
         )}
