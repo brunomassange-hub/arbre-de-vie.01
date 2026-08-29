@@ -22,17 +22,22 @@ const LIGHT_EMOTION_COLORS = {
   Joie: "bg-emerald-500/20 text-emerald-300 border-emerald-500/30",
 };
 
+const WOUND_COLOR = "bg-red-900/20 text-red-700 border-red-900/30";
+
 const NEED_COLORS = {
   wound: "bg-rose-100 text-rose-700 border-rose-200",
   strength: "bg-emerald-100 text-emerald-700 border-emerald-200",
 };
 
-export default function RelationTags({ emotion, need_tags = [], polarity = "wound" }) {
+// Affiche les trois tags principaux de façon cohérente : émotion, blessure de
+// l'âme (polarité "wound" uniquement) et besoin (troublé/comblé selon polarity).
+export default function RelationTags({ emotion, wound, need_tags = [], polarity = "wound" }) {
   const isWound = polarity === "wound";
   const emotionColors = isWound ? SHADOW_EMOTION_COLORS : LIGHT_EMOTION_COLORS;
   const needs = migrateNeedTags(need_tags);
+  const wounds = Array.isArray(wound) ? wound : (wound ? [wound] : []);
   const hasEmotion = emotion && emotion !== "__none__";
-  if (!hasEmotion && needs.length === 0) return null;
+  if (!hasEmotion && wounds.length === 0 && needs.length === 0) return null;
   return (
     <div className="flex flex-wrap gap-1 mt-1">
       {hasEmotion && (
@@ -40,6 +45,9 @@ export default function RelationTags({ emotion, need_tags = [], polarity = "woun
           {emotion}
         </Badge>
       )}
+      {isWound && wounds.map(w => (
+        <Badge key={w} className={`${WOUND_COLOR} text-xs border`}>{w}</Badge>
+      ))}
       {needs.map(tag => (
         <Badge key={tag} className={`${NEED_COLORS[polarity] || NEED_COLORS.wound} text-xs border`}>
           {getTagLabel(tag)}

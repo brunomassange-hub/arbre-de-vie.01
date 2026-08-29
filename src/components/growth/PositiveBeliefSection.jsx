@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Plus, Trash2, Save, Pencil, ChevronDown, ChevronUp } from "lucide-react";
 import EmotionNeedFields from "@/components/tree/EmotionNeedFields";
+import RelationTags from "@/components/relations/RelationTags";
 
 const BRANCH_AXES = [
   { name: "Émotionnel", icon: "❤️", color: "text-rose-300", bg: "bg-rose-500/10 border-rose-500/20" },
@@ -96,6 +97,7 @@ export default function PositiveBeliefSection({ refreshKey = 0, onRefresh }) {
                           <p className="text-[#3e2723] text-sm font-medium">✦ {b.belief}</p>
                           {b.age != null && <p className="text-[#8d6e63] text-xs mt-0.5">Âge : {b.age} ans</p>}
                           {b.note && <p className="text-[#5d4037] text-xs mt-1">{b.note}</p>}
+                          <RelationTags emotion={b.emotion} need_tags={b.need_tags} polarity="strength" />
                         </div>
                         <div className="flex gap-1 flex-shrink-0">
                           <button onClick={() => { setEditingId(b.id); setEditForm({ ...b, need_tags: b.need_tags || [] }); }} className="text-[#a1887f] hover:text-emerald-600 transition">

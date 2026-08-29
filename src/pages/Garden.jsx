@@ -9,23 +9,11 @@ import { Plus, Trash2, ChevronDown, ChevronUp, Pencil, Save } from "lucide-react
 import FullTree from "@/components/tree/FullTree";
 import LinkQualification from "@/components/garden/LinkQualification";
 import BeliefQualification from "@/components/garden/BeliefQualification";
-import ClinicalTagBadges from "@/components/clinical/ClinicalTagBadges";
 import { CHAKRAS } from "@/lib/chakras";
 import NeedSelector from "@/components/tree/NeedSelector";
 import EmotionNeedFields from "@/components/tree/EmotionNeedFields";
 import RelationTags from "@/components/relations/RelationTags";
-
-// ─── TRONC ───────────────────────────────────────────────
-const EMOTIONS = ["Solitude", "Colère", "Anxiété", "Peur", "Culpabilité", "Honte", "Tristesse"];
-const EMOTION_COLORS = {
-  Solitude: "bg-purple-500/20 text-purple-300 border-purple-500/30",
-  Colère: "bg-indigo-500/20 text-indigo-300 border-indigo-500/30",
-  Anxiété: "bg-cyan-500/20 text-cyan-300 border-cyan-500/30",
-  Peur: "bg-green-500/20 text-green-300 border-green-500/30",
-  Culpabilité: "bg-yellow-500/20 text-yellow-300 border-yellow-500/30",
-  Honte: "bg-amber-500/20 text-amber-300 border-amber-500/30",
-  Tristesse: "bg-red-500/20 text-red-300 border-red-500/30",
-};
+import { extractWoundLabels } from "@/lib/clinicalCategories";
 
 // ─── RACINES ─────────────────────────────────────────────
 const LINK_TYPES = ["Famille", "Ami(e)", "Partenaire", "Mentor", "Collègue", "Autre"];
@@ -198,17 +186,9 @@ function TroncSection() {
                 ) : (
                   <div className="flex items-start justify-between gap-2">
                     <div>
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <span className="text-[#3e2723] text-sm font-semibold">{ev.title}</span>
-                        <Badge className={`${EMOTION_COLORS[ev.emotion]} text-xs border`}>{ev.emotion}</Badge>
-                        {ev.wound_type && <Badge className="bg-red-900/20 text-red-700 border border-red-900/30 text-xs">{ev.wound_type}</Badge>}
-                      </div>
+                      <span className="text-[#3e2723] text-sm font-semibold">{ev.title}</span>
                       {ev.description && <p className="text-[#8d6e63] text-xs mt-1">{ev.description}</p>}
-                      {ev.clinical_tags?.length > 0 && (
-                        <div className="mt-1">
-                          <ClinicalTagBadges tags={ev.clinical_tags} generalOnly />
-                        </div>
-                      )}
+                      <RelationTags emotion={ev.emotion} wound={ev.wound_type} need_tags={ev.need_tags} polarity="wound" />
                     </div>
                     <div className="flex gap-1 flex-shrink-0">
                       <button onClick={() => { setEditingId(ev.id);                        setEditForm({ ...ev, clinical_tags: ev.clinical_tags || [], need_tags: ev.need_tags || [] }); setShowQualEdit(!!ev.clinical_tags?.length); }} className="text-[#a1887f] hover:text-amber-600 transition">
@@ -333,12 +313,7 @@ function RacinesSection() {
                 <div className="flex-1 min-w-0">
                   <span className="text-[#3e2723] text-sm font-semibold">{lk.name}</span>
                   {lk.description && <p className="text-[#8d6e63] text-xs mt-0.5">{lk.description}</p>}
-                  <RelationTags emotion={lk.emotion} need_tags={lk.need_tags} polarity="wound" />
-                  {lk.clinical_tags?.length > 0 && (
-                    <div className="mt-1">
-                      <ClinicalTagBadges tags={lk.clinical_tags} generalOnly />
-                    </div>
-                  )}
+                  <RelationTags emotion={lk.emotion} wound={extractWoundLabels(lk)} need_tags={lk.need_tags} polarity="wound" />
                 </div>
                 <div className="flex gap-1 flex-shrink-0">
                   <button onClick={() => { setEditingId(lk.id); setEditForm({ ...lk, clinical_tags: lk.clinical_tags || [], need_tags: lk.need_tags || [] }); setShowQualEdit(!!lk.clinical_tags?.length); }} className="text-[#a1887f] hover:text-rose-600 transition">
@@ -460,9 +435,9 @@ function BranchesSection({ refreshKey = 0, onRefresh }) {
                           {b.age != null && <p className="text-[#8d6e63] text-xs mt-0.5">Âge : {b.age} ans</p>}
                           {b.origin && <p className="text-[#8d6e63] text-xs mt-1">Origine : {b.origin}</p>}
                           {b.reframe && <p className="text-green-600 text-xs mt-1">✦ {b.reframe}</p>}
-                          {(b.clinical_tags?.length || b.source_event_id || b.source_link_id) && (
+                          <RelationTags emotion={b.emotion} wound={extractWoundLabels(b)} need_tags={b.need_tags} polarity="wound" />
+                          {(b.source_event_id || b.source_link_id) && (
                             <div className="flex flex-wrap gap-1 mt-1">
-                              {b.clinical_tags?.length > 0 && <ClinicalTagBadges tags={b.clinical_tags} generalOnly />}
                               {b.source_event_id && events.find(e => e.id === b.source_event_id) && (
                                 <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-amber-100 text-amber-700 border border-amber-200">
                                   📅 {events.find(e => e.id === b.source_event_id).title}

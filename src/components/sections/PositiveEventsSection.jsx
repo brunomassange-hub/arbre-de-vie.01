@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Plus, Trash2, Pencil, Save } from "lucide-react";
 import { CHAKRAS } from "@/lib/chakras";
 import NeedSelector from "@/components/tree/NeedSelector";
+import RelationTags from "@/components/relations/RelationTags";
 
 export default function PositiveEventsSection() {
   const [events, setEvents] = useState([]);
@@ -128,12 +129,7 @@ export default function PositiveEventsSection() {
                   <div className="flex-1 min-w-0">
                     <span className="text-[#3e2723] text-sm font-semibold">{ev.title}</span>
                     {ev.description && <p className="text-[#5d4037] text-xs mt-0.5">{ev.description}</p>}
-                    {ev.emotion && (
-                      <span className="inline-block mt-1 text-xs px-2 py-0.5 rounded-full"
-                        style={{ background: col + "20", color: col }}>
-                        {ev.emotion} — {ev.chakra}
-                      </span>
-                    )}
+                    <RelationTags emotion={ev.emotion} need_tags={ev.need_tags} polarity="strength" />
                   </div>
                   <div className="flex gap-1 flex-shrink-0">
                     <button onClick={() => { setEditingId(ev.id);                      setEditForm({ ...ev, need_tags: ev.need_tags || [] }); }} className="text-[#a1887f] hover:text-green-600 transition">
