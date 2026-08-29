@@ -218,6 +218,7 @@ function BigFiveSection() {
 
       {/* Qualités par trait */}
       <div className="mt-5 space-y-3">
+        <p className="text-[11px] leading-snug mb-1" style={{ color: "#a1887f" }}>Vos qualités décrivent comment vous êtes naturellement, selon vos traits de personnalité.</p>
         <p className="text-[#3e2723] text-sm font-semibold">✨ Mes qualités par trait</p>
         {BIG5.map(d => {
           const traitQualites = qualites.filter(q => q.trait === d.key);
@@ -407,6 +408,7 @@ export default function Growth() {
         <div className="mb-8">
           <Section emoji="🌟" title="Les Branches — Valeurs personnelles" subtitle="Vos principes directeurs"
             accentClass="bg-amber-50 border-amber-200">
+            <p className="text-[11px] leading-snug mb-3" style={{ color: "#a1887f" }}>Vos valeurs représentent ce qui compte pour vous, les principes qui guident vos choix, indépendamment de votre tempérament naturel.</p>
             <ValueSection refreshKey={refreshKey} onRefresh={() => setRefreshKey(k => k + 1)} />
           </Section>
         </div>
