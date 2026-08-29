@@ -78,6 +78,9 @@ export default function EnneagramQuiz({ onComplete, onClose }) {
           Total : {total} case(s) cochée(s) · pourcentage de chaque type par rapport au total
         </p>
 
+        <p className="text-amber-300/90 text-xs mb-3 text-center italic">
+          Cliquez sur votre type pour confirmer et enregistrer ce résultat comme votre profil Ennéagramme.
+        </p>
         <div className="flex gap-2">
           <Button onClick={() => { setChecked({}); setShowResult(false); }}
             variant="outline" className="flex-1 bg-white/10 border-white/20 text-white hover:bg-white/20">
