@@ -1,5 +1,5 @@
 import React from "react";
-import { getTagLabel, getTagDescription } from "@/lib/clinicalCategories";
+import { getTagLabel, getTagDescription, toGeneralTags } from "@/lib/clinicalCategories";
 
 const LIST_BADGE_COLORS = {
   trauma: "bg-red-100 text-red-700 border-red-200",
@@ -10,11 +10,12 @@ const LIST_BADGE_COLORS = {
   need: "bg-cyan-100 text-cyan-700 border-cyan-200",
 };
 
-export default function ClinicalTagBadges({ tags = [] }) {
-  if (!tags || tags.length === 0) return null;
+export default function ClinicalTagBadges({ tags = [], generalOnly = false }) {
+  const displayTags = generalOnly ? toGeneralTags(tags) : (tags || []);
+  if (!displayTags || displayTags.length === 0) return null;
   return (
     <div className="flex flex-wrap gap-1">
-      {tags.map(tag => {
+      {displayTags.map(tag => {
         const [listId] = tag.split(":");
         const colorClass = LIST_BADGE_COLORS[listId] || "bg-gray-100 text-gray-700 border-gray-200";
         return (

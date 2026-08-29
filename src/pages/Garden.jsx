@@ -206,7 +206,7 @@ function TroncSection() {
                       {ev.description && <p className="text-[#8d6e63] text-xs mt-1">{ev.description}</p>}
                       {ev.clinical_tags?.length > 0 && (
                         <div className="mt-1">
-                          <ClinicalTagBadges tags={ev.clinical_tags} />
+                          <ClinicalTagBadges tags={ev.clinical_tags} generalOnly />
                         </div>
                       )}
                     </div>
@@ -336,7 +336,7 @@ function RacinesSection() {
                   <RelationTags emotion={lk.emotion} need_tags={lk.need_tags} polarity="wound" />
                   {lk.clinical_tags?.length > 0 && (
                     <div className="mt-1">
-                      <ClinicalTagBadges tags={lk.clinical_tags} />
+                      <ClinicalTagBadges tags={lk.clinical_tags} generalOnly />
                     </div>
                   )}
                 </div>
@@ -462,7 +462,7 @@ function BranchesSection({ refreshKey = 0, onRefresh }) {
                           {b.reframe && <p className="text-green-600 text-xs mt-1">✦ {b.reframe}</p>}
                           {(b.clinical_tags?.length || b.source_event_id || b.source_link_id) && (
                             <div className="flex flex-wrap gap-1 mt-1">
-                              {b.clinical_tags?.length > 0 && <ClinicalTagBadges tags={b.clinical_tags} />}
+                              {b.clinical_tags?.length > 0 && <ClinicalTagBadges tags={b.clinical_tags} generalOnly />}
                               {b.source_event_id && events.find(e => e.id === b.source_event_id) && (
                                 <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-amber-100 text-amber-700 border border-amber-200">
                                   📅 {events.find(e => e.id === b.source_event_id).title}

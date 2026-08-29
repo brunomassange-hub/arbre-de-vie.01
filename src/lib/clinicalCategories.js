@@ -182,6 +182,19 @@ const NEED_MIGRATION = {
   autonomie: "accomplissement",
 };
 
+export function toGeneralTags(tags = []) {
+  const seen = new Set();
+  const result = [];
+  for (const tag of tags || []) {
+    const listId = tag?.split(":")[0];
+    if (listId && !seen.has(listId)) {
+      seen.add(listId);
+      result.push(generalTagFor(listId));
+    }
+  }
+  return result;
+}
+
 export function migrateNeedTags(tags = []) {
   const seen = new Set();
   return (tags || []).map(tag => {
