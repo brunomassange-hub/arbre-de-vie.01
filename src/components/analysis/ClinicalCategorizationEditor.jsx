@@ -36,6 +36,8 @@ export default function ClinicalCategorizationEditor({ value = [], onChange }) {
     const generalTag = generalTagFor(listId);
     if (value.includes(generalTag)) onChange(value.filter(v => v !== generalTag));
     else onChange([...value, generalTag]);
+    // Toujours déplier la liste des sous-catégories lors d'un clic sur la grande catégorie
+    setExpandedThemes(prev => ({ ...prev, [listId]: true }));
   };
 
   const toggleTag = (fullId) => {
