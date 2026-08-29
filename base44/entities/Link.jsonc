@@ -26,6 +26,17 @@
       "type": "string",
       "description": "\u00c9motion principale associ\u00e9e \u00e0 cette relation (ombre du chakra)"
     },
+    "soul_wound": {
+      "type": "string",
+      "enum": [
+        "Trahison",
+        "Rejet",
+        "Abandon",
+        "Humiliation",
+        "Injustice"
+      ],
+      "description": "Blessure de l'\u00e2me principale associ\u00e9e \u00e0 cette relation"
+    },
     "need_tags": {
       "type": "array",
       "items": {

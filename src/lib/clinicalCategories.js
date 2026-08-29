@@ -209,10 +209,12 @@ export function migrateNeedTags(tags = []) {
   });
 }
 
-// Récupère le(s) libellé(s) de blessure de l'âme : depuis le champ dédié wound_type
-// (TraumaticEvent) ou depuis les tags cliniques wound:* (Link, LimitingBelief).
+// Récupère le(s) libellé(s) de blessure de l'âme : depuis le champ dédié principal
+// (wound_type pour TraumaticEvent, soul_wound pour Link/LimitingBelief), ou à défaut
+// depuis les sous-catégories cliniques wound:* (catégorisation fine, page Analyse).
 export function extractWoundLabels(entity = {}) {
   if (entity.wound_type) return [entity.wound_type];
+  if (entity.soul_wound) return [entity.soul_wound];
   return (entity.clinical_tags || [])
     .filter(t => t.startsWith("wound:") && t !== "wound:general")
     .map(t => getTagLabel(t));

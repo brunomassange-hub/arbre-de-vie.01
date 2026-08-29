@@ -214,7 +214,7 @@ function TroncSection() {
 function RacinesSection() {
   const [links, setLinks] = useState([]);
   const [showForm, setShowForm] = useState(false);
-  const [form, setForm] = useState({ name: "", type: "Famille", description: "", emotion: "", need_tags: [], clinical_tags: [] });
+  const [form, setForm] = useState({ name: "", type: "Famille", description: "", emotion: "", soul_wound: "", need_tags: [], clinical_tags: [] });
   const [editingId, setEditingId] = useState(null);
   const [editForm, setEditForm] = useState(null);
   const [showQualForm, setShowQualForm] = useState(false);
@@ -225,7 +225,7 @@ function RacinesSection() {
   const handleCreate = async () => {
     if (!form.name.trim()) return;
     await base44.entities.Link.create(form);
-    setForm({ name: "", type: "Famille", description: "", emotion: "", need_tags: [], clinical_tags: [] });
+    setForm({ name: "", type: "Famille", description: "", emotion: "", soul_wound: "", need_tags: [], clinical_tags: [] });
     setShowForm(false);
     setShowQualForm(false);
     base44.entities.Link.list().then(setLinks);
@@ -338,7 +338,7 @@ function BranchesSection({ refreshKey = 0, onRefresh }) {
   const [beliefs, setBeliefs] = useState([]);
   const [openAxis, setOpenAxis] = useState(null);
   const [showFormFor, setShowFormFor] = useState(null);
-  const [form, setForm] = useState({ belief: "", age: "", origin: "", reframe: "", emotion: "", need_tags: [], clinical_tags: [] });
+  const [form, setForm] = useState({ belief: "", age: "", origin: "", reframe: "", emotion: "", soul_wound: "", need_tags: [], clinical_tags: [] });
   const [editingId, setEditingId] = useState(null);
   const [editForm, setEditForm] = useState(null);
   const [showQualForm, setShowQualForm] = useState(false);
@@ -357,7 +357,7 @@ function BranchesSection({ refreshKey = 0, onRefresh }) {
     const data = { ...form, branch };
     if (data.age) data.age = Number(data.age); else delete data.age;
     await base44.entities.LimitingBelief.create(data);
-    setForm({ belief: "", age: "", origin: "", reframe: "", emotion: "", need_tags: [], clinical_tags: [] });
+    setForm({ belief: "", age: "", origin: "", reframe: "", emotion: "", soul_wound: "", need_tags: [], clinical_tags: [] });
     setShowFormFor(null);
     setShowQualForm(false);
     onRefresh?.();
@@ -485,7 +485,7 @@ function BranchesSection({ refreshKey = 0, onRefresh }) {
                     )}
                     <div className="flex gap-2">
                       <Button onClick={() => handleCreate(axis.name)} size="sm" className="flex-1 bg-green-800 hover:bg-green-700 text-xs">Ajouter</Button>
-                      <Button onClick={() => { setShowFormFor(null); setForm({ belief: "", age: "", origin: "", reframe: "", emotion: "", need_tags: [], clinical_tags: [] }); setShowQualForm(false); }}
+                      <Button onClick={() => { setShowFormFor(null); setForm({ belief: "", age: "", origin: "", reframe: "", emotion: "", soul_wound: "", need_tags: [], clinical_tags: [] }); setShowQualForm(false); }}
                         size="sm" variant="outline" className="border-[#e0d6c8] text-[#3e2723] hover:bg-white/60 text-xs">Annuler</Button>
                     </div>
                   </div>
