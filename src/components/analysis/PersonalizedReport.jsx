@@ -242,7 +242,12 @@ Les fragilités ou manques apparents (ex: patterns répétés de difficultés re
 Les forces sur lesquelles l'utilisateur peut s'appuyer: traits Big Five positifs, ressources relationnelles positives, croyances positives, qualités listées.
 
 ## Pistes de développement concrètes
-Suggestions pratiques et actionnables, en lien avec les outils thérapeutiques disponibles: Ancrage (grounding), Hypnose, Méditation, Axes d'amélioration. Précise quand un outil est particulièrement pertinent au regard d'une difficulté identifiée.
+Centre cette section sur la personne et son vécu propre, pas sur un catalogue de pratiques. Propose des pistes de réflexion et d'action concrètes et personnalisées, ancrées dans les données réelles de l'utilisateur:
+- Comment aborder différemment un conflit psychique identifié (ex: une tension entre deux besoins ou croyances repérés dans ses données).
+- Quels nouveaux comportements ou réflexes pourraient remplacer un pattern problématique identifié (ex: remplacer l'évitement relationnel par une action progressive et concrète adaptée à sa situation).
+- Comment faire évoluer une habitude relationnelle repérée comme récurrente, en lien avec les événements et relations spécifiques de son parcours.
+- Des questions de réflexion personnelle ou des micro-actions à essayer dans son quotidien, ancrées dans ses propres événements et croyances plutôt que des recommandations génériques.
+N'évoque pas les outils du Journal (Ancrage, Hypnose, Méditation, Axes d'amélioration) dans cette section et ne les utilise pas comme fil conducteur: reste centré sur l'analyse humaine et personnelle de la situation de l'utilisateur.
 
 ## Sens de la vie
 En te basant EXCLUSIVEMENT sur les croyances limitantes de l'utilisateur et leurs thèmes (branches: Physique, Social, Intellectuel, Émotionnel, Artistique, Spirituel), explore ce qui pourrait donner du sens à sa vie. Identifie les valeurs qui transparaissent à travers ses croyances (ce qu'il craint révèle ce qu'il valorise), et propose des pistes pour aligner sa vie avec un sens porteur. Formule avec bienveillance et sans jugement.
