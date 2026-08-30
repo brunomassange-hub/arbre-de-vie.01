@@ -1,6 +1,8 @@
 import React from "react";
 import ClinicalCategorizationEditor from "./ClinicalCategorizationEditor";
 import SourceFieldEditor from "./SourceFieldEditor";
+import RelationTags from "@/components/relations/RelationTags";
+import { extractWoundLabels } from "@/lib/clinicalCategories";
 
 export default function SourceElementList({ events = [], links = [], beliefs = [], onTagsChange, onFieldsChange }) {
   if (events.length === 0 && links.length === 0 && beliefs.length === 0) return null;
@@ -19,6 +21,7 @@ export default function SourceElementList({ events = [], links = [], beliefs = [
                   <span className="text-sm font-semibold text-white">{lk.name}</span>
                   <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/30">{lk.type}</span>
                 </div>
+                <RelationTags emotion={lk.emotion} wound={extractWoundLabels(lk)} need_tags={lk.need_tags} polarity="wound" />
                 {lk.description && <p className="text-xs text-gray-400 mb-2">{lk.description}</p>}
                 <ClinicalCategorizationEditor
                   value={lk.clinical_tags || []}
@@ -44,9 +47,8 @@ export default function SourceElementList({ events = [], links = [], beliefs = [
                 <div className="flex items-center gap-2 mb-1 flex-wrap">
                   <span className="text-sm font-semibold text-white">{ev.title}</span>
                   {ev.age != null && <span className="text-[10px] text-gray-500">{ev.age} ans</span>}
-                  {ev.emotion && <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30">{ev.emotion}</span>}
-                  {ev.wound_type && <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-red-500/20 text-red-300 border border-red-500/30">{ev.wound_type}</span>}
                 </div>
+                <RelationTags emotion={ev.emotion} wound={extractWoundLabels(ev)} need_tags={ev.need_tags} polarity="wound" />
                 {ev.description && <p className="text-xs text-gray-400 mb-2">{ev.description}</p>}
                 <ClinicalCategorizationEditor
                   value={ev.clinical_tags || []}
@@ -73,6 +75,7 @@ export default function SourceElementList({ events = [], links = [], beliefs = [
                   <span className="text-sm font-semibold text-white">"{b.belief}"</span>
                   <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">{b.branch}</span>
                 </div>
+                <RelationTags emotion={b.emotion} wound={extractWoundLabels(b)} need_tags={b.need_tags} polarity="wound" />
                 {b.origin && <p className="text-xs text-gray-400 mb-2">Origine : {b.origin}</p>}
                 <ClinicalCategorizationEditor
                   value={b.clinical_tags || []}
