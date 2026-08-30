@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { base44 } from "@/api/base44Client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -66,6 +66,11 @@ function BigFiveSection() {
   const [newQualiteTrait, setNewQualiteTrait] = useState("agreabilite");
   const [saved, setSaved] = useState(false);
 
+  // Référence vivante des données courantes (pour les sauvegardes différées/immediates)
+  const latest = useRef({ scores, qualites, profile });
+  latest.current = { scores, qualites, profile };
+  const saveTimer = useRef(null);
+
   useEffect(() => {
     base44.entities.BigFiveProfile.list().then(d => {
       if (d[0]) {
@@ -85,21 +90,52 @@ function BigFiveSection() {
     });
   }, []);
 
-  const handleSave = async () => {
-    const data = { ...scores, qualites };
-    if (profile) await base44.entities.BigFiveProfile.update(profile.id, data);
-    else { const c = await base44.entities.BigFiveProfile.create(data); setProfile(c); }
+  // Persiste le profil Big Five (scores + qualités) en base.
+  const persist = async (nextQualites) => {
+    const cur = latest.current;
+    const payload = { ...cur.scores, qualites: nextQualites };
+    if (cur.profile) await base44.entities.BigFiveProfile.update(cur.profile.id, payload);
+    else { const c = await base44.entities.BigFiveProfile.create(payload); setProfile(c); }
     setSaved(true);
-    setTimeout(() => setSaved(false), 2000);
+    setTimeout(() => setSaved(false), 1500);
   };
 
+  // Curseur : mise à jour visuelle immédiate, sauvegarde différée (anti-spam API).
+  const handleScoreChange = (key, val) => {
+    setScores(prev => ({ ...prev, [key]: val }));
+    if (saveTimer.current) clearTimeout(saveTimer.current);
+    saveTimer.current = setTimeout(() => {
+      saveTimer.current = null;
+      persist(latest.current.qualites);
+    }, 500);
+  };
+
+  // Ajout / suppression de qualité : sauvegarde immédiate.
   const addQualite = () => {
     if (!newQualite.trim()) return;
-    setQualites([...qualites, { trait: newQualiteTrait, text: newQualite.trim() }]);
+    const next = [...latest.current.qualites, { trait: newQualiteTrait, text: newQualite.trim() }];
+    setQualites(next);
     setNewQualite("");
+    persist(next);
   };
 
-  const removeQualite = (i) => setQualites(qualites.filter((_, idx) => idx !== i));
+  const removeQualite = (i) => {
+    const next = latest.current.qualites.filter((_, idx) => idx !== i);
+    setQualites(next);
+    persist(next);
+  };
+
+  // Flush au démontage : aucune donnée perdue si l'utilisateur quitte la page
+  // juste après avoir ajusté un curseur (sauvegarde différée en cours).
+  useEffect(() => {
+    return () => {
+      if (saveTimer.current) {
+        clearTimeout(saveTimer.current);
+        saveTimer.current = null;
+        persist(latest.current.qualites);
+      }
+    };
+  }, []);
 
   // Radar SVG
   const cx = 130, cy = 130, r = 100;
@@ -209,7 +245,7 @@ function BigFiveSection() {
                 <span className="text-[#8d6e63]">{scores[d.key]}%</span>
               </div>
               <input type="range" min={0} max={100} value={scores[d.key]}
-                onChange={e => setScores({ ...scores, [d.key]: Number(e.target.value) })}
+                onChange={e => handleScoreChange(d.key, Number(e.target.value))}
                 className="w-full accent-green-500 h-1.5 rounded-full cursor-pointer" />
               <p className="text-[#a1887f] text-xs mt-0.5">{d.desc}</p>
             </div>
@@ -259,10 +295,11 @@ function BigFiveSection() {
         })}
       </div>
 
-      <Button onClick={handleSave} className="mt-4 w-full bg-green-800 hover:bg-green-700 text-white">
-        <Save className="w-4 h-4 mr-2" />
-        {saved ? "✓ Sauvegardé !" : "Sauvegarder mon profil"}
-      </Button>
+      {saved && (
+        <div className="mt-4 text-center text-xs font-medium text-green-700 transition-opacity">
+          ✓ Enregistré
+        </div>
+      )}
     </div>
   );
 }
