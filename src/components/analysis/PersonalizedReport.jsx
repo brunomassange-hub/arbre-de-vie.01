@@ -2,7 +2,90 @@ import React, { useState, useEffect } from "react";
 import { Loader2, RefreshCw, FileText, AlertCircle } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import { base44 } from "@/api/base44Client";
-import { getTagLabel, migrateNeedTags } from "@/lib/clinicalCategories";
+import { getTagLabel, migrateNeedTags, CLINICAL_LISTS, isGeneralTag, getListLabel } from "@/lib/clinicalCategories";
+
+// Listes cliniques détaillées dans le bilan (hors wound/need gérés via champs dédiés)
+const DETAIL_LIST_IDS = ["rel", "trauma", "conflict", "behavior"];
+
+// Produit un résumé structuré des catégories cliniques : pour chaque grande
+// catégorie sélectionnée, liste les sous-catégories précises cochées.
+function formatClinicalDetail(tags = []) {
+  const byList = {};
+  tags.forEach(tag => {
+    const [listId, itemId] = tag.split(":");
+    if (!DETAIL_LIST_IDS.includes(listId)) return;
+    (byList[listId] ||= { general: false, specifics: [] });
+    if (isGeneralTag(tag)) byList[listId].general = true;
+    else byList[listId].specifics.push(getTagLabel(tag));
+  });
+  const lines = [];
+  DETAIL_LIST_IDS.forEach(listId => {
+    const entry = byList[listId];
+    if (!entry) return;
+    const catLabel = getListLabel(listId);
+    const parts = [];
+    if (entry.specifics.length) parts.push(entry.specifics.join(", "));
+    if (entry.general) parts.push("(catégorie générale)");
+    lines.push(`  • ${catLabel}${parts.length ? ": " + parts.join(" — ") : ""}`);
+  });
+  return lines.length ? lines.join("\n") : "";
+}
+
+// Calcule les récurrences entre émotions, blessures de l'âme, besoins et les
+// sous-catégories cliniques, pour nourrir l'analyse fine du LLM.
+function buildRecurrenceSummary({ events = [], links = [], beliefs = [] }) {
+  const emoCount = {};
+  const woundCount = {};
+  const needCount = {};
+  const emoTrauma = {};
+  const needRel = {};
+
+  const addEmotion = (emo, clinicalTags = []) => {
+    if (!emo) return;
+    emoCount[emo] = (emoCount[emo] || 0) + 1;
+    const traumaSubs = (clinicalTags || [])
+      .filter(t => t.startsWith("trauma:") && !isGeneralTag(t))
+      .map(t => getTagLabel(t));
+    if (traumaSubs.length) (emoTrauma[emo] ||= []).push(...traumaSubs);
+  };
+  const addWound = (w) => { if (w) woundCount[w] = (woundCount[w] || 0) + 1; };
+  const addNeeds = (tags, clinicalTags = []) => {
+    const needs = migrateNeedTags(tags).map(t => getTagLabel(t));
+    needs.forEach(n => { needCount[n] = (needCount[n] || 0) + 1; });
+    const relSubs = (clinicalTags || [])
+      .filter(t => t.startsWith("rel:") && !isGeneralTag(t))
+      .map(t => getTagLabel(t));
+    if (needs.length && relSubs.length) needs.forEach(n => (needRel[n] ||= []).push(...relSubs));
+  };
+
+  events.forEach(ev => { addEmotion(ev.emotion, ev.clinical_tags); addWound(ev.wound_type); addNeeds(ev.need_tags, ev.clinical_tags); });
+  links.forEach(lk => { addEmotion(lk.emotion, lk.clinical_tags); addWound(lk.soul_wound); addNeeds(lk.need_tags, lk.clinical_tags); });
+  beliefs.forEach(b => { addEmotion(b.emotion, b.clinical_tags); addWound(b.soul_wound); addNeeds(b.need_tags, b.clinical_tags); });
+
+  const topSubs = (subs) => {
+    const c = {};
+    subs.forEach(s => c[s] = (c[s] || 0) + 1);
+    return Object.entries(c).sort((a, b) => b[1] - a[1]).slice(0, 3).map(([s, n]) => `${s} (${n}×)`).join(", ");
+  };
+
+  const lines = [];
+  const emoRec = Object.entries(emoCount).filter(([, c]) => c >= 2).sort((a, b) => b[1] - a[1]);
+  if (emoRec.length) lines.push(`Émotions récurrentes (≥2): ${emoRec.map(([e, c]) => `${e} (${c}×)`).join(", ")}`);
+  const woundRec = Object.entries(woundCount).filter(([, c]) => c >= 2).sort((a, b) => b[1] - a[1]);
+  if (woundRec.length) lines.push(`Blessures de l'âme récurrentes (≥2): ${woundRec.map(([w, c]) => `${w} (${c}×)`).join(", ")}`);
+  const needRec = Object.entries(needCount).filter(([, c]) => c >= 2).sort((a, b) => b[1] - a[1]);
+  if (needRec.length) lines.push(`Besoins troublés récurrents (≥2): ${needRec.map(([n, c]) => `${n} (${c}×)`).join(", ")}`);
+
+  const emoTraumaLines = Object.entries(emoTrauma)
+    .map(([emo, subs]) => `  - Émotion « ${emo} » associée à des traumatismes: ${topSubs(subs)}`);
+  if (emoTraumaLines.length) lines.push(`Croisements émotion × sous-catégorie de traumatisme:\n${emoTraumaLines.join("\n")}`);
+
+  const needRelLines = Object.entries(needRel)
+    .map(([n, subs]) => `  - Besoin « ${n} » associé à des difficultés relationnelles: ${topSubs(subs)}`);
+  if (needRelLines.length) lines.push(`Croisements besoin × difficulté relationnelle:\n${needRelLines.join("\n")}`);
+
+  return lines.join("\n");
+}
 
 export default function PersonalizedReport({
   events = [],
@@ -54,12 +137,12 @@ export default function PersonalizedReport({
     if (events.length > 0) {
       sections.push("--- ÉVÉNEMENTS DE VIE (Blessures) ---");
       events.forEach(ev => {
-        const tags = (ev.clinical_tags || []).map(t => getTagLabel(t)).filter(Boolean);
         const needs = migrateNeedTags(ev.need_tags).map(t => getTagLabel(t)).filter(Boolean);
-        sections.push(`• "${ev.title}" — émotion: ${ev.emotion || "?"}, blessure de l'âme: ${ev.wound_type || "?"}, âge: ${ev.age ?? "?"}`);
+        const clinical = formatClinicalDetail(ev.clinical_tags || []);
+        sections.push(`• "${ev.title}" — émotion: ${ev.emotion || "non précisée"}, blessure de l'âme: ${ev.wound_type || "non précisée"}, âge: ${ev.age ?? "?"}`);
         if (ev.description) sections.push(`  Description: ${ev.description}`);
-        if (tags.length) sections.push(`  Catégories cliniques: ${tags.join(", ")}`);
         if (needs.length) sections.push(`  Besoins troublés: ${needs.join(", ")}`);
+        if (clinical) sections.push(`  Catégorisation clinique:\n${clinical}`);
       });
       sections.push("");
     }
@@ -68,10 +151,12 @@ export default function PersonalizedReport({
     if (links.length > 0) {
       sections.push("--- RELATIONS (Racines) ---");
       links.forEach(lk => {
-        const tags = (lk.clinical_tags || []).map(t => getTagLabel(t)).filter(Boolean);
-        sections.push(`• ${lk.name} (${lk.type})`);
+        const needs = migrateNeedTags(lk.need_tags).map(t => getTagLabel(t)).filter(Boolean);
+        const clinical = formatClinicalDetail(lk.clinical_tags || []);
+        sections.push(`• ${lk.name} (${lk.type}) — émotion: ${lk.emotion || "non précisée"}, blessure de l'âme: ${lk.soul_wound || "non précisée"}`);
         if (lk.description) sections.push(`  Description: ${lk.description}`);
-        if (tags.length) sections.push(`  Catégories cliniques: ${tags.join(", ")}`);
+        if (needs.length) sections.push(`  Besoins troublés: ${needs.join(", ")}`);
+        if (clinical) sections.push(`  Catégorisation clinique:\n${clinical}`);
       });
       sections.push("");
     }
@@ -80,12 +165,22 @@ export default function PersonalizedReport({
     if (beliefs.length > 0) {
       sections.push("--- CROYANCES LIMITANTES (Branches) ---");
       beliefs.forEach(b => {
-        const tags = (b.clinical_tags || []).map(t => getTagLabel(t)).filter(Boolean);
-        sections.push(`• [${b.branch}] "${b.belief}"`);
+        const needs = migrateNeedTags(b.need_tags).map(t => getTagLabel(t)).filter(Boolean);
+        const clinical = formatClinicalDetail(b.clinical_tags || []);
+        sections.push(`• [${b.branch}] "${b.belief}" — émotion: ${b.emotion || "non précisée"}, blessure de l'âme: ${b.soul_wound || "non précisée"}`);
         if (b.origin) sections.push(`  Origine: ${b.origin}`);
         if (b.age != null) sections.push(`  Formée à: ${b.age} ans`);
-        if (tags.length) sections.push(`  Catégories cliniques: ${tags.join(", ")}`);
+        if (needs.length) sections.push(`  Besoins troublés: ${needs.join(", ")}`);
+        if (clinical) sections.push(`  Catégorisation clinique:\n${clinical}`);
       });
+      sections.push("");
+    }
+
+    // Synthèse des récurrences (émotions / blessures / besoins / sous-catégories cliniques)
+    const recurrence = buildRecurrenceSummary({ events, links, beliefs });
+    if (recurrence) {
+      sections.push("--- SYNTHÈSE DES RÉCURRENCES ---");
+      sections.push(recurrence);
       sections.push("");
     }
 
@@ -138,7 +233,7 @@ export default function PersonalizedReport({
     sections.push(`Tu es un accompagnant en développement personnel bienveillant. En te basant UNIQUEMENT sur les données ci-dessus, rédige un bilan personnalisé en français, structuré en 4 parties avec les titres suivants en markdown (## ...):
 
 ## Vue d'ensemble
-Synthèse des schémas récurrents que tu identifies en croisant les différentes données (blessures, émotions, relations, croyances, profil Big Five, style d'attachement, MBTI/Ennéagramme). Met en évidence les liens entre ces éléments.
+Synthèse des schémas récurrents que tu identifies en croisant TOUTES les données disponibles : émotions associées à chaque événement/relation/croyance, blessures de l'âme, besoins troublés, sous-catégories cliniques précises (Difficulté relationnelle, Traumatisme, Conflit psychique, Troubles du comportement), profil Big Five, style d'attachement, MBTI/Ennéagramme. Identifie notamment les récurrences croisées: une émotion récurrente associée à une sous-catégorie précise de traumatisme, un besoin troublé à répétition en lien avec un type de difficulté relationnelle, ou une blessure de l'âme qui revient dans plusieurs contexte. Appuie-toi sur la section « Synthèse des récurrences » fournie dans les données. Met en évidence les liens entre ces éléments.
 
 ## Zones de vigilance
 Les fragilités ou manques apparents (ex: patterns répétés de difficultés relationnelles combinés à une Nervosité élevée et un attachement anxieux). Formule avec bienveillance, sans jugement ni diagnostic clinique. N'utilise jamais de termes de pathologie psychiatrique.
@@ -153,7 +248,7 @@ Suggestions pratiques et actionnables, en lien avec les outils thérapeutiques d
 En te basant EXCLUSIVEMENT sur les croyances limitantes de l'utilisateur et leurs thèmes (branches: Physique, Social, Intellectuel, Émotionnel, Artistique, Spirituel), explore ce qui pourrait donner du sens à sa vie. Identifie les valeurs qui transparaissent à travers ses croyances (ce qu'il craint révèle ce qu'il valorise), et propose des pistes pour aligner sa vie avec un sens porteur. Formule avec bienveillance et sans jugement.
 
 Règles:
-- Sois précis et référence les vraies données de l'utilisateur (cite des événements, relations ou croyances spécifiques).
+- Sois précis et référence les vraies données de l'utilisateur (cite des événements, relations ou croyances spécifiques, et nomme explicitement les sous-catégories cliniques et les émotions/besoins/blessures concernés).
 - Sois chaleureux, respectueux, non jugeant.
 - Ne pose aucun diagnostic médical ou psychologique.
 - Si certaines données manquent, concentre-toi sur ce qui est disponible sans signaler le manque.
